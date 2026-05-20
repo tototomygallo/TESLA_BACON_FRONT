@@ -20,8 +20,6 @@ export interface ApiClient {
   // Trae las muestras que BACON informó como enviadas (estado=logistica).
   // En producción: el back hace proxy a la API de BACON.
   obtenerMuestrasEnviadasBacon(): Promise<BaconMuestra[]>;
-  obtenerBaconPendientes(): Promise<{ cantidad: number; codigos: string[] }>;
-  reintentarBaconPendientes(): Promise<{ exitosos: number; fallidos: number; total: number }>;
 
   // --- Muestras ---
   listarMuestras(): Promise<Muestra[]>;

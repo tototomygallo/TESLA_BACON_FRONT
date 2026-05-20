@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ControlPrevio } from '../components/ControlPrevio';
-import { generarEtiquetasPdf } from '../services/etiquetas';
 import type { Muestra, ResultadoIngreso } from '../types';
 
 interface Props {
@@ -56,22 +55,11 @@ export function ScannerPage({ muestras, onIngresar }: Props) {
       const resultado = await onIngresar(codigosEscaneados);
       setAlerta(resultado);
       setCodigosEscaneados([]);
-
-      // Generación automática de etiquetas (scope 2.4):
-      // "El PDF se genera automáticamente al aceptar la importación"
     } catch (e) {
       console.error(e);
     } finally {
       setEnviando(false);
       setTimeout(() => inputRef.current?.focus(), 0);
-    }
-  };
-
-  // Re-generar etiquetas del último lote (por si el usuario perdió el PDF)
-  const reimprimirUltimoLote = () => {
-    if (alerta && alerta.ingresadas.length > 0) {
-      const fecha = new Date().toISOString().slice(0, 10);
-      generarEtiquetasPdf(alerta.ingresadas, `etiquetas-lote-${fecha}`);
     }
   };
 
@@ -109,34 +97,23 @@ export function ScannerPage({ muestras, onIngresar }: Props) {
               </div>
               <div className="flex-1">
                 <div className="font-semibold text-slate-900">
-                  Se cargaron {alerta.ingresadas.length} muestra
+                  Se cargó {alerta.ingresadas.length} muestra
                   {alerta.ingresadas.length !== 1 ? 's' : ''}
                 </div>
                 {alerta.ingresadas.length > 0 && (
                   <>
                     <div className="text-sm text-slate-600 mt-1">
-                      Protocolos generados:
+                      TauKits ingresados:
                       <div className="mt-2 flex flex-wrap gap-1.5">
                         {alerta.ingresadas.map((m) => (
                           <span
-                            key={m.protocolo}
+                            key={m.codigoTauKit}
                             className="text-xs px-2 py-0.5 rounded bg-emerald-50 border border-emerald-200 text-emerald-800 font-mono font-semibold"
                           >
-                            {m.protocolo}
+                            {m.codigoTauKit}
                           </span>
                         ))}
                       </div>
-                    </div>
-                    <div className="mt-3 flex items-center gap-2 text-xs">
-                      <span className="text-slate-500">
-                        🏷️ Etiquetas generadas automáticamente.
-                      </span>
-                      <button
-                        onClick={reimprimirUltimoLote}
-                        className="text-emerald-700 hover:text-emerald-900 font-medium underline underline-offset-2"
-                      >
-                        Volver a descargar PDF
-                      </button>
                     </div>
                   </>
                 )}

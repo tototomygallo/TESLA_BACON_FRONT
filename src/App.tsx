@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { BaconPendientesBanner } from './components/BaconPendientesBanner';
 import { Topbar, type Vista } from './components/Topbar';
 import { useHistorial } from './hooks/useHistorial';
 import { useMuestras } from './hooks/useMuestras';
@@ -42,7 +41,6 @@ export default function App() {
         vista={vista}
         setVista={setVista}
       />
-      <BaconPendientesBanner />
       <main className="max-w-[1400px] mx-auto px-6 py-8">
         {cargandoMuestras && muestras.length === 0 ? (
           <div className="text-center py-20 text-slate-400 text-sm">

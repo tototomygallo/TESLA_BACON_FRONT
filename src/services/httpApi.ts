@@ -56,16 +56,6 @@ export const httpApi: ApiClient = {
     return request<BaconMuestra[]>('/bacon/muestras-enviadas');
   },
 
-  async obtenerBaconPendientes(): Promise<{ cantidad: number; codigos: string[] }> {
-    return request<{ cantidad: number; codigos: string[] }>('/bacon/pendientes');
-  },
-
-  async reintentarBaconPendientes(): Promise<{ exitosos: number; fallidos: number; total: number }> {
-    return request<{ exitosos: number; fallidos: number; total: number }>('/bacon/reintentar', {
-      method: 'POST',
-    });
-  },
-
   async listarMuestras(): Promise<Muestra[]> {
     return request<Muestra[]>('/muestras');
   },

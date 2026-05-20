@@ -9,7 +9,6 @@ import type {
 import { ApiError, type ApiClient } from './apiClient';
 import {
   BACON_DB,
-  HOY,
   MUESTRAS_INICIALES,
   USUARIOS_MOCK,
   construirMuestra,
@@ -22,6 +21,22 @@ let _historial: ResumenDiario[] = generarHistorialMock();
 
 const delay = <T>(value: T, ms = 50): Promise<T> =>
   new Promise((resolve) => setTimeout(() => resolve(value), ms));
+
+function fechaHoyLocal(): string {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function fechaHoraLocal(): string {
+  const d = new Date();
+  const fecha = fechaHoyLocal();
+  const horas = String(d.getHours()).padStart(2, '0');
+  const minutos = String(d.getMinutes()).padStart(2, '0');
+  return `${fecha} ${horas}:${minutos}`;
+}
 
 // Mock de la respuesta de BACON: simula lo que devuelve
 // GET /api/getSerialNumbers?estado=logistica
@@ -56,14 +71,6 @@ export const mockApi: ApiClient = {
     return delay([...BACON_ENVIADAS_MOCK], 200);
   },
 
-  async obtenerBaconPendientes(): Promise<{ cantidad: number; codigos: string[] }> {
-    return delay({ cantidad: 0, codigos: [] });
-  },
-
-  async reintentarBaconPendientes(): Promise<{ exitosos: number; fallidos: number; total: number }> {
-    return delay({ exitosos: 0, fallidos: 0, total: 0 });
-  },
-
   async listarMuestras(): Promise<Muestra[]> {
     return delay([..._muestras]);
   },
@@ -78,7 +85,7 @@ export const mockApi: ApiClient = {
       const codigo = c.trim().toUpperCase();
       if (tauKitsExistentes.has(codigo)) { duplicadas.push(codigo); continue; }
       if (!BACON_DB[codigo]) { rechazadas.push(codigo); continue; }
-      const nueva = construirMuestra(codigo, 'en_proceso');
+      const nueva = construirMuestra(codigo, 'recibido');
       if (nueva) {
         _muestras = [..._muestras, nueva];
         ingresadas.push(nueva);
@@ -87,21 +94,36 @@ export const mockApi: ApiClient = {
     }
 
     if (rechazadas.length > 0) {
-      const ahora = new Date().toISOString().slice(0, 16).replace('T', ' ');
+      const ahora = fechaHoraLocal();
+      const fechaHoy = fechaHoyLocal();
       const nuevasDiscrepancias = rechazadas.map((c) => ({
         codigo: c,
         fecha: ahora,
         motivo: 'No figura como enviado en BACON',
       }));
-      _historial = _historial.map((h) =>
-        h.fecha === HOY
-          ? {
-              ...h,
-              discrepancias: h.discrepancias + rechazadas.length,
-              rechazados: [...h.rechazados, ...nuevasDiscrepancias],
-            }
-          : h,
-      );
+      const existeResumenHoy = _historial.some((h) => h.fecha === fechaHoy);
+      _historial = existeResumenHoy
+        ? _historial.map((h) =>
+            h.fecha === fechaHoy
+              ? {
+                  ...h,
+                  discrepancias: h.discrepancias + rechazadas.length,
+                  rechazados: [...h.rechazados, ...nuevasDiscrepancias],
+                }
+              : h,
+          )
+        : [
+            ..._historial,
+            {
+              fecha: fechaHoy,
+              ingresadas: 0,
+              procesadas: 0,
+              finalizadas: 0,
+              pendientes: 0,
+              discrepancias: rechazadas.length,
+              rechazados: nuevasDiscrepancias,
+            },
+          ];
     }
 
     return delay({ ingresadas, rechazadas, duplicadas });

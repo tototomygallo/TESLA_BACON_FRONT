@@ -356,7 +356,9 @@ export function MuestrasPage({
                         )}
                         {m.estado === 'completado' && (
                           <button
-                            onClick={() => generarInformePdf(m)}
+                            onClick={async () => {
+                              await generarInformePdf(m);
+                            }}
                             className="text-xs px-2.5 py-1 rounded-md border border-slate-300 text-slate-700 hover:bg-slate-50 transition-colors font-medium"
                           >
                             Ver PDF

@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 import { MetricCard } from '../components/MetricCard';
-import { HOY } from '../mocks/data';
 import type { Muestra, ResumenDiario } from '../types';
 
 interface Props {
@@ -16,15 +15,24 @@ function formatearFecha(fecha: string): string {
   return `${dias[date.getDay()]} ${parseInt(d)} de ${meses[parseInt(m) - 1]} ${y}`;
 }
 
+function fechaHoyLocal(): string {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
 export function DashboardPage({ historial, muestras }: Props) {
-  const [fechaSeleccionada, setFechaSeleccionada] = useState(HOY);
+  const hoy = fechaHoyLocal();
+  const [fechaSeleccionada, setFechaSeleccionada] = useState(hoy);
   const [busquedaHistorial, setBusquedaHistorial] = useState('');
 
   const resumenHoy = useMemo<ResumenDiario>(() => {
-    if (fechaSeleccionada === HOY) {
+    if (fechaSeleccionada === hoy) {
       // Cálculo en vivo desde las muestras actuales (3 estados oficiales).
       const muestrasHoy = muestras.filter((m) =>
-        m.fechaIngreso.startsWith(HOY),
+        m.fechaIngreso.startsWith(hoy),
       );
       const ingresadas = muestrasHoy.length;
       // Procesadas = ya pasó del estado "Recibido" (carga de TXT completada).
@@ -41,11 +49,11 @@ export function DashboardPage({ historial, muestras }: Props) {
       const pendientes = muestrasHoy.filter(
         (m) => m.estado !== 'completado',
       ).length;
-      const historialHoy = historial.find((h) => h.fecha === HOY);
+      const historialHoy = historial.find((h) => h.fecha === hoy);
       const discrepancias = historialHoy?.discrepancias ?? 0;
       const rechazados = historialHoy?.rechazados ?? [];
       return {
-        fecha: HOY,
+        fecha: hoy,
         ingresadas,
         procesadas,
         finalizadas,
@@ -65,9 +73,9 @@ export function DashboardPage({ historial, muestras }: Props) {
         rechazados: [],
       }
     );
-  }, [fechaSeleccionada, historial, muestras]);
+  }, [fechaSeleccionada, historial, muestras, hoy]);
 
-  const esHoy = fechaSeleccionada === HOY;
+  const esHoy = fechaSeleccionada === hoy;
 
   const historialOrdenado = useMemo(() => {
     return [...historial]
@@ -100,13 +108,13 @@ export function DashboardPage({ historial, muestras }: Props) {
           <input
             type="date"
             value={fechaSeleccionada}
-            max={HOY}
+            max={hoy}
             onChange={(e) => setFechaSeleccionada(e.target.value)}
             className="px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
           />
           {!esHoy && (
             <button
-              onClick={() => setFechaSeleccionada(HOY)}
+              onClick={() => setFechaSeleccionada(hoy)}
               className="text-xs px-3 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 font-medium"
             >
               Hoy
@@ -290,7 +298,7 @@ export function DashboardPage({ historial, muestras }: Props) {
                 </tr>
               ) : (
                 historialOrdenado.map((h) => {
-                  const esHoyFila = h.fecha === HOY;
+                  const esHoyFila = h.fecha === hoy;
                   const esSeleccionada = h.fecha === fechaSeleccionada;
                   return (
                     <tr
