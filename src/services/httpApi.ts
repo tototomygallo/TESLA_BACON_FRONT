@@ -27,15 +27,28 @@ async function request<T>(
     throw new ApiError('No se pudo conectar al servidor', 'NETWORK');
   }
 
-  if (!response.ok) {
-    if (response.status === 401)
-      throw new ApiError('Usuario o contraseña incorrectos', 'UNAUTHORIZED');
-    if (response.status === 404)
-      throw new ApiError('Recurso no encontrado', 'NOT_FOUND');
-    if (response.status === 422)
-      throw new ApiError('Datos inválidos', 'VALIDATION');
-    throw new ApiError(`Error ${response.status}`, 'UNKNOWN');
-  }
+if (!response.ok) {
+  let detail = `Error ${response.status}`;
+
+  try {
+    const data = await response.json();
+    detail = data.detail || detail;
+  } catch {}
+
+  if (response.status === 401)
+    throw new ApiError(detail, 'UNAUTHORIZED');
+
+  if (response.status === 403)
+    throw new ApiError(detail, 'FORBIDDEN');
+
+  if (response.status === 404)
+    throw new ApiError(detail, 'NOT_FOUND');
+
+  if (response.status === 422)
+    throw new ApiError(detail, 'VALIDATION');
+
+  throw new ApiError(detail, 'UNKNOWN');
+}
 
   return response.json() as Promise<T>;
 }

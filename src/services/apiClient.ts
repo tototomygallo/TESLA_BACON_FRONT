@@ -53,6 +53,7 @@ export class ApiError extends Error {
     public readonly code:
       | 'NOT_FOUND'
       | 'UNAUTHORIZED'
+      | 'FORBIDDEN'
       | 'NETWORK'
       | 'VALIDATION'
       | 'UNKNOWN',
