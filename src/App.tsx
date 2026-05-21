@@ -34,14 +34,14 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans">
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
       <Topbar
         usuario={usuario}
         onLogout={() => setUsuario(null)}
         vista={vista}
         setVista={setVista}
       />
-      <main className="max-w-[1400px] mx-auto px-6 py-8">
+      <main className="max-w-[1400px] mx-auto px-6 py-8 lg:py-10">
         {cargandoMuestras && muestras.length === 0 ? (
           <div className="text-center py-20 text-slate-400 text-sm">
             Cargando datos…

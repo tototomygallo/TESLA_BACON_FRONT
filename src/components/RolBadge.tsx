@@ -8,7 +8,7 @@ const labels: Record<Rol, string> = {
 
 export function RolBadge({ rol }: { rol: Rol }) {
   return (
-    <span className="text-xs px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-medium">
+    <span className="text-xs px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-semibold ring-1 ring-slate-200">
       {labels[rol]}
     </span>
   );

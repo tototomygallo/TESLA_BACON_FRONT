@@ -23,10 +23,52 @@ function fechaHoyLocal(): string {
   return `${y}-${m}-${day}`;
 }
 
+function resumenDesdeMuestras(
+  fecha: string,
+  muestras: Muestra[],
+  historial?: ResumenDiario,
+): ResumenDiario {
+  const muestrasFecha = muestras.filter((m) => m.fechaIngreso.startsWith(fecha));
+  const ingresadas = muestrasFecha.length;
+  const procesadas = muestrasFecha.filter(
+    (m) =>
+      m.estado === 'en_proceso' ||
+      m.estado === 'en_validacion' ||
+      m.estado === 'completado',
+  ).length;
+  const finalizadas = muestrasFecha.filter((m) => m.estado === 'completado').length;
+  const pendientes = muestrasFecha.filter((m) => m.estado !== 'completado').length;
+
+  if (ingresadas === 0 && historial) return historial;
+
+  return {
+    fecha,
+    ingresadas,
+    procesadas,
+    finalizadas,
+    pendientes,
+    discrepancias: historial?.discrepancias ?? 0,
+    rechazados: historial?.rechazados ?? [],
+  };
+}
+
 export function DashboardPage({ historial, muestras }: Props) {
   const hoy = fechaHoyLocal();
   const [fechaSeleccionada, setFechaSeleccionada] = useState(hoy);
   const [busquedaHistorial, setBusquedaHistorial] = useState('');
+
+  const resumenesDiarios = useMemo<ResumenDiario[]>(() => {
+    const historialPorFecha = new Map(historial.map((h) => [h.fecha, h]));
+    const fechas = new Set<string>([
+      ...historial.map((h) => h.fecha),
+      ...muestras.map((m) => m.fechaIngreso.slice(0, 10)),
+      hoy,
+    ]);
+
+    return [...fechas].map((fecha) =>
+      resumenDesdeMuestras(fecha, muestras, historialPorFecha.get(fecha)),
+    );
+  }, [historial, muestras, hoy]);
 
   const resumenHoy = useMemo<ResumenDiario>(() => {
     if (fechaSeleccionada === hoy) {
@@ -63,7 +105,7 @@ export function DashboardPage({ historial, muestras }: Props) {
       };
     }
     return (
-      historial.find((h) => h.fecha === fechaSeleccionada) ?? {
+      resumenesDiarios.find((h) => h.fecha === fechaSeleccionada) ?? {
         fecha: fechaSeleccionada,
         ingresadas: 0,
         procesadas: 0,
@@ -73,17 +115,17 @@ export function DashboardPage({ historial, muestras }: Props) {
         rechazados: [],
       }
     );
-  }, [fechaSeleccionada, historial, muestras, hoy]);
+  }, [fechaSeleccionada, historial, muestras, hoy, resumenesDiarios]);
 
   const esHoy = fechaSeleccionada === hoy;
 
   const historialOrdenado = useMemo(() => {
-    return [...historial]
+    return [...resumenesDiarios]
       .filter(
         (h) => !busquedaHistorial || h.fecha.includes(busquedaHistorial),
       )
       .sort((a, b) => b.fecha.localeCompare(a.fecha));
-  }, [historial, busquedaHistorial]);
+  }, [resumenesDiarios, busquedaHistorial]);
 
   return (
     <div className="space-y-6">
