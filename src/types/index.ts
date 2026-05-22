@@ -40,7 +40,7 @@ export interface Paciente {
 
 // Sucursal del laboratorio (para generar el protocolo interno).
 export interface Sucursal {
-  codigo: string; // 2 letras, ej. 'TM'
+  codigo: string;
   nombre: string; // ej. 'Tucumán - Mate de Luna'
 }
 
@@ -139,16 +139,6 @@ export interface ResultadoCargaTxt {
   controles: number;
   // Errores de parseo (líneas mal formateadas).
   erroresParseo: number;
-}
-
-// Helper para construir el protocolo.
-export function generarProtocolo(
-  sucursal: Sucursal,
-  estudio: Estudio,
-  consecutivo: number,
-): string {
-  const num = String(consecutivo).padStart(8, '0');
-  return `${sucursal.codigo}-${estudio.codigo}-${num}`;
 }
 
 // ============================================

@@ -1,5 +1,4 @@
 import {
-  generarProtocolo,
   type Estudio,
   type Muestra,
   type Paciente,
@@ -17,17 +16,14 @@ export const USUARIOS_MOCK: Record<string, Usuario> = {
   adm2: { id: 'adm2', nombre: 'Roberto Silva', rol: 'admin' },
 };
 
-export const SUCURSALES: Record<string, Sucursal> = {
-  TM: { codigo: 'TM', nombre: 'Tucumán - Mate de Luna' },
+const MOCK_SUCURSAL: Sucursal = {
+  codigo: 'mock-sucursal',
+  nombre: 'Sucursal mock',
 };
 
-export const ESTUDIOS: Record<string, Estudio> = {
-  HC: { codigo: 'HC', nombre: 'Hemograma Completo' },
-  PT: { codigo: 'PT', nombre: 'Perfil Tiroideo' },
-  GL: { codigo: 'GL', nombre: 'Glucemia' },
-  HP: { codigo: 'HP', nombre: 'Hepatograma' },
-  CG: { codigo: 'CG', nombre: 'Coagulograma' },
-  HU: { codigo: 'HU', nombre: 'Helicobacter Pylori (Urea-13C)' },
+const MOCK_ESTUDIO: Estudio = {
+  codigo: 'mock-estudio',
+  nombre: 'Helicobacter Pylori (Urea-13C)',
 };
 
 export const BACON_DB: Record<
@@ -36,48 +32,37 @@ export const BACON_DB: Record<
 > = {
   'TK-2026-0001': {
     paciente: { nombre: 'Roberto', apellido: 'González', dni: '28456789', fechaTomaMuestra: '2026-05-12' },
-    estudio: ESTUDIOS.HU,
+    estudio: MOCK_ESTUDIO,
   },
   'TK-2026-0002': {
     paciente: { nombre: 'Lucía', apellido: 'Fernández', dni: '32145678', fechaTomaMuestra: '2026-05-12' },
-    estudio: ESTUDIOS.HU,
+    estudio: MOCK_ESTUDIO,
   },
   'TK-2026-0003': {
     paciente: { nombre: 'Martín', apellido: 'Rodríguez', dni: '35789012', fechaTomaMuestra: '2026-05-13' },
-    estudio: ESTUDIOS.HU,
+    estudio: MOCK_ESTUDIO,
   },
   'TK-2026-0004': {
     paciente: { nombre: 'Carmen', apellido: 'López', dni: '29876543', fechaTomaMuestra: '2026-05-13' },
-    estudio: ESTUDIOS.HU,
+    estudio: MOCK_ESTUDIO,
   },
   'TK-2026-0005': {
     paciente: { nombre: 'Diego', apellido: 'Martínez', dni: '31234567', fechaTomaMuestra: '2026-05-13' },
-    estudio: ESTUDIOS.HU,
+    estudio: MOCK_ESTUDIO,
   },
   'TK-2026-0006': {
     paciente: { nombre: 'Sofía', apellido: 'Ramírez', dni: '33456789', fechaTomaMuestra: '2026-05-13' },
-    estudio: ESTUDIOS.HU,
+    estudio: MOCK_ESTUDIO,
   },
   'TK-2026-0007': {
     paciente: { nombre: 'Pablo', apellido: 'Acosta', dni: '27890123', fechaTomaMuestra: '2026-05-13' },
-    estudio: ESTUDIOS.HU,
+    estudio: MOCK_ESTUDIO,
   },
   'TK-2026-0008': {
     paciente: { nombre: 'Valeria', apellido: 'Suárez', dni: '34567891', fechaTomaMuestra: '2026-05-13' },
-    estudio: ESTUDIOS.HU,
+    estudio: MOCK_ESTUDIO,
   },
 };
-
-export const SUCURSAL_ACTUAL = SUCURSALES.TM;
-
-let _consecutivos: Record<string, number> = {
-  HC: 4521, PT: 3187, GL: 5012, HP: 2334, CG: 1876, HU: 4520,
-};
-
-export function siguienteConsecutivo(codigoEstudio: string): number {
-  _consecutivos[codigoEstudio] = (_consecutivos[codigoEstudio] ?? 0) + 1;
-  return _consecutivos[codigoEstudio];
-}
 
 export function construirMuestra(
   codigoTauKit: string,
@@ -88,19 +73,12 @@ export function construirMuestra(
 ): Muestra | null {
   const datos = BACON_DB[codigoTauKit];
   if (!datos) return null;
-  const protocolo =
-    opciones.protocolo ??
-    generarProtocolo(
-      SUCURSAL_ACTUAL,
-      datos.estudio,
-      siguienteConsecutivo(datos.estudio.codigo),
-    );
   return {
-    protocolo,
+    protocolo: opciones.protocolo ?? codigoTauKit,
     codigoTauKit,
     paciente: datos.paciente,
     estudio: datos.estudio,
-    sucursal: SUCURSAL_ACTUAL,
+    sucursal: MOCK_SUCURSAL,
     estado,
     fechaIngreso:
       opciones.fechaIngreso ??
@@ -113,12 +91,12 @@ export function construirMuestra(
 
 export const HOY = '2026-05-13';
 
-// Muestras iniciales con protocolos REALES formato TM-HU-NNNNNNNN.
+// Muestras iniciales mock. En modo real el protocolo siempre viene del backend.
 // Matchean con el TXT de ejemplo (public/sample-helifan.txt).
 export const MUESTRAS_INICIALES: Muestra[] = [
   // Ya completada → el TXT debe ignorarla
   construirMuestra('TK-2026-0001', 'completado', {
-    protocolo: 'TM-HU-00004521',
+    protocolo: 'TK-2026-0001',
     fechaIngreso: `${HOY} 08:14`,
     resultados: {
       basalCO2: 1.69228, postCO2: 1.66703, basalDelta: -25.96, postDelta: -26.15,
@@ -127,7 +105,7 @@ export const MUESTRAS_INICIALES: Muestra[] = [
   })!,
   // En 'en_validacion' con resultados → lista para validar en el modal
   construirMuestra('TK-2026-0002', 'en_validacion', {
-    protocolo: 'TM-HU-00004522',
+    protocolo: 'TK-2026-0002',
     fechaIngreso: `${HOY} 08:22`,
     resultados: {
       basalCO2: 2.09735, postCO2: 1.84998, basalDelta: -23.77, postDelta: 4.17,
@@ -135,19 +113,19 @@ export const MUESTRAS_INICIALES: Muestra[] = [
     },
   })!,
   // En 'recibido' → esperando carga de TXT
-  construirMuestra('TK-2026-0003', 'recibido', { protocolo: 'TM-HU-00004523', fechaIngreso: `${HOY} 08:35` })!,
-  construirMuestra('TK-2026-0004', 'recibido', { protocolo: 'TM-HU-00004524', fechaIngreso: `${HOY} 09:01` })!,
+  construirMuestra('TK-2026-0003', 'recibido', { fechaIngreso: `${HOY} 08:35` })!,
+  construirMuestra('TK-2026-0004', 'recibido', { fechaIngreso: `${HOY} 09:01` })!,
   // Con 1 error previo del HeliFan → en proceso, esperando reintento
   construirMuestra('TK-2026-0005', 'en_proceso', {
-    protocolo: 'TM-HU-00004525',
+    protocolo: 'TK-2026-0005',
     fechaIngreso: `${HOY} 09:15`,
     tieneError: true,
     intentosFallidos: 1,
   })!,
-  construirMuestra('TK-2026-0006', 'recibido', { protocolo: 'TM-HU-00004526', fechaIngreso: `${HOY} 09:30` })!,
-  construirMuestra('TK-2026-0007', 'recibido', { protocolo: 'TM-HU-00004527', fechaIngreso: `${HOY} 09:45` })!,
+  construirMuestra('TK-2026-0006', 'recibido', { fechaIngreso: `${HOY} 09:30` })!,
+  construirMuestra('TK-2026-0007', 'recibido', { fechaIngreso: `${HOY} 09:45` })!,
   // Su protocolo NO está en el TXT → queda en 'recibido' sin resultados
-  construirMuestra('TK-2026-0008', 'recibido', { protocolo: 'TM-HU-00004528', fechaIngreso: `${HOY} 10:00` })!,
+  construirMuestra('TK-2026-0008', 'recibido', { fechaIngreso: `${HOY} 10:00` })!,
 ];
 
 export function generarHistorialMock(): ResumenDiario[] {
