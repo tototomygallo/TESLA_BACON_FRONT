@@ -5,6 +5,7 @@ import type {
   ResultadoIngreso,
   ResumenDiario,
   Usuario,
+  UsuarioConfiguracion,
 } from '../types';
 
 // ============================================
@@ -15,6 +16,35 @@ import type {
 export interface ApiClient {
   // --- Autenticación ---
   login(userId: string, password: string): Promise<Usuario>;
+  cambiarPasswordActual(
+    usuarioId: string,
+    actual: string,
+    nueva: string,
+  ): Promise<void>;
+  listarUsuariosConfiguracion(usuarioId: string): Promise<UsuarioConfiguracion[]>;
+  crearUsuarioConfiguracion(
+    usuarioId: string,
+    usuario: Pick<
+      UsuarioConfiguracion,
+      'usuario' | 'email' | 'nombre' | 'rol' | 'activo'
+    > & { password: string },
+  ): Promise<UsuarioConfiguracion>;
+  actualizarUsuarioConfiguracion(
+    usuarioId: string,
+    usuario: Pick<
+      UsuarioConfiguracion,
+      'id' | 'usuario' | 'email' | 'nombre' | 'rol' | 'activo'
+    >,
+  ): Promise<UsuarioConfiguracion>;
+  resetPasswordUsuarioConfiguracion(
+    usuarioId: string,
+    usuarioEditadoId: string,
+    passwordNueva: string,
+  ): Promise<void>;
+  eliminarUsuarioConfiguracion(
+    usuarioId: string,
+    usuarioEditadoId: string,
+  ): Promise<void>;
 
   // --- BACON: control previo (scope 2.2) ---
   // Trae las muestras que BACON informó como enviadas (estado=logistica).

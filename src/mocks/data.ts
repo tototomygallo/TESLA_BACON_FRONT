@@ -19,8 +19,6 @@ export const USUARIOS_MOCK: Record<string, Usuario> = {
 
 export const SUCURSALES: Record<string, Sucursal> = {
   TM: { codigo: 'TM', nombre: 'Tucumán - Mate de Luna' },
-  TC: { codigo: 'TC', nombre: 'Tucumán - Centro' },
-  YR: { codigo: 'YR', nombre: 'Yerba Buena' },
 };
 
 export const ESTUDIOS: Record<string, Estudio> = {

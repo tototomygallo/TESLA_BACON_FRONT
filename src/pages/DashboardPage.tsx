@@ -306,26 +306,26 @@ export function DashboardPage({ historial, muestras }: Props) {
         <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-slate-200 bg-slate-50/50">
-                <th className="text-left text-xs font-semibold text-slate-600 uppercase tracking-wider px-4 py-3">
+              <tr className="border-b border-slate-900 bg-slate-950">
+                <th className="text-left text-xs font-semibold text-slate-200 uppercase tracking-wider px-4 py-3">
                   Fecha
                 </th>
-                <th className="text-right text-xs font-semibold text-slate-600 uppercase tracking-wider px-4 py-3">
+                <th className="text-right text-xs font-semibold text-slate-200 uppercase tracking-wider px-4 py-3">
                   Ingresadas
                 </th>
-                <th className="text-right text-xs font-semibold text-slate-600 uppercase tracking-wider px-4 py-3">
+                <th className="text-right text-xs font-semibold text-slate-200 uppercase tracking-wider px-4 py-3">
                   Procesadas
                 </th>
-                <th className="text-right text-xs font-semibold text-slate-600 uppercase tracking-wider px-4 py-3">
+                <th className="text-right text-xs font-semibold text-slate-200 uppercase tracking-wider px-4 py-3">
                   Finalizadas
                 </th>
-                <th className="text-right text-xs font-semibold text-slate-600 uppercase tracking-wider px-4 py-3">
+                <th className="text-right text-xs font-semibold text-slate-200 uppercase tracking-wider px-4 py-3">
                   Pendientes
                 </th>
-                <th className="text-right text-xs font-semibold text-slate-600 uppercase tracking-wider px-4 py-3">
+                <th className="text-right text-xs font-semibold text-slate-200 uppercase tracking-wider px-4 py-3">
                   Discrepancias
                 </th>
-                <th className="text-right text-xs font-semibold text-slate-600 uppercase tracking-wider px-4 py-3"></th>
+                <th className="text-right text-xs font-semibold text-slate-200 uppercase tracking-wider px-4 py-3"></th>
               </tr>
             </thead>
             <tbody>

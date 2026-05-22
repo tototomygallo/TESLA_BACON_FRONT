@@ -86,10 +86,10 @@ export function ControlPrevio({ tauKitsIngresados }: Props) {
           </div>
           <div>
             <div className="text-sm font-semibold text-slate-900">
-              Control previo — Muestras enviadas por BACON
+              Control previo
             </div>
             <div className="text-xs text-slate-500">
-              Verificá que lo enviado coincida con lo recibido físicamente antes de escanear.
+              Muestras enviadas por BACON que aún no fueron ingresadas al sistema
             </div>
           </div>
         </div>
@@ -129,24 +129,6 @@ export function ControlPrevio({ tauKitsIngresados }: Props) {
         </div>
       ) : (
         <>
-          {/* Métricas */}
-          <div className="grid grid-cols-3 gap-3 px-5 py-4 border-b border-slate-100 bg-slate-50/50">
-            <div className="text-center">
-              <div className="text-2xl font-semibold text-slate-900 font-mono">{totalEnviadas}</div>
-              <div className="text-[10px] uppercase tracking-wider text-slate-500 font-medium">Enviadas</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-semibold text-emerald-700 font-mono">{yaIngresadas}</div>
-              <div className="text-[10px] uppercase tracking-wider text-slate-500 font-medium">Ya ingresadas</div>
-            </div>
-            <div className="text-center">
-              <div className={`text-2xl font-semibold font-mono ${pendientes > 0 ? 'text-amber-600' : 'text-slate-300'}`}>
-                {pendientes}
-              </div>
-              <div className="text-[10px] uppercase tracking-wider text-slate-500 font-medium">Pendientes</div>
-            </div>
-          </div>
-
           {/* Tabla de muestras */}
           <div className="max-h-56 overflow-y-auto">
             <table className="w-full">

@@ -1,7 +1,13 @@
+import teslaLogo from '../assets/lab-tesla-logo.png';
 import type { Usuario } from '../types';
 import { RolBadge } from './RolBadge';
 
-export type Vista = 'resumen' | 'muestras' | 'scanner' | 'carga_txt';
+export type Vista =
+  | 'resumen'
+  | 'muestras'
+  | 'scanner'
+  | 'carga_txt'
+  | 'configuracion';
 
 interface Props {
   usuario: Usuario;
@@ -15,25 +21,20 @@ const tabs: Array<{ id: Vista; label: string }> = [
   { id: 'muestras', label: 'Muestras' },
   { id: 'scanner', label: 'Ingreso por scanner' },
   { id: 'carga_txt', label: 'Carga de resultados' },
+  { id: 'configuracion', label: 'Configuración' },
 ];
 
 export function Topbar({ usuario, vista, setVista, onLogout }: Props) {
   return (
     <header className="bg-white/90 backdrop-blur-xl border-b border-slate-200/80 sticky top-0 z-10 shadow-[0_1px_0_rgba(15,23,42,0.04),0_18px_40px_rgba(15,23,42,0.05)]">
-      <div className="max-w-[1400px] mx-auto px-6 flex items-center justify-between min-h-[76px] gap-6">
+      <div className="w-full pl-4 pr-4 sm:pl-6 sm:pr-6 lg:pl-14 lg:pr-8 flex items-center justify-between min-h-[76px] gap-6">
         <div className="flex items-center gap-7 min-w-0">
-          <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-slate-950 flex items-center justify-center shadow-lg shadow-slate-900/15 ring-1 ring-white/10">
-              <span className="text-emerald-300 font-bold text-lg font-mono">τ</span>
-            </div>
-            <div>
-              <div className="font-semibold text-slate-950 tracking-tight leading-tight">
-                TauKits
-              </div>
-              <div className="text-[10px] uppercase tracking-[0.18em] text-slate-400 font-semibold">
-                TESLA BACON
-              </div>
-            </div>
+          <div className="h-14 w-52 rounded-lg bg-white flex items-center justify-start">
+            <img
+              src={teslaLogo}
+              alt="Tesla Laboratorio"
+              className="h-full w-full object-contain object-left"
+            />
           </div>
 
           <nav className="flex items-center gap-1.5 rounded-xl bg-slate-100/80 p-1 border border-slate-200/80 shadow-inner overflow-x-auto">

@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react';
 import { EstadoBadge, ErrorBadge } from '../components/EstadoBadge';
 import { ValidacionModal } from '../components/ValidacionModal';
 import { generarEtiquetasMuestra } from '../services/etiquetas';
-import { generarInformePdf } from '../services/informe';
 import { api } from '../services';
 import type { Estado, Muestra, Usuario } from '../types';
 
@@ -225,29 +224,29 @@ export function MuestrasPage({
       <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-slate-200 bg-slate-50/50">
-              <th className="text-left text-xs font-semibold text-slate-600 uppercase tracking-wider px-4 py-3">
+            <tr className="border-b border-slate-900 bg-slate-950">
+              <th className="text-left text-xs font-semibold text-slate-200 uppercase tracking-wider px-4 py-3">
                 Protocolo
               </th>
-              <th className="text-left text-xs font-semibold text-slate-600 uppercase tracking-wider px-4 py-3">
+              <th className="text-left text-xs font-semibold text-slate-200 uppercase tracking-wider px-4 py-3">
                 TauKit
               </th>
-              <th className="text-left text-xs font-semibold text-slate-600 uppercase tracking-wider px-4 py-3">
+              <th className="text-left text-xs font-semibold text-slate-200 uppercase tracking-wider px-4 py-3">
                 Paciente
               </th>
-              <th className="text-left text-xs font-semibold text-slate-600 uppercase tracking-wider px-4 py-3">
+              <th className="text-left text-xs font-semibold text-slate-200 uppercase tracking-wider px-4 py-3">
                 Estudio
               </th>
-              <th className="text-left text-xs font-semibold text-slate-600 uppercase tracking-wider px-4 py-3">
+              <th className="text-left text-xs font-semibold text-slate-200 uppercase tracking-wider px-4 py-3">
                 Estado
               </th>
-              <th className="text-right text-xs font-semibold text-slate-600 uppercase tracking-wider px-4 py-3">
+              <th className="text-right text-xs font-semibold text-slate-200 uppercase tracking-wider px-4 py-3">
                 Δ ‰
               </th>
-              <th className="text-left text-xs font-semibold text-slate-600 uppercase tracking-wider px-4 py-3">
+              <th className="text-left text-xs font-semibold text-slate-200 uppercase tracking-wider px-4 py-3">
                 Ingreso
               </th>
-              <th className="text-right text-xs font-semibold text-slate-600 uppercase tracking-wider px-4 py-3">
+              <th className="text-right text-xs font-semibold text-slate-200 uppercase tracking-wider px-4 py-3">
                 Acciones
               </th>
             </tr>
@@ -354,10 +353,11 @@ export function MuestrasPage({
                             Validar
                           </button>
                         )}
-                        {m.estado === 'completado' && (
+                        {(m.estado === 'completado' || m.estado === 'anulado') && (
                           <button
-                            onClick={async () => {
-                              await generarInformePdf(m);
+                            onClick={() => {
+                              const base = import.meta.env.VITE_API_BASE_URL ?? '/api';
+                              window.open(`${base}/muestras/${m.protocolo}/pdf`, '_blank');
                             }}
                             className="text-xs px-2.5 py-1 rounded-md border border-slate-300 text-slate-700 hover:bg-slate-50 transition-colors font-medium"
                           >

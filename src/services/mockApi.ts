@@ -5,6 +5,7 @@ import type {
   ResultadoIngreso,
   ResumenDiario,
   Usuario,
+  UsuarioConfiguracion,
 } from '../types';
 import { ApiError, type ApiClient } from './apiClient';
 import {
@@ -18,6 +19,11 @@ import { parsearTxt } from './txtParser';
 
 let _muestras: Muestra[] = [...MUESTRAS_INICIALES];
 let _historial: ResumenDiario[] = generarHistorialMock();
+let _usuariosConfig: UsuarioConfiguracion[] = [
+  { id: 'tec1', usuario: 'tec1', email: 'tec1@diagnosticotesla.com', nombre: 'Técnico 1', rol: 'tecnico', activo: true },
+  { id: 'bio1', usuario: 'bio1', email: 'bio1@diagnosticotesla.com', nombre: 'Bioquímico 1', rol: 'bioquimico', activo: true },
+  { id: 'adm1', usuario: 'adm1', email: 'adm1@diagnosticotesla.com', nombre: 'Admin 1', rol: 'admin', activo: true },
+];
 
 const delay = <T>(value: T, ms = 50): Promise<T> =>
   new Promise((resolve) => setTimeout(() => resolve(value), ms));
@@ -62,6 +68,109 @@ export const mockApi: ApiClient = {
     const usuario = USUARIOS_MOCK[userId.trim().toLowerCase()];
     if (!usuario) throw new ApiError('Usuario no encontrado', 'NOT_FOUND');
     return delay(usuario);
+  },
+
+  async cambiarPasswordActual(): Promise<void> {
+    return delay(undefined);
+  },
+
+  async listarUsuariosConfiguracion(usuarioId: string): Promise<UsuarioConfiguracion[]> {
+    const usuario = USUARIOS_MOCK[usuarioId.trim().toLowerCase()];
+    if (usuario?.rol !== 'admin') {
+      throw new ApiError('No autorizado', 'FORBIDDEN');
+    }
+    return delay([..._usuariosConfig]);
+  },
+
+  async crearUsuarioConfiguracion(
+    usuarioId: string,
+    nuevo: Pick<
+      UsuarioConfiguracion,
+      'usuario' | 'email' | 'nombre' | 'rol' | 'activo'
+    > & { password: string },
+  ): Promise<UsuarioConfiguracion> {
+    const usuario = USUARIOS_MOCK[usuarioId.trim().toLowerCase()];
+    if (usuario?.rol !== 'admin') {
+      throw new ApiError('No autorizado', 'FORBIDDEN');
+    }
+    if (!nuevo.password.trim()) {
+      throw new ApiError('La contraseÃ±a es requerida', 'VALIDATION');
+    }
+
+    const creado: UsuarioConfiguracion = {
+      id: crypto.randomUUID(),
+      usuario: nuevo.usuario,
+      email: nuevo.email,
+      nombre: nuevo.nombre,
+      rol: nuevo.rol,
+      activo: nuevo.activo,
+    };
+    _usuariosConfig = [..._usuariosConfig, creado];
+    return delay(creado);
+  },
+
+  async actualizarUsuarioConfiguracion(
+    usuarioId: string,
+    cambios: Pick<
+      UsuarioConfiguracion,
+      'id' | 'usuario' | 'email' | 'nombre' | 'rol' | 'activo'
+    >,
+  ): Promise<UsuarioConfiguracion> {
+    const usuario = USUARIOS_MOCK[usuarioId.trim().toLowerCase()];
+    if (usuario?.rol !== 'admin') {
+      throw new ApiError('No autorizado', 'FORBIDDEN');
+    }
+
+    const existente = _usuariosConfig.find((u) => u.id === cambios.id);
+    if (!existente) {
+      throw new ApiError('Usuario no encontrado', 'NOT_FOUND');
+    }
+
+    const actualizado: UsuarioConfiguracion = {
+      ...existente,
+      usuario: cambios.usuario,
+      email: cambios.email,
+      nombre: cambios.nombre,
+      rol: cambios.rol,
+      activo: cambios.activo,
+    };
+    _usuariosConfig = _usuariosConfig.map((u) =>
+      u.id === cambios.id ? actualizado : u,
+    );
+    return delay(actualizado);
+  },
+
+  async resetPasswordUsuarioConfiguracion(
+    usuarioId: string,
+    usuarioEditadoId: string,
+    passwordNueva: string,
+  ): Promise<void> {
+    const usuario = USUARIOS_MOCK[usuarioId.trim().toLowerCase()];
+    if (usuario?.rol !== 'admin') {
+      throw new ApiError('No autorizado', 'FORBIDDEN');
+    }
+    if (!_usuariosConfig.some((u) => u.id === usuarioEditadoId)) {
+      throw new ApiError('Usuario no encontrado', 'NOT_FOUND');
+    }
+    if (!passwordNueva.trim()) {
+      throw new ApiError('La nueva contraseÃ±a es requerida', 'VALIDATION');
+    }
+    return delay(undefined);
+  },
+
+  async eliminarUsuarioConfiguracion(
+    usuarioId: string,
+    usuarioEditadoId: string,
+  ): Promise<void> {
+    const usuario = USUARIOS_MOCK[usuarioId.trim().toLowerCase()];
+    if (usuario?.rol !== 'admin') {
+      throw new ApiError('No autorizado', 'FORBIDDEN');
+    }
+    if (!_usuariosConfig.some((u) => u.id === usuarioEditadoId)) {
+      throw new ApiError('Usuario no encontrado', 'NOT_FOUND');
+    }
+    _usuariosConfig = _usuariosConfig.filter((u) => u.id !== usuarioEditadoId);
+    return delay(undefined);
   },
 
   // ============================================

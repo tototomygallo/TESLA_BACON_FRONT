@@ -17,6 +17,16 @@ export interface Usuario {
   id: string;
   nombre: string;
   rol: Rol;
+  passwordExpired?: boolean;
+}
+
+export interface UsuarioConfiguracion {
+  id: string;
+  usuario: string;
+  email: string;
+  nombre?: string;
+  rol: Rol | string;
+  activo: boolean;
 }
 
 // Datos del paciente que devuelve la API de BACON al consultar

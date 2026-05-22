@@ -3,6 +3,7 @@ import { Topbar, type Vista } from './components/Topbar';
 import { useHistorial } from './hooks/useHistorial';
 import { useMuestras } from './hooks/useMuestras';
 import { CargaTxtPage } from './pages/CargaTxtPage';
+import { ConfiguracionPage } from './pages/ConfiguracionPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { LoginPage } from './pages/LoginPage';
 import { MuestrasPage } from './pages/MuestrasPage';
@@ -11,7 +12,7 @@ import type { Usuario } from './types';
 
 export default function App() {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
-  const [vista, setVista] = useState<Vista>('resumen');
+  const [vista, setVista] = useState<Vista>('scanner');
 
   const {
     muestras,
@@ -41,7 +42,7 @@ export default function App() {
         vista={vista}
         setVista={setVista}
       />
-      <main className="max-w-[1400px] mx-auto px-6 py-8 lg:py-10">
+      <main className="max-w-[1680px] mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-10">
         {cargandoMuestras && muestras.length === 0 ? (
           <div className="text-center py-20 text-slate-400 text-sm">
             Cargando datos…
@@ -49,7 +50,10 @@ export default function App() {
         ) : (
           <>
             {vista === 'resumen' && (
-              <DashboardPage historial={historial} muestras={muestras} />
+              <DashboardPage
+                historial={historial}
+                muestras={muestras}
+              />
             )}
             {vista === 'muestras' && (
               <MuestrasPage
@@ -63,6 +67,9 @@ export default function App() {
             )}
             {vista === 'carga_txt' && (
               <CargaTxtPage onCargado={recargarMuestras} />
+            )}
+            {vista === 'configuracion' && (
+              <ConfiguracionPage usuario={usuario} />
             )}
           </>
         )}
