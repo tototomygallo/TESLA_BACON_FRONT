@@ -235,9 +235,9 @@ export function CargaTxtPage({ onCargado }: Props) {
           </div>
           <pre className="text-[10px] font-mono text-slate-500 leading-relaxed overflow-x-auto">
 {`t/min   12CO2/%  Delta,c/‰  TestValue  TestID
-   0    1,69228   -25,96      -0,2    PROTOCOLO-DEL-BACKEND
+   0    1,69228   -25,96      -0,2    PROTOCOLO-INTERNO
   30    1,66703   -26,15
-   0    2,09735   -23,77      28,0    PROTOCOLO-DEL-BACKEND
+   0    2,09735   -23,77      28,0    PROTOCOLO-INTERNO
   30    1,84998     4,17
    ...`}
           </pre>

@@ -1,3 +1,4 @@
+import consultersLogo from '../assets/consulters-logo.png';
 import teslaLogo from '../assets/lab-tesla-logo.png';
 import type { Usuario } from '../types';
 import { RolBadge } from './RolBadge';
@@ -29,11 +30,17 @@ export function Topbar({ usuario, vista, setVista, onLogout }: Props) {
     <header className="bg-white/90 backdrop-blur-xl border-b border-slate-200/80 sticky top-0 z-10 shadow-[0_1px_0_rgba(15,23,42,0.04),0_18px_40px_rgba(15,23,42,0.05)]">
       <div className="w-full pl-4 pr-4 sm:pl-6 sm:pr-6 lg:pl-14 lg:pr-8 flex items-center justify-between min-h-[76px] gap-6">
         <div className="flex items-center gap-7 min-w-0">
-          <div className="h-14 w-52 rounded-lg bg-white flex items-center justify-start">
+          <div className="h-14 rounded-lg bg-white flex items-center justify-start gap-3">
+            <img
+              src={consultersLogo}
+              alt="Consulters"
+              className="h-8 w-8 object-contain"
+            />
+            <div className="h-9 w-px bg-slate-200" />
             <img
               src={teslaLogo}
               alt="Tesla Laboratorio"
-              className="h-full w-full object-contain object-left"
+              className="h-full w-36 object-contain object-left"
             />
           </div>
 

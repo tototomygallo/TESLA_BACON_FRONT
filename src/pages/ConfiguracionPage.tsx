@@ -310,7 +310,7 @@ export function ConfiguracionPage({ usuario }: Props) {
                 Usuarios
               </TabConfig>
               <TabConfig activo={vista === 'reset'} onClick={() => setVista('reset')}>
-                Reset passwords
+                Cambiar contraseñas
               </TabConfig>
             </>
           )}

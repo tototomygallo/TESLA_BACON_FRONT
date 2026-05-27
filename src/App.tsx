@@ -23,7 +23,14 @@ export default function App() {
   const { historial, recargar: recargarHistorial } = useHistorial();
 
   if (!usuario) {
-    return <LoginPage onLogin={setUsuario} />;
+    return (
+      <LoginPage
+        onLogin={(u) => {
+          setVista('scanner');
+          setUsuario(u);
+        }}
+      />
+    );
   }
 
   const handleIngresar = async (codigos: string[]) => {
@@ -38,7 +45,10 @@ export default function App() {
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
       <Topbar
         usuario={usuario}
-        onLogout={() => setUsuario(null)}
+        onLogout={() => {
+          setVista('scanner');
+          setUsuario(null);
+        }}
         vista={vista}
         setVista={setVista}
       />

@@ -125,3 +125,17 @@
 [2m11:27:26[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/CargaTxtPage.tsx, /src/index.css[22m
 [2m11:28:04[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/components/ValidacionModal.tsx, /src/components/ControlPrevio.tsx[22m
 [2m11:28:12[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/components/ValidacionModal.tsx, /src/components/ControlPrevio.tsx[22m
+[2m02:51:57[22m [36m[1m[vite][22m[39m [32m.env changed, restarting server...[39m
+[2m02:51:57[22m [36m[1m[vite][22m[39m [32m.env.development changed, restarting server...[39m
+[2m02:51:58[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m Re-optimizing dependencies because vite config has changed
+[2m02:51:59[22m [36m[1m[vite][22m[39m server restarted.
+[2m02:56:18[22m [36m[1m[vite][22m[39m [32m.env changed, restarting server...[39m
+[2m02:56:18[22m [36m[1m[vite][22m[39m server restarted.
+[2m04:10:02[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+[2m04:10:02[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+[2m04:10:37[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/CargaTxtPage.tsx, /src/index.css[22m
+[2m04:10:40[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/CargaTxtPage.tsx, /src/index.css[22m
+[2m04:10:43[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/CargaTxtPage.tsx, /src/index.css[22m
+[2m04:11:35[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/ConfiguracionPage.tsx, /src/index.css[22m
+[2m04:11:38[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/ConfiguracionPage.tsx, /src/index.css[22m
+[2m04:11:43[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/ConfiguracionPage.tsx, /src/index.css[22m
