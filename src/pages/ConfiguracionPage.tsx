@@ -72,7 +72,15 @@ export function ConfiguracionPage({ usuario }: Props) {
       .listarUsuariosConfiguracion(usuario.id)
       .then((lista) => {
         setUsuarios(lista);
-        setResetUsuarioId((actual) => actual || lista[0]?.id || '');
+        setResetUsuarioId((actual) => {
+          if (
+            actual &&
+            lista.some((u) => u.id === actual && puedeModificarUsuario(usuario, u))
+          ) {
+            return actual;
+          }
+          return lista.find((u) => puedeModificarUsuario(usuario, u))?.id || '';
+        });
       })
       .catch((e) =>
         setErrorUsuarios(
@@ -159,6 +167,12 @@ export function ConfiguracionPage({ usuario }: Props) {
   };
 
   const guardarUsuario = async (usuarioEditado: UsuarioConfiguracion) => {
+    if (!puedeModificarUsuario(usuario, usuarioEditado)) {
+      setMensajeUsuarios(null);
+      setErrorUsuarios('Este usuario está protegido y no podés modificarlo.');
+      return;
+    }
+
     const errorValidacion = validarUsuarioEditable(usuarioEditado);
     if (errorValidacion) {
       setMensajeUsuarios(null);
@@ -194,6 +208,12 @@ export function ConfiguracionPage({ usuario }: Props) {
 
   const eliminarUsuario = async () => {
     if (!usuarioAEliminar) return;
+    if (!puedeModificarUsuario(usuario, usuarioAEliminar)) {
+      setMensajeUsuarios(null);
+      setErrorUsuarios('Este usuario está protegido y no podés eliminarlo.');
+      setUsuarioAEliminar(null);
+      return;
+    }
 
     setEliminandoUsuarioId(usuarioAEliminar.id);
     setMensajeUsuarios(null);
@@ -206,7 +226,7 @@ export function ConfiguracionPage({ usuario }: Props) {
       );
       setResetUsuarioId((actual) =>
         actual === usuarioAEliminar.id
-          ? usuarios.find((u) => u.id !== usuarioAEliminar.id)?.id ?? ''
+          ? usuarios.find((u) => u.id !== usuarioAEliminar.id && puedeModificarUsuario(usuario, u))?.id ?? ''
           : actual,
       );
       setMensajeUsuarios('Usuario eliminado correctamente');
@@ -228,6 +248,11 @@ export function ConfiguracionPage({ usuario }: Props) {
 
     if (!resetUsuarioId) {
       setErrorReset('Seleccioná un usuario.');
+      return;
+    }
+    const usuarioReset = usuarios.find((u) => u.id === resetUsuarioId);
+    if (!usuarioReset || !puedeModificarUsuario(usuario, usuarioReset)) {
+      setErrorReset('Este usuario está protegido y no podés cambiarle la contraseña.');
       return;
     }
     if (!reglasReset.esValida) {
@@ -389,12 +414,15 @@ export function ConfiguracionPage({ usuario }: Props) {
                     </td>
                   </tr>
                 ) : (
-                  usuarios.map((u) => (
+                  usuarios.map((u) => {
+                    const puedeEditar = puedeModificarUsuario(usuario, u);
+                    return (
                     <tr key={u.id} className="border-b border-slate-100">
                       <Td>
                         <InputTabla
                           value={u.usuario}
                           invalido={u.usuario.trim().length < 3}
+                          disabled={!puedeEditar}
                           onChange={(value) =>
                             actualizarUsuarioLocal(u.id, { usuario: value })
                           }
@@ -405,6 +433,7 @@ export function ConfiguracionPage({ usuario }: Props) {
                           type="email"
                           value={u.email}
                           invalido={!esEmailValido(u.email)}
+                          disabled={!puedeEditar}
                           onChange={(value) =>
                             actualizarUsuarioLocal(u.id, { email: value })
                           }
@@ -414,6 +443,7 @@ export function ConfiguracionPage({ usuario }: Props) {
                         <InputTabla
                           value={u.nombre ?? ''}
                           invalido={!(u.nombre ?? '').trim()}
+                          disabled={!puedeEditar}
                           onChange={(value) =>
                             actualizarUsuarioLocal(u.id, { nombre: value })
                           }
@@ -422,6 +452,7 @@ export function ConfiguracionPage({ usuario }: Props) {
                       <Td>
                         <SelectRol
                           value={u.rol}
+                          disabled={!puedeEditar}
                           onChange={(value) =>
                             actualizarUsuarioLocal(u.id, { rol: value })
                           }
@@ -430,12 +461,13 @@ export function ConfiguracionPage({ usuario }: Props) {
                       <Td>
                         <select
                           value={u.activo ? 'activo' : 'inactivo'}
+                          disabled={!puedeEditar}
                           onChange={(e) =>
                             actualizarUsuarioLocal(u.id, {
                               activo: e.target.value === 'activo',
                             })
                           }
-                          className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900"
+                          className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
                         >
                           <option value="activo">Activo</option>
                           <option value="inactivo">Inactivo</option>
@@ -447,6 +479,7 @@ export function ConfiguracionPage({ usuario }: Props) {
                             type="button"
                           onClick={() => guardarUsuario(u)}
                           disabled={
+                            !puedeEditar ||
                             guardandoUsuarioId === u.id ||
                             !!validarUsuarioEditable(u)
                           }
@@ -457,7 +490,7 @@ export function ConfiguracionPage({ usuario }: Props) {
                           <button
                             type="button"
                             onClick={() => setUsuarioAEliminar(u)}
-                            disabled={eliminandoUsuarioId === u.id}
+                            disabled={!puedeEditar || eliminandoUsuarioId === u.id}
                             className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-red-200 bg-white text-red-600 hover:bg-red-50 disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-300 transition-colors"
                             aria-label={`Eliminar usuario ${u.usuario}`}
                             title="Eliminar usuario"
@@ -467,7 +500,8 @@ export function ConfiguracionPage({ usuario }: Props) {
                         </div>
                       </Td>
                     </tr>
-                  ))
+                    );
+                  })
                 )}
               </tbody>
             </table>
@@ -500,7 +534,11 @@ export function ConfiguracionPage({ usuario }: Props) {
                 className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
               >
                 {usuarios.map((u) => (
-                  <option key={u.id} value={u.id}>
+                  <option
+                    key={u.id}
+                    value={u.id}
+                    disabled={!puedeModificarUsuario(usuario, u)}
+                  >
                     {u.usuario} - {u.nombre || u.email}
                   </option>
                 ))}
@@ -731,6 +769,26 @@ function validarPassword(value: string) {
   };
 }
 
+function normalizarUsername(value: string | undefined): string {
+  return (value ?? '').trim().toLowerCase();
+}
+
+function usernameLogueado(usuario: Usuario): string {
+  return normalizarUsername(usuario.nombre || usuario.id);
+}
+
+function puedeModificarUsuario(
+  usuarioLogueado: Usuario,
+  usuarioObjetivo: UsuarioConfiguracion,
+): boolean {
+  const actual = usernameLogueado(usuarioLogueado);
+  const objetivo = normalizarUsername(usuarioObjetivo.usuario);
+
+  if (objetivo === 'pscharf') return actual === 'pscharf';
+  if (objetivo === 'tgallo') return actual === 'pscharf' || actual === 'tgallo';
+  return true;
+}
+
 function validarUsuarioEditable(usuario: UsuarioConfiguracion): string | null {
   if (!usuario.usuario.trim()) return 'El usuario no puede estar vacío.';
   if (usuario.usuario.trim().length < 3) {
@@ -902,15 +960,18 @@ function Label({ children }: { children: React.ReactNode }) {
 function SelectRol({
   value,
   onChange,
+  disabled = false,
 }: {
   value: string;
   onChange: (value: Rol) => void;
+  disabled?: boolean;
 }) {
   return (
     <select
       value={value}
       onChange={(e) => onChange(e.target.value as Rol)}
-      className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900"
+      disabled={disabled}
+      className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
     >
       <option value="admin">admin</option>
       <option value="bioquimico">bioquímico</option>
@@ -924,19 +985,24 @@ function InputTabla({
   onChange,
   type = 'text',
   invalido = false,
+  disabled = false,
 }: {
   value: string;
   onChange: (value: string) => void;
   type?: string;
   invalido?: boolean;
+  disabled?: boolean;
 }) {
   return (
     <input
       type={type}
       value={value}
       onChange={(e) => onChange(e.target.value)}
+      disabled={disabled}
       className={`w-full rounded-lg border bg-white px-3 py-2 text-sm text-slate-900 ${
-        invalido
+        disabled
+          ? 'border-slate-200 bg-slate-100 text-slate-400 cursor-not-allowed'
+          : invalido
           ? 'border-red-300 bg-red-50/40 focus:outline-none focus:ring-2 focus:ring-red-200'
           : 'border-slate-200'
       }`}
