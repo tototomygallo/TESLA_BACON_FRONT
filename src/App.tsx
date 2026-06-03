@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Topbar, type Vista } from './components/Topbar';
 import { useHistorial } from './hooks/useHistorial';
 import { useMuestras } from './hooks/useMuestras';
@@ -13,6 +13,7 @@ import type { Usuario } from './types';
 export default function App() {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [vista, setVista] = useState<Vista>('scanner');
+  const [mensajeLogin, setMensajeLogin] = useState<string | null>(null);
 
   const {
     muestras,
@@ -22,10 +23,44 @@ export default function App() {
   } = useMuestras();
   const { historial, recargar: recargarHistorial } = useHistorial();
 
+  const cerrarSesion = useCallback((mensaje?: string) => {
+    localStorage.clear();
+    sessionStorage.clear();
+    setVista('scanner');
+    setUsuario(null);
+    setMensajeLogin(mensaje ?? null);
+  }, []);
+
+  useEffect(() => {
+    if (!usuario) return;
+
+    let timeoutId: number | undefined;
+
+    const logoutByIdle = () => {
+      cerrarSesion('Sesión cerrada por inactividad.');
+    };
+
+    const resetTimer = () => {
+      if (timeoutId) window.clearTimeout(timeoutId);
+      timeoutId = window.setTimeout(logoutByIdle, 300000);
+    };
+
+    const events = ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll'];
+    events.forEach((event) => window.addEventListener(event, resetTimer));
+    resetTimer();
+
+    return () => {
+      if (timeoutId) window.clearTimeout(timeoutId);
+      events.forEach((event) => window.removeEventListener(event, resetTimer));
+    };
+  }, [cerrarSesion, usuario]);
+
   if (!usuario) {
     return (
       <LoginPage
+        mensaje={mensajeLogin}
         onLogin={(u) => {
+          setMensajeLogin(null);
           setVista('scanner');
           setUsuario(u);
         }}
@@ -45,10 +80,7 @@ export default function App() {
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
       <Topbar
         usuario={usuario}
-        onLogout={() => {
-          setVista('scanner');
-          setUsuario(null);
-        }}
+        onLogout={() => cerrarSesion()}
         vista={vista}
         setVista={setVista}
       />

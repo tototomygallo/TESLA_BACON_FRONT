@@ -6,9 +6,10 @@ import type { Usuario } from '../types';
 
 interface Props {
   onLogin: (u: Usuario) => void;
+  mensaje?: string | null;
 }
 
-export function LoginPage({ onLogin }: Props) {
+export function LoginPage({ onLogin, mensaje }: Props) {
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -170,6 +171,11 @@ export function LoginPage({ onLogin }: Props) {
             {error && (
               <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
                 {error}
+              </div>
+            )}
+            {mensaje && !error && (
+              <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800">
+                {mensaje}
               </div>
             )}
 
