@@ -325,7 +325,7 @@ export function MuestrasPage({
                     </td>
                     <td className="px-4 py-3 text-right">
                       <div className="inline-flex gap-1">
-                        {m.estado === 'recibido' && (
+                        {(m.estado === 'recibido' || m.estado === 'en_proceso') && (
                           <button
                             onClick={async () => {
                               await generarEtiquetasMuestra(m);
