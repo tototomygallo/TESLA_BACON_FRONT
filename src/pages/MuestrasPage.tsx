@@ -116,6 +116,9 @@ export function MuestrasPage({
   const [mesesPersonalizados, setMesesPersonalizados] = useState(3);
   const [mensajeAccion, setMensajeAccion] = useState<string | null>(null);
   const [errorAccion, setErrorAccion] = useState<string | null>(null);
+  // Aviso amarillo: la validación fue exitosa pero algo secundario falló
+  // (p.ej. el informe quedó completo pero no se pudo enviar por mail).
+  const [advertenciaAccion, setAdvertenciaAccion] = useState<string | null>(null);
   // Muestra cuyo modal de validación está abierto (null = cerrado)
   const [muestraEnValidacion, setMuestraEnValidacion] =
     useState<Muestra | null>(null);
@@ -237,6 +240,22 @@ export function MuestrasPage({
       {mensajeAccion && (
         <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
           {mensajeAccion}
+        </div>
+      )}
+
+      {advertenciaAccion && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 flex items-start justify-between gap-3">
+          <div className="flex items-start gap-2">
+            <span aria-hidden>⚠️</span>
+            <span>{advertenciaAccion}</span>
+          </div>
+          <button
+            onClick={() => setAdvertenciaAccion(null)}
+            className="text-amber-500 hover:text-amber-700 leading-none"
+            aria-label="Cerrar aviso"
+          >
+            ✕
+          </button>
         </div>
       )}
 
@@ -622,7 +641,13 @@ export function MuestrasPage({
           onActualizada={onMuestraActualizada}
           onValidacionExitosa={(mensaje) => {
             setErrorAccion(null);
+            setAdvertenciaAccion(null);
             setMensajeAccion(mensaje);
+          }}
+          onValidacionConAdvertencia={(mensaje) => {
+            setErrorAccion(null);
+            setMensajeAccion(null);
+            setAdvertenciaAccion(mensaje);
           }}
         />
       )}

@@ -288,3 +288,10 @@
 [2m11:50:47[22m [36m[1m[vite][22m[39m server restarted.
 [2m11:50:52[22m [36m[1m[vite][22m[39m [32m.env.development changed, restarting server...[39m
 [2m11:50:52[22m [36m[1m[vite][22m[39m server restarted.
+[2m12:17:50[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/types/index.ts[22m
+[2m12:17:58[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/ValidacionModal.tsx, /src/index.css[22m
+[2m12:18:07[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/ValidacionModal.tsx, /src/index.css[22m
+[2m12:18:17[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/ValidacionModal.tsx, /src/index.css[22m
+[2m12:18:30[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m12:18:39[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m12:18:45[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m

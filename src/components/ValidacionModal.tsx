@@ -11,6 +11,8 @@ interface Props {
   // para que el padre refresque la lista.
   onActualizada: () => void;
   onValidacionExitosa?: (mensaje: string) => void;
+  // La muestra se completó y verificó en BACON, pero el envío por mail falló.
+  onValidacionConAdvertencia?: (mensaje: string) => void;
 }
 
 // ============================================
@@ -29,6 +31,7 @@ export function ValidacionModal({
   onCerrar,
   onActualizada,
   onValidacionExitosa,
+  onValidacionConAdvertencia,
 }: Props) {
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -58,7 +61,14 @@ export function ValidacionModal({
       }
       onActualizada();
       onCerrar();
-      onValidacionExitosa?.('PDF subido correctamente. Verificación exitosa.');
+      // La validación fue exitosa (status 200), pero el backend puede avisar
+      // que el informe no se pudo enviar por mail. En ese caso mostramos un
+      // aviso amarillo en vez del mensaje de éxito.
+      if (respuesta.advertencia) {
+        onValidacionConAdvertencia?.(respuesta.advertencia);
+      } else {
+        onValidacionExitosa?.('PDF subido correctamente. Verificación exitosa.');
+      }
     } catch (e) {
       setError(
         e instanceof ApiError ? e.message : 'Error al validar la muestra',

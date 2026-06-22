@@ -97,6 +97,10 @@ export interface Muestra {
 export interface ValidacionMuestraResponse extends Muestra {
   pdfGenerado?: boolean;
   pdfVerificado?: boolean;
+  // null → todo OK (subida + verificación + mail).
+  // string → la muestra se completó y verificó en BACON, pero el envío del
+  // informe por mail falló. El texto trae el detalle del error.
+  advertencia?: string | null;
   pdfVerificacion?: {
     success?: boolean;
     nombre_esperado?: string;
