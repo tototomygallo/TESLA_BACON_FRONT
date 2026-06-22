@@ -247,10 +247,11 @@ export const mockApi: ApiClient = {
   // Reglas:
   // - Match exacto TestID del TXT ↔ protocolo interno.
   // - Si está 'completado': ignorar (no se pisa).
-  // - Si está 'recibido' o 'en_validacion' sin error:
+  // - Si NO tiene resultados aún ('recibido' o recién reiniciada):
   //     cargar resultados y pasar a 'en_validacion'.
-  // - Si tieneError previo: pisar resultados (scope: "el sistema pisa
-  //   solo los resultados con error previo").
+  // - Si YA tiene resultados ('en_validacion' o con error): NO se pisa;
+  //   se reporta en requierenReinicio. Para volver a cargarla hay que
+  //   apretar "Reiniciar muestra" primero (eso limpia los resultados).
   // - Si el TXT trae error del equipo (postDelta = -10000):
   //     incrementar intentosFallidos, marcar tieneError, no cambiar estado.
   // - TestIDs sin match: reportar como noEncontrados.
@@ -268,6 +269,7 @@ export const mockApi: ApiClient = {
     const noEncontrados: string[] = [];
     const yaCompletados: string[] = [];
     const yaAnuladas: string[] = [];
+    const requierenReinicio: string[] = [];
 
     const indice = new Map(_muestras.map((m) => [m.protocolo, m] as const));
     const cambios = new Map<string, Muestra>();
@@ -284,8 +286,14 @@ export const mockApi: ApiClient = {
         yaAnuladas.push(muestra.protocolo);
         continue;
       }
-
-      const tuvoErrorPrevio = muestra.tieneError;
+      // Una muestra que YA tiene resultados cargados no se puede recargar por
+      // TXT: hay que apretar "Reiniciar muestra" primero (el reinicio limpia
+      // los resultados). Cubre tanto 'en_validacion' como 'con error'. Así se
+      // garantiza una sola carga por reinicio y no se pisan datos existentes.
+      if (muestra.resultados) {
+        requierenReinicio.push(muestra.protocolo);
+        continue;
+      }
       const resultadoCargado = {
         basalCO2: r.basalCO2,
         postCO2: r.postCO2,
@@ -316,7 +324,9 @@ export const mockApi: ApiClient = {
           tieneError: false,
           resultados: resultadoCargado,
         });
-        if (tuvoErrorPrevio) cargadosReintentando.push(muestra.protocolo);
+        // Si ya gastó algún intento, esta carga viene de una muestra reiniciada
+        // (reintento); si no, es la primera carga.
+        if (muestra.intentosFallidos > 0) cargadosReintentando.push(muestra.protocolo);
         else cargadosOk.push(muestra.protocolo);
       }
     }
@@ -331,6 +341,7 @@ export const mockApi: ApiClient = {
       noEncontrados,
       yaCompletados,
       yaAnuladas,
+      requierenReinicio,
       controles: parseado.controles,
       erroresParseo: parseado.errores.length,
     });

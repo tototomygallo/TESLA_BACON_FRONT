@@ -333,10 +333,12 @@ function ResultadoCarga({
 }) {
   const totalOk =
     resultado.cargadosOk.length + resultado.cargadosReintentando.length;
+  const requierenReinicio = resultado.requierenReinicio ?? [];
   const hayProblemas =
     resultado.conErrorEquipo.length > 0 ||
     resultado.anuladas.length > 0 ||
     resultado.noEncontrados.length > 0 ||
+    requierenReinicio.length > 0 ||
     resultado.erroresParseo > 0;
 
   return (
@@ -371,21 +373,44 @@ function ResultadoCarga({
         </button>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 text-center">
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 text-center">
         <ResumenItem label="Cargados OK" valor={resultado.cargadosOk.length} color="emerald" />
         <ResumenItem label="Reintentados" valor={resultado.cargadosReintentando.length} color="violet" />
         <ResumenItem label="Error equipo" valor={resultado.conErrorEquipo.length} color="red" />
+        <ResumenItem label="No reiniciada" valor={requierenReinicio.length} color="red" />
         <ResumenItem label="Anuladas" valor={resultado.anuladas.length} color="red" />
         <ResumenItem label="No encontrados" valor={resultado.noEncontrados.length} color="amber" />
         <ResumenItem label="Ya completados" valor={resultado.yaCompletados.length} color="slate" />
         <ResumenItem label="Controles" valor={resultado.controles} color="slate" />
       </div>
 
+      {requierenReinicio.length > 0 && (
+        <div className="rounded-lg border border-red-300 bg-red-50 px-4 py-3 space-y-2">
+          <div className="text-sm font-bold text-red-700 uppercase tracking-wider">
+            ⚠️ Error ingreso — muestra no reiniciada
+          </div>
+          <div className="text-xs text-red-600">
+            Estas muestras ya tienen datos cargados y no se pisaron. Para volver a
+            cargarlas, primero apretá <span className="font-semibold">"Reiniciar muestra"</span>.
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {requierenReinicio.map((p) => (
+              <span
+                key={p}
+                className="text-xs px-2 py-0.5 rounded border border-red-200 bg-white text-red-700 font-mono"
+              >
+                {p}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
       {resultado.cargadosOk.length > 0 && (
         <DetalleProtocolos titulo="Cargados correctamente" protocolos={resultado.cargadosOk} color="emerald" />
       )}
       {resultado.cargadosReintentando.length > 0 && (
-        <DetalleProtocolos titulo="Reintentados (pisaron error previo)" protocolos={resultado.cargadosReintentando} color="violet" />
+        <DetalleProtocolos titulo="Reintentados (recargados tras reinicio)" protocolos={resultado.cargadosReintentando} color="violet" />
       )}
       {resultado.conErrorEquipo.length > 0 && (
         <DetalleProtocolos titulo="Con error del equipo — quedan intentos" protocolos={resultado.conErrorEquipo} color="red" />
