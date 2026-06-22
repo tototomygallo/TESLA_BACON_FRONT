@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Topbar, type Vista } from './components/Topbar';
 import { useHistorial } from './hooks/useHistorial';
 import { useMuestras } from './hooks/useMuestras';
+import { AdministracionPage } from './pages/AdministracionPage';
 import { CargaTxtPage } from './pages/CargaTxtPage';
 import { ConfiguracionPage } from './pages/ConfiguracionPage';
 import { DashboardPage } from './pages/DashboardPage';
@@ -24,8 +25,12 @@ export default function App() {
   const { historial, recargar: recargarHistorial } = useHistorial();
 
   const cerrarSesion = useCallback((mensaje?: string) => {
-    localStorage.clear();
-    sessionStorage.clear();
+    localStorage.removeItem('usuario');
+    localStorage.removeItem('token');
+    localStorage.removeItem('authToken');
+    sessionStorage.removeItem('usuario');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('authToken');
     setVista('scanner');
     setUsuario(null);
     setMensajeLogin(mensaje ?? null);
@@ -69,7 +74,7 @@ export default function App() {
   }
 
   const handleIngresar = async (codigos: string[]) => {
-    const resultado = await ingresarLote(codigos);
+    const resultado = await ingresarLote(codigos, usuario.username);
     if (resultado.rechazadas.length > 0) {
       await recargarHistorial();
     }
@@ -108,7 +113,14 @@ export default function App() {
               <ScannerPage muestras={muestras} onIngresar={handleIngresar} />
             )}
             {vista === 'carga_txt' && (
-              <CargaTxtPage onCargado={recargarMuestras} />
+              <CargaTxtPage usuario={usuario} onCargado={recargarMuestras} />
+            )}
+            {vista === 'administracion' && usuario.rol === 'admin' && (
+              <AdministracionPage
+                usuario={usuario}
+                muestras={muestras}
+                onActualizada={recargarMuestras}
+              />
             )}
             {vista === 'configuracion' && (
               <ConfiguracionPage usuario={usuario} />

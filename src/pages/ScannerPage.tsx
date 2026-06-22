@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { ControlPrevio } from '../components/ControlPrevio';
 import { api } from '../services';
 import type { BaconMuestra, Muestra, ResultadoIngreso } from '../types';
+import { codigoMuestra, etiquetaTipoEstudioMayus } from '../utils/estudios';
 
 interface Props {
   muestras: Muestra[];
@@ -12,16 +13,20 @@ export function ScannerPage({ muestras, onIngresar }: Props) {
   const [codigo, setCodigo] = useState('');
   const [codigosEscaneados, setCodigosEscaneados] = useState<string[]>([]);
   const [alerta, setAlerta] = useState<ResultadoIngreso | null>(null);
+  const [errorIngreso, setErrorIngreso] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
   const [muestrasBacon, setMuestrasBacon] = useState<BaconMuestra[] | null>(
     null,
   );
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const tauKitsIngresados = useMemo(
-    () => new Set(muestras.map((m) => m.codigoTauKit)),
-    [muestras],
-  );
+  const codigosIngresados = useMemo(() => {
+    const s = new Set<string>();
+    for (const m of muestras) {
+      s.add(codigoMuestra(m));
+    }
+    return s;
+  }, [muestras]);
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -47,7 +52,7 @@ export function ScannerPage({ muestras, onIngresar }: Props) {
   const pendientesBacon =
     muestrasBacon === null
       ? null
-      : muestrasBacon.filter((m) => !tauKitsIngresados.has(m.numero_serie))
+      : muestrasBacon.filter((m) => !codigosIngresados.has(m.numero_serie))
           .length;
 
   const agregarCodigo = (cod: string) => {
@@ -77,12 +82,18 @@ export function ScannerPage({ muestras, onIngresar }: Props) {
   const confirmarIngreso = async () => {
     if (codigosEscaneados.length === 0) return;
     setEnviando(true);
+    setErrorIngreso(null);
+    setAlerta(null);
     try {
       const resultado = await onIngresar(codigosEscaneados);
       setAlerta(resultado);
       setCodigosEscaneados([]);
     } catch (e) {
-      console.error(e);
+      setErrorIngreso(
+        e instanceof Error
+          ? `No se pudo completar la accion en BACON: ${e.message}`
+          : 'No se pudo completar la accion en BACON.',
+      );
     } finally {
       setEnviando(false);
       setTimeout(() => inputRef.current?.focus(), 0);
@@ -92,14 +103,15 @@ export function ScannerPage({ muestras, onIngresar }: Props) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-semibold text-slate-900 tracking-tight">
-          Ingreso por scanner
-        </h2>
-        <p className="text-sm text-slate-500 mt-0.5">
-          Escaneá códigos TauKit. BACON valida cada uno y trae los datos del
-          paciente automáticamente.
-        </p>
+        <h2 className="text-2xl font-semibold text-slate-900 tracking-tight">Ingreso por scanner</h2>
+        <p className="text-sm text-slate-500 mt-0.5">Escaneá códigos de muestra. BACON valida cada uno y trae los datos del paciente automáticamente.</p>
       </div>
+
+      {errorIngreso && (
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {errorIngreso}
+        </div>
+      )}
 
       {alerta && (
         <div
@@ -117,25 +129,25 @@ export function ScannerPage({ muestras, onIngresar }: Props) {
               {alerta.rechazadas.length > 0 ? '⚠' : '✓'}
             </div>
             <div className="flex-1">
-              <div className="font-semibold text-slate-900">
-                Se cargó {alerta.ingresadas.length} muestra
-                {alerta.ingresadas.length !== 1 ? 's' : ''}
-              </div>
-              {alerta.ingresadas.length > 0 && (
-                <div className="text-sm text-slate-600 mt-1">
-                  TauKits ingresados:
-                  <div className="mt-2 flex flex-wrap gap-1.5">
-                    {alerta.ingresadas.map((m) => (
-                      <span
-                        key={m.codigoTauKit}
-                        className="text-xs px-2 py-0.5 rounded bg-emerald-50 border border-emerald-200 text-emerald-800 font-mono font-semibold"
-                      >
-                        {m.codigoTauKit}
-                      </span>
-                    ))}
-                  </div>
+                <div className="font-semibold text-slate-900">
+                  Se cargó {alerta.ingresadas.length} muestra
+                  {alerta.ingresadas.length !== 1 ? 's' : ''}
                 </div>
-              )}
+                {alerta.ingresadas.length > 0 && (
+                  <div className="text-sm text-slate-600 mt-1">
+                    Muestras ingresadas:
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {alerta.ingresadas.map((m) => (
+                        <span
+                          key={codigoMuestra(m) ?? m.protocolo}
+                          className="text-xs px-2 py-0.5 rounded bg-emerald-50 border border-emerald-200 text-emerald-800 font-mono font-semibold"
+                        >
+                          {codigoMuestra(m)} · {etiquetaTipoEstudioMayus(m.tipoEstudio)}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               {alerta.rechazadas.length > 0 && (
                 <div className="text-sm text-red-700 mt-3">
                   No se cargaron {alerta.rechazadas.length} muestra
@@ -152,7 +164,7 @@ export function ScannerPage({ muestras, onIngresar }: Props) {
                     ))}
                   </div>
                   <div className="text-xs text-slate-500 mt-2">
-                    Registrado en el Resumen del día.
+                    Registrado en el Resúmen del día.
                   </div>
                 </div>
               )}
@@ -183,7 +195,7 @@ export function ScannerPage({ muestras, onIngresar }: Props) {
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-white border border-slate-200 rounded-xl p-6">
             <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">
-              Código TauKit
+              Código de muestra
             </label>
             <div className="relative">
               <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
@@ -219,7 +231,7 @@ export function ScannerPage({ muestras, onIngresar }: Props) {
             </p>
           </div>
 
-          <ControlPrevio tauKitsIngresados={tauKitsIngresados} />
+          <ControlPrevio codigosIngresados={codigosIngresados} />
         </div>
 
         <div className="space-y-5">
@@ -276,8 +288,8 @@ export function ScannerPage({ muestras, onIngresar }: Props) {
             </div>
             <ul className="space-y-2 text-sm text-slate-300">
               <li className="flex gap-2">
-                <span className="text-emerald-400">·</span> Escaneás los TauKits
-                de un lote.
+                <span className="text-emerald-400">·</span> Escaneás las
+                muestras de un lote.
               </li>
               <li className="flex gap-2">
                 <span className="text-emerald-400">·</span> Al confirmar, BACON

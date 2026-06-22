@@ -1,9 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { EstadoBadge, ErrorBadge } from '../components/EstadoBadge';
 import { ValidacionModal } from '../components/ValidacionModal';
 import { generarEtiquetasMuestra } from '../services/etiquetas';
 import { api } from '../services';
 import type { Estado, Muestra, Usuario } from '../types';
+import { codigoMuestra, etiquetaTipoEstudio, type FiltroEstudio } from '../utils/estudios';
 
 // Fecha real de hoy (no la constante mock)
 const hoy = () => new Date().toISOString().slice(0, 10);
@@ -33,11 +34,24 @@ function hace3Dias(): string {
   return d.toISOString().slice(0, 10);
 }
 
+function haceDias(dias: number): string {
+  const d = new Date();
+  d.setDate(d.getDate() - dias);
+  return d.toISOString().slice(0, 10);
+}
+
+function haceMeses(meses: number): string {
+  const d = new Date();
+  d.setMonth(d.getMonth() - meses);
+  return d.toISOString().slice(0, 10);
+}
+
 function exportarCsv(muestras: Muestra[]): void {
   const sep = ';';
   const headers = [
     'Protocolo',
-    'TauKit',
+    'Tipo de Muestra',
+    'N° Serie',
     'Apellido',
     'Nombre',
     'DNI',
@@ -54,7 +68,8 @@ function exportarCsv(muestras: Muestra[]): void {
 
   const filas = muestras.map((m) => [
     m.protocolo,
-    m.codigoTauKit,
+    m.tipoEstudio.toUpperCase(),
+    codigoMuestra(m),
     m.paciente.apellido,
     m.paciente.nombre,
     m.paciente.dni,
@@ -94,12 +109,22 @@ export function MuestrasPage({
   const [busqueda, setBusqueda] = useState('');
   const [fechaDesde, setFechaDesde] = useState(hace3Dias);
   const [fechaHasta, setFechaHasta] = useState(hoy);
+  const [rangoFechaActivo, setRangoFechaActivo] = useState('Últimos 3 días');
+  const [filtroEstudio, setFiltroEstudio] = useState<FiltroEstudio>('todos');
+  const [pagina, setPagina] = useState(1);
+  const [porPagina, setPorPagina] = useState(20);
+  const [mesesPersonalizados, setMesesPersonalizados] = useState(3);
+  const [mensajeAccion, setMensajeAccion] = useState<string | null>(null);
+  const [errorAccion, setErrorAccion] = useState<string | null>(null);
   // Muestra cuyo modal de validación está abierto (null = cerrado)
   const [muestraEnValidacion, setMuestraEnValidacion] =
     useState<Muestra | null>(null);
 
   const filtradas = useMemo(() => {
     return muestras.filter((m) => {
+      // Filtro por tipo de estudio
+      const matchEstudio = filtroEstudio === 'todos' || m.tipoEstudio === filtroEstudio;
+      if (!matchEstudio) return false;
       // Filtro por estado
       const matchEstado =
         filtroEstado === 'todos' ||
@@ -111,7 +136,7 @@ export function MuestrasPage({
       const matchBusqueda =
         !q ||
         m.protocolo.toLowerCase().includes(q) ||
-        m.codigoTauKit.toLowerCase().includes(q) ||
+        codigoMuestra(m).toLowerCase().includes(q) ||
         m.paciente.nombre.toLowerCase().includes(q) ||
         m.paciente.apellido.toLowerCase().includes(q) ||
         m.paciente.dni.includes(q) ||
@@ -124,10 +149,71 @@ export function MuestrasPage({
 
       return matchEstado && matchBusqueda && matchFecha;
     });
-  }, [muestras, filtroEstado, busqueda, fechaDesde, fechaHasta]);
+  }, [muestras, filtroEstado, filtroEstudio, busqueda, fechaDesde, fechaHasta]);
 
   const puedeValidar =
     usuario.rol === 'bioquimico' || usuario.rol === 'admin';
+  const resumenPeriodo = useMemo(() => {
+    const q = busqueda.toLowerCase();
+    const base = muestras.filter((m) => {
+      const matchEstudio = filtroEstudio === 'todos' || m.tipoEstudio === filtroEstudio;
+      const matchBusqueda =
+        !q ||
+        m.protocolo.toLowerCase().includes(q) ||
+        codigoMuestra(m).toLowerCase().includes(q) ||
+        m.paciente.nombre.toLowerCase().includes(q) ||
+        m.paciente.apellido.toLowerCase().includes(q) ||
+        m.paciente.dni.includes(q) ||
+        m.estudio.nombre.toLowerCase().includes(q);
+      const fechaIngreso = m.fechaIngreso.slice(0, 10);
+      const matchFecha = fechaIngreso >= fechaDesde && fechaIngreso <= fechaHasta;
+
+      return matchEstudio && matchBusqueda && matchFecha;
+    });
+
+    return {
+      total: base.length,
+      recibidas: base.filter((m) => m.estado === 'recibido').length,
+      proceso: base.filter((m) => m.estado === 'en_proceso').length,
+      validacion: base.filter((m) => m.estado === 'en_validacion').length,
+      completadas: base.filter((m) => m.estado === 'completado').length,
+      conError: base.filter((m) => m.tieneError).length,
+    };
+  }, [muestras, filtroEstudio, busqueda, fechaDesde, fechaHasta]);
+  const totalPaginas = Math.max(1, Math.ceil(filtradas.length / porPagina));
+  const inicioPagina = (pagina - 1) * porPagina;
+  const finPagina = inicioPagina + porPagina;
+  const paginadas = filtradas.slice(inicioPagina, finPagina);
+  const primeraVisible = filtradas.length === 0 ? 0 : inicioPagina + 1;
+  const ultimaVisible = Math.min(finPagina, filtradas.length);
+
+  useEffect(() => {
+    setPagina(1);
+  }, [busqueda, fechaDesde, fechaHasta, filtroEstado, filtroEstudio, porPagina]);
+
+  useEffect(() => {
+    if (pagina > totalPaginas) setPagina(totalPaginas);
+  }, [pagina, totalPaginas]);
+
+  const aplicarRangoFecha = (dias: number) => {
+    setFechaDesde(haceDias(dias));
+    setFechaHasta(hoy());
+    setRangoFechaActivo(
+      dias === 3 ? 'Últimos 3 días' : dias === 7 ? 'Última semana' : 'Último mes',
+    );
+  };
+
+  const aplicarRangoMeses = (meses: number) => {
+    setFechaDesde(haceMeses(meses));
+    setFechaHasta(hoy());
+    setRangoFechaActivo(meses === 12 ? 'Último año' : `Últimos ${meses} meses`);
+  };
+  const claseBotonRango = (label: string) =>
+    `text-xs px-3 py-1.5 rounded-lg border font-medium transition-colors ${
+      rangoFechaActivo === label
+        ? 'border-emerald-600 bg-emerald-50 text-emerald-700'
+        : 'border-slate-300 text-slate-600 hover:bg-slate-50'
+    }`;
 
   return (
     <div className="space-y-4">
@@ -142,11 +228,23 @@ export function MuestrasPage({
         </div>
       </div>
 
+      {errorAccion && (
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {errorAccion}
+        </div>
+      )}
+
+      {mensajeAccion && (
+        <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
+          {mensajeAccion}
+        </div>
+      )}
+
       <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-3">
         <div className="flex flex-wrap items-center gap-3">
           <input
             type="text"
-            placeholder="Buscar por protocolo, TauKit, paciente, DNI o estudio..."
+            placeholder="Buscar por protocolo, muestra, paciente, DNI o estudio..."
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
             className="flex-1 min-w-[240px] px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
@@ -171,13 +269,30 @@ export function MuestrasPage({
         <div className="flex flex-wrap items-center gap-3 pt-1 border-t border-slate-100">
           <div className="flex items-center gap-2">
             <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              Tipo de estudio
+            </label>
+            <select
+              value={filtroEstudio}
+              onChange={(e) => setFiltroEstudio(e.target.value as FiltroEstudio)}
+              className="px-2.5 py-1.5 border border-slate-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+            >
+              <option value="todos">Todos</option>
+              <option value="taukit">Taukit</option>
+              <option value="lactokit">Lactokit</option>
+            </select>
+          </div>
+          <div className="flex items-center gap-2">
+            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
               Desde
             </label>
             <input
               type="date"
               value={fechaDesde}
               max={fechaHasta}
-              onChange={(e) => setFechaDesde(e.target.value)}
+              onChange={(e) => {
+                setFechaDesde(e.target.value);
+                setRangoFechaActivo('Personalizado');
+              }}
               className="px-2.5 py-1.5 border border-slate-300 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
             />
           </div>
@@ -190,19 +305,62 @@ export function MuestrasPage({
               value={fechaHasta}
               min={fechaDesde}
               max={hoy()}
-              onChange={(e) => setFechaHasta(e.target.value)}
+              onChange={(e) => {
+                setFechaHasta(e.target.value);
+                setRangoFechaActivo('Personalizado');
+              }}
               className="px-2.5 py-1.5 border border-slate-300 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
             />
           </div>
           <button
-            onClick={() => {
-              setFechaDesde(hace3Dias());
-              setFechaHasta(hoy());
-            }}
-            className="text-xs px-3 py-1.5 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 font-medium"
+            onClick={() => aplicarRangoFecha(3)}
+            className={claseBotonRango('Últimos 3 días')}
           >
             Últimos 3 días
           </button>
+          <button
+            onClick={() => aplicarRangoFecha(7)}
+            className={claseBotonRango('Última semana')}
+          >
+            Última semana
+          </button>
+          <button
+            onClick={() => aplicarRangoFecha(30)}
+            className={claseBotonRango('Último mes')}
+          >
+            Último mes
+          </button>
+          <button
+            onClick={() => aplicarRangoMeses(12)}
+            className={claseBotonRango('Último año')}
+          >
+            Último año
+          </button>
+          <div
+            className={`flex items-center gap-2 rounded-lg border px-2 py-1 ${
+              rangoFechaActivo === `Últimos ${mesesPersonalizados} meses`
+                ? 'border-emerald-600 bg-emerald-50'
+                : 'border-slate-300'
+            }`}
+          >
+            <span className="text-xs font-semibold text-slate-500">Últimos</span>
+            <input
+              type="number"
+              min={1}
+              max={60}
+              value={mesesPersonalizados}
+              onChange={(e) => setMesesPersonalizados(Math.max(1, Number(e.target.value) || 1))}
+              className="w-14 border-0 p-0 text-center text-sm font-mono text-slate-900 focus:outline-none"
+            />
+            <span className="text-xs font-semibold text-slate-500">meses</span>
+            <button
+              type="button"
+              onClick={() => aplicarRangoMeses(mesesPersonalizados)}
+              className="rounded-md bg-slate-950 px-2 py-1 text-xs font-semibold text-white hover:bg-slate-800"
+            >
+              Aplicar
+            </button>
+          </div>
 
           <div className="flex-1" />
 
@@ -221,6 +379,15 @@ export function MuestrasPage({
         </div>
       </div>
 
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+        <ResumenPeriodoCard label="Total" valor={resumenPeriodo.total} />
+        <ResumenPeriodoCard label="Recibidas" valor={resumenPeriodo.recibidas} />
+        <ResumenPeriodoCard label="En proceso" valor={resumenPeriodo.proceso} />
+        <ResumenPeriodoCard label="En validacion" valor={resumenPeriodo.validacion} />
+        <ResumenPeriodoCard label="Completadas" valor={resumenPeriodo.completadas} />
+        <ResumenPeriodoCard label="Con error" valor={resumenPeriodo.conError} tono="error" />
+      </div>
+
       <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
         <table className="w-full">
           <thead>
@@ -229,7 +396,10 @@ export function MuestrasPage({
                 Protocolo
               </th>
               <th className="text-left text-xs font-semibold text-slate-200 uppercase tracking-wider px-4 py-3">
-                TauKit
+                Tipo de Muestra
+              </th>
+              <th className="text-left text-xs font-semibold text-slate-200 uppercase tracking-wider px-4 py-3">
+                N° Serie
               </th>
               <th className="text-left text-xs font-semibold text-slate-200 uppercase tracking-wider px-4 py-3">
                 Paciente
@@ -255,14 +425,14 @@ export function MuestrasPage({
             {filtradas.length === 0 ? (
               <tr>
                 <td
-                  colSpan={8}
+                  colSpan={9}
                   className="text-center py-12 text-slate-400 text-sm"
                 >
                   No se encontraron muestras con los filtros aplicados
                 </td>
               </tr>
             ) : (
-              filtradas.map((m) => {
+              paginadas.map((m) => {
                 const bloqueada = m.intentosFallidos >= 2;
                 return (
                   <tr
@@ -276,7 +446,12 @@ export function MuestrasPage({
                     </td>
                     <td className="px-4 py-3">
                       <span className="text-xs text-slate-500 font-mono">
-                        {m.codigoTauKit}
+                        {etiquetaTipoEstudio(m.tipoEstudio)}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className="text-sm text-slate-700 font-mono">
+                        {codigoMuestra(m)}
                       </span>
                     </td>
                     <td className="px-4 py-3">
@@ -325,12 +500,25 @@ export function MuestrasPage({
                     </td>
                     <td className="px-4 py-3 text-right">
                       <div className="inline-flex gap-1">
-                        {m.estado === 'recibido' && (
+                        {(m.estado === 'recibido' || m.estado === 'en_proceso') && (
                           <button
                             onClick={async () => {
-                              await generarEtiquetasMuestra(m);
-                              await api.imprimirEtiquetas(m.protocolo);
-                              onMuestraActualizada();
+                              setErrorAccion(null);
+                              setMensajeAccion(null);
+                              try {
+                                const actualizada = await api.imprimirEtiquetas(
+                                  m.protocolo,
+                                  usuario.username,
+                                );
+                                await generarEtiquetasMuestra(actualizada);
+                                onMuestraActualizada();
+                              } catch (e) {
+                                setErrorAccion(
+                                  e instanceof Error
+                                    ? `No se pudo cambiar el estado en BACON: ${e.message}`
+                                    : 'No se pudo cambiar el estado en BACON.',
+                                );
+                              }
                             }}
                             className="text-xs px-2.5 py-1 rounded-md border border-slate-300 text-slate-700 hover:bg-slate-50 transition-colors font-medium"
                           >
@@ -347,7 +535,11 @@ export function MuestrasPage({
                         )}
                         {m.estado === 'en_validacion' && puedeValidar && (
                           <button
-                            onClick={() => setMuestraEnValidacion(m)}
+                            onClick={() => {
+                              setErrorAccion(null);
+                              setMensajeAccion(null);
+                              setMuestraEnValidacion(m);
+                            }}
                             className="text-xs px-2.5 py-1 rounded-md bg-violet-600 text-white hover:bg-violet-700 transition-colors font-medium"
                           >
                             Validar
@@ -357,7 +549,7 @@ export function MuestrasPage({
                           <button
                             onClick={() => {
                               const base = import.meta.env.VITE_API_BASE_URL ?? '/api';
-                              window.open(`${base}/muestras/${m.protocolo}/pdf`, '_blank');
+                              window.open(`${base}/muestras/${encodeURIComponent(m.protocolo)}/pdf`, '_blank');
                             }}
                             className="text-xs px-2.5 py-1 rounded-md border border-slate-300 text-slate-700 hover:bg-slate-50 transition-colors font-medium"
                           >
@@ -374,6 +566,46 @@ export function MuestrasPage({
         </table>
       </div>
 
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600">
+        <div>
+          Mostrando {primeraVisible} a {ultimaVisible} de {filtradas.length} muestra
+          {filtradas.length !== 1 ? 's' : ''}
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <label className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
+            Por pagina
+            <select
+              value={porPagina}
+              onChange={(e) => setPorPagina(Number(e.target.value))}
+              className="rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-sm font-normal normal-case text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            >
+              <option value={20}>20</option>
+              <option value={30}>30</option>
+              <option value={50}>50</option>
+            </select>
+          </label>
+          <button
+            type="button"
+            onClick={() => setPagina((p) => Math.max(1, p - 1))}
+            disabled={pagina === 1}
+            className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-300"
+          >
+            Anterior
+          </button>
+          <span className="min-w-[92px] text-center text-xs font-semibold text-slate-500">
+            Pagina {pagina} de {totalPaginas}
+          </span>
+          <button
+            type="button"
+            onClick={() => setPagina((p) => Math.min(totalPaginas, p + 1))}
+            disabled={pagina === totalPaginas}
+            className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-300"
+          >
+            Siguiente
+          </button>
+        </div>
+      </div>
+
       {!puedeValidar && (
         <div className="text-xs text-slate-500 px-1">
           ℹ️ La acción <span className="font-medium">Validar</span> solo está
@@ -385,10 +617,40 @@ export function MuestrasPage({
       {muestraEnValidacion && (
         <ValidacionModal
           muestra={muestraEnValidacion}
+          usuarioId={usuario.username}
           onCerrar={() => setMuestraEnValidacion(null)}
           onActualizada={onMuestraActualizada}
+          onValidacionExitosa={(mensaje) => {
+            setErrorAccion(null);
+            setMensajeAccion(mensaje);
+          }}
         />
       )}
+    </div>
+  );
+}
+
+function ResumenPeriodoCard({
+  label,
+  valor,
+  tono = 'normal',
+}: {
+  label: string;
+  valor: number;
+  tono?: 'normal' | 'error';
+}) {
+  return (
+    <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+      <div className="text-xs font-bold uppercase tracking-wider text-slate-500">
+        {label}
+      </div>
+      <div
+        className={`mt-1 text-2xl font-extrabold tracking-tight ${
+          tono === 'error' ? 'text-red-600' : 'text-emerald-600'
+        }`}
+      >
+        {valor}
+      </div>
     </div>
   );
 }

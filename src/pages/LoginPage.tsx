@@ -65,7 +65,7 @@ export function LoginPage({ onLogin, mensaje }: Props) {
 
     setCambiandoPassword(true);
     try {
-      await api.cambiarPasswordActual(usuarioPendiente.id, password, nuevaPassword);
+      await api.cambiarPasswordActual(usuarioPendiente.username, password, nuevaPassword);
       onLogin({ ...usuarioPendiente, passwordExpired: false });
       setUsuarioPendiente(null);
       setPassword('');

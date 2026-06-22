@@ -8,12 +8,12 @@ import {
 } from '../types';
 
 export const USUARIOS_MOCK: Record<string, Usuario> = {
-  tec1: { id: 'tec1', nombre: 'María López', rol: 'tecnico' },
-  tec2: { id: 'tec2', nombre: 'Juan Pérez', rol: 'tecnico' },
-  bio1: { id: 'bio1', nombre: 'Dra. Ana García', rol: 'bioquimico' },
-  bio2: { id: 'bio2', nombre: 'Dr. Carlos Ruiz', rol: 'bioquimico' },
-  adm1: { id: 'adm1', nombre: 'Laura Martínez', rol: 'admin' },
-  adm2: { id: 'adm2', nombre: 'Roberto Silva', rol: 'admin' },
+  tec1: { id: 'tec1', username: 'tec1', nombre: 'María López', rol: 'tecnico' },
+  tec2: { id: 'tec2', username: 'tec2', nombre: 'Juan Pérez', rol: 'tecnico' },
+  bio1: { id: 'bio1', username: 'bio1', nombre: 'Dra. Ana García', rol: 'bioquimico' },
+  bio2: { id: 'bio2', username: 'bio2', nombre: 'Dr. Carlos Ruiz', rol: 'bioquimico' },
+  adm1: { id: 'adm1', username: 'adm1', nombre: 'Laura Martínez', rol: 'admin' },
+  adm2: { id: 'adm2', username: 'adm2', nombre: 'Roberto Silva', rol: 'admin' },
 };
 
 const MOCK_SUCURSAL: Sucursal = {
@@ -24,6 +24,11 @@ const MOCK_SUCURSAL: Sucursal = {
 const MOCK_ESTUDIO: Estudio = {
   codigo: 'mock-estudio',
   nombre: 'Helicobacter Pylori (Urea-13C)',
+};
+
+const MOCK_ESTUDIO_LACTOKIT: Estudio = {
+  codigo: '002',
+  nombre: 'Malabsorcion de Lactosa',
 };
 
 export const BACON_DB: Record<
@@ -62,6 +67,18 @@ export const BACON_DB: Record<
     paciente: { nombre: 'Valeria', apellido: 'Suárez', dni: '34567891', fechaTomaMuestra: '2026-05-13' },
     estudio: MOCK_ESTUDIO,
   },
+  '20000001': {
+    paciente: { nombre: 'Mariana', apellido: 'Ferreyra', dni: '30123456', fechaTomaMuestra: '2026-05-13' },
+    estudio: MOCK_ESTUDIO_LACTOKIT,
+  },
+  '20000002': {
+    paciente: { nombre: 'Lucas', apellido: 'Ramirez', dni: '33222111', fechaTomaMuestra: '2026-05-13' },
+    estudio: MOCK_ESTUDIO_LACTOKIT,
+  },
+  '20000003': {
+    paciente: { nombre: 'Analia', apellido: 'Diaz', dni: '26578901', fechaTomaMuestra: '2026-05-13' },
+    estudio: MOCK_ESTUDIO_LACTOKIT,
+  },
 };
 
 export function construirMuestra(
@@ -76,6 +93,11 @@ export function construirMuestra(
   return {
     protocolo: opciones.protocolo ?? codigoTauKit,
     codigoTauKit,
+    // Determinar tipo de estudio por prefijo (mock): códigos que empiezan con '2' son Lactokit
+    tipoEstudio: codigoTauKit.trim().startsWith('2') ? 'lactokit' : 'taukit',
+
+    // Para Lactokit guardamos el código alternativo; en Taukit queda null
+    codigoLactokit: codigoTauKit.trim().startsWith('2') ? codigoTauKit : null,
     paciente: datos.paciente,
     estudio: datos.estudio,
     sucursal: MOCK_SUCURSAL,
@@ -124,6 +146,9 @@ export const MUESTRAS_INICIALES: Muestra[] = [
   })!,
   construirMuestra('TK-2026-0006', 'recibido', { fechaIngreso: `${HOY} 09:30` })!,
   construirMuestra('TK-2026-0007', 'recibido', { fechaIngreso: `${HOY} 09:45` })!,
+  construirMuestra('20000001', 'en_proceso', { fechaIngreso: `${HOY} 10:10` })!,
+  construirMuestra('20000002', 'en_proceso', { fechaIngreso: `${HOY} 10:18` })!,
+  construirMuestra('20000003', 'recibido', { fechaIngreso: `${HOY} 10:25` })!,
   // Su protocolo NO está en el TXT → queda en 'recibido' sin resultados
   construirMuestra('TK-2026-0008', 'recibido', { fechaIngreso: `${HOY} 10:00` })!,
 ];

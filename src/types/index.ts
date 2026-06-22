@@ -15,6 +15,7 @@ export type Estado = 'recibido' | 'en_proceso' | 'en_validacion' | 'completado' 
 
 export interface Usuario {
   id: string;
+  username: string;
   nombre: string;
   rol: Rol;
   passwordExpired?: boolean;
@@ -60,6 +61,12 @@ export interface Muestra {
   // Es el código que se escanea con el lector.
   codigoTauKit: string;
 
+  // Tipo de estudio: determina si es un Taukit o un Lactokit.
+  tipoEstudio: 'taukit' | 'lactokit';
+
+  // Código alternativo para Lactokit (cuando aplique).
+  codigoLactokit?: string | null;
+
   // Datos del paciente (vienen de BACON).
   paciente: Paciente;
 
@@ -82,6 +89,34 @@ export interface Muestra {
 
   // Resultados cargados del TXT del HeliFan. null hasta que se cargue.
   resultados: ResultadoMuestra | null;
+
+  // Resultados específicos para Lactokit.
+  resultadosLactokit?: ResultadoLactokit | null;
+}
+
+export interface ValidacionMuestraResponse extends Muestra {
+  pdfGenerado?: boolean;
+  pdfVerificado?: boolean;
+  pdfVerificacion?: {
+    success?: boolean;
+    nombre_esperado?: string;
+    archivo?: {
+      nombre?: string;
+      fecha_subida?: string;
+      tamaño?: string;
+      url?: string;
+    };
+  };
+}
+
+// Resultados de un Lactokit según el backend.
+export interface ResultadoLactokit {
+  h2: Array<number | null>; // 8 valores (uno por frasco) o más/menos según backend
+  ch4: Array<number | null>;
+  co2: Array<number | null>;
+  valoracion: '1' | '2' | '3' | '4' | 'ERROR';
+  descripcion: string;
+  cargadoEn: string; // 'YYYY-MM-DD HH:mm'
 }
 
 export interface Discrepancia {
@@ -104,6 +139,17 @@ export interface ResultadoIngreso {
   ingresadas: Muestra[]; // muestras completas ingresadas (con su protocolo, paciente, etc.)
   rechazadas: string[]; // códigos TauKit rechazados por BACON
   duplicadas: string[]; // códigos TauKit ya ingresados
+}
+
+export interface ProtocoloEditado {
+  protocolo: string;
+  numeroSerie: string;
+  tipoEstudio: 'taukit' | 'lactokit' | string;
+  fechaIngreso: string;
+  fechaEdicion: string;
+  motivo: string;
+  usuario: string;
+  camposEditados?: string[];
 }
 
 // Resultados de una muestra parseados del TXT del HeliFan.

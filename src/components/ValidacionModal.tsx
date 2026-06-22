@@ -5,10 +5,12 @@ import type { Muestra } from '../types';
 
 interface Props {
   muestra: Muestra;
+  usuarioId: string;
   onCerrar: () => void;
   // Se llama cuando la muestra cambió (validada o reiniciada),
   // para que el padre refresque la lista.
   onActualizada: () => void;
+  onValidacionExitosa?: (mensaje: string) => void;
 }
 
 // ============================================
@@ -21,7 +23,13 @@ interface Props {
 //   - Cancelar → cierra sin cambios (queda 'en_validacion')
 //   - Reiniciar → solo si tiene error; borra resultados para recargar
 
-export function ValidacionModal({ muestra, onCerrar, onActualizada }: Props) {
+export function ValidacionModal({
+  muestra,
+  usuarioId,
+  onCerrar,
+  onActualizada,
+  onValidacionExitosa,
+}: Props) {
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirmandoReinicio, setConfirmandoReinicio] = useState(false);
@@ -37,14 +45,20 @@ export function ValidacionModal({ muestra, onCerrar, onActualizada }: Props) {
 
   const bloqueada = muestra.intentosFallidos >= 2;
   const r = muestra.resultados;
+  const resultadosLactokit = muestra.resultadosLactokit;
 
   const handleAceptar = async () => {
     setEnviando(true);
     setError(null);
     try {
-      await api.validarMuestra(muestra.protocolo);
+      const respuesta = await api.validarMuestra(muestra.protocolo, usuarioId);
+      if (respuesta.pdfVerificado !== true) {
+        setError('No se pudo verificar la subida del PDF en BACON. La muestra no se marcó como completada.');
+        return;
+      }
       onActualizada();
       onCerrar();
+      onValidacionExitosa?.('PDF subido correctamente. Verificación exitosa.');
     } catch (e) {
       setError(
         e instanceof ApiError ? e.message : 'Error al validar la muestra',
@@ -63,7 +77,7 @@ export function ValidacionModal({ muestra, onCerrar, onActualizada }: Props) {
     setEnviando(true);
     setError(null);
     try {
-      await api.reiniciarMuestra(muestra.protocolo);
+      await api.reiniciarMuestra(muestra.protocolo, usuarioId);
       onActualizada();
       onCerrar();
     } catch (e) {
@@ -136,8 +150,12 @@ export function ValidacionModal({ muestra, onCerrar, onActualizada }: Props) {
                 </span>
               </div>
               <div>
-                <span className="text-slate-400">TauKit:</span>{' '}
-                <span className="font-mono">{muestra.codigoTauKit}</span>
+                <span className="text-slate-400">Tipo de estudio:</span>{' '}
+                <span className="font-mono">{muestra.tipoEstudio.toUpperCase()}</span>
+              </div>
+              <div>
+                <span className="text-slate-400">Código:</span>{' '}
+                <span className="font-mono">{muestra.tipoEstudio === 'lactokit' ? (muestra.codigoLactokit ?? muestra.codigoTauKit) : muestra.codigoTauKit}</span>
               </div>
               <div>
                 <span className="text-slate-400">Estudio:</span>{' '}
@@ -145,75 +163,147 @@ export function ValidacionModal({ muestra, onCerrar, onActualizada }: Props) {
               </div>
             </div>
           </div>
-
-          {/* Resultados del HeliFan */}
+          {/* Resultados bioquímicos */}
           <div className="border border-slate-200 rounded-lg overflow-hidden">
             <div className="px-4 py-2 bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-              Resultados del HeliFan
+              Resultados
             </div>
-            {r ? (
-              <div className="p-4 space-y-3">
-                {/* TestValue destacado */}
-                <div className="flex items-center justify-between bg-slate-900 text-white rounded-lg px-4 py-3">
-                  <span className="text-sm text-slate-300">
-                    Incremento sobre basal (Δ ‰)
-                  </span>
-                  <span className="text-2xl font-semibold font-mono">
-                    {r.testValue.toFixed(1)}
-                  </span>
-                </div>
-
-                {/* Detalle basal / post */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="border border-slate-200 rounded-lg p-3">
-                    <div className="text-xs text-slate-400 uppercase tracking-wider mb-1.5">
-                      Minuto 0 (basal)
-                    </div>
-                    <div className="space-y-1 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-slate-500">CO₂</span>
-                        <span className="font-mono text-slate-900">
-                          {r.basalCO2.toFixed(5)}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-slate-500">Delta</span>
-                        <span className="font-mono text-slate-900">
-                          {r.basalDelta.toFixed(2)}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="border border-slate-200 rounded-lg p-3">
-                    <div className="text-xs text-slate-400 uppercase tracking-wider mb-1.5">
-                      Minuto 30 (post)
-                    </div>
-                    <div className="space-y-1 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-slate-500">CO₂</span>
-                        <span className="font-mono text-slate-900">
-                          {r.postCO2.toFixed(5)}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-slate-500">Delta</span>
-                        <span className="font-mono text-slate-900">
-                          {r.postDelta.toFixed(2)}
-                        </span>
-                      </div>
+            {muestra.tipoEstudio === 'lactokit' ? (
+              resultadosLactokit ? (
+                <div className="p-4 space-y-4">
+                  <div className="space-y-3">
+                    <div className="text-sm font-semibold">Condiciones</div>
+                    <div className="overflow-auto border border-slate-200 rounded-lg">
+                      <table className="w-full text-xs border-collapse">
+                        <thead>
+                          <tr className="bg-slate-50 text-left text-slate-500 uppercase tracking-wider text-[10px]">
+                            <th className="px-3 py-2 border-b border-slate-200">Condición</th>
+                            <th className="px-3 py-2 border-b border-slate-200">Descripción</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr className="border-b border-slate-200">
+                            <td className="px-3 py-2 align-top font-semibold">c</td>
+                            <td className="px-3 py-2">Si H2 en cualquier punto es {'>'}20ppm respecto del basal: Hay malabsorción de azúcares con elevación de hidrógeno.</td>
+                          </tr>
+                          <tr className="border-b border-slate-200">
+                            <td className="px-3 py-2 align-top font-semibold">d</td>
+                            <td className="px-3 py-2">Si CH4 es mayor a 10ppm en cualquier frasco: Hay malabsorción de azúcares con elevación de metano.</td>
+                          </tr>
+                          <tr className="border-b border-slate-200">
+                            <td className="px-3 py-2 align-top font-semibold">e</td>
+                            <td className="px-3 py-2">Si se cumple condición c y d en simultáneo: Hay malabsorción de azúcares con elevación de hidrógeno y metano.</td>
+                          </tr>
+                          <tr>
+                            <td className="px-3 py-2 align-top font-semibold">g</td>
+                            <td className="px-3 py-2">Si no se cumple ninguna de las condiciones anteriores: Resultado compatible con malabsorción de azúcares.</td>
+                          </tr>
+                        </tbody>
+                      </table>
                     </div>
                   </div>
-                </div>
 
-                <div className="text-xs text-slate-400">
-                  Cargado el{' '}
-                  <span className="font-mono">{r.cargadoEn}</span>
+                  <div className="space-y-3">
+                    <div className="text-sm font-semibold">Valoración</div>
+                    <div className="overflow-auto border border-slate-200 rounded-lg">
+                      <table className="w-full text-xs border-collapse">
+                        <thead>
+                          <tr className="bg-slate-50 text-left text-slate-500 uppercase tracking-wider text-[10px]">
+                            <th className="px-3 py-2 border-b border-slate-200">Valoración</th>
+                            <th className="px-3 py-2 border-b border-slate-200">Descripción</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr className="border-b border-slate-200">
+                            <td className="px-3 py-2 font-semibold">1</td>
+                            <td className="px-3 py-2">Resultado no compatible con malabsorción de lactosa.</td>
+                          </tr>
+                          <tr className="border-b border-slate-200">
+                            <td className="px-3 py-2 font-semibold">2</td>
+                            <td className="px-3 py-2">Resultado compatible con malabsorción de lactosa con elevación de hidrógeno y metano, si el paciente reporta síntomas, entonces estaríamos frente a una.</td>
+                          </tr>
+                          <tr className="border-b border-slate-200">
+                            <td className="px-3 py-2 font-semibold">3</td>
+                            <td className="px-3 py-2">Resultado compatible con malabsorción de lactosa con elevación de hidrógeno, si el paciente reporta síntomas, entonces estaríamos frente a una.</td>
+                          </tr>
+                          <tr className="border-b border-slate-200">
+                            <td className="px-3 py-2 font-semibold">4</td>
+                            <td className="px-3 py-2">Resultado compatible con malabsorción de lactosa con elevación de metano, si el paciente reporta síntomas, entonces estaríamos frente a una.</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="text-sm font-semibold">Resultados por toma</div>
+                    <div className="overflow-auto border border-slate-200 rounded-lg">
+                      <table className="w-full text-xs border-collapse">
+                        <thead>
+                          <tr className="bg-slate-50 text-left text-slate-500 uppercase tracking-wider text-[10px]">
+                            <th className="px-3 py-2 border-b border-slate-200">Tiempo (min)</th>
+                            <th className="px-3 py-2 border-b border-slate-200">H2 (ppm) corregido</th>
+                            <th className="px-3 py-2 border-b border-slate-200">CH4 (ppm) corregido</th>
+                            <th className="px-3 py-2 border-b border-slate-200">CO2 (%) muestra</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {resultadosLactokit.h2.map((_, i) => {
+                            const time = i * 25;
+                            return (
+                              <tr key={i} className="border-b border-slate-200">
+                                <td className="px-3 py-2 align-top">{time}</td>
+                                <td className="px-3 py-2 font-mono">{String(resultadosLactokit.h2[i] ?? '—')}</td>
+                                <td className="px-3 py-2 font-mono">{String(resultadosLactokit.ch4[i] ?? '—')}</td>
+                                <td className="px-3 py-2 font-mono">{String(resultadosLactokit.co2[i] ?? '—')}</td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
+                    <div className="font-semibold">Valoración del informe</div>
+                    <div className="mt-2 text-2xl font-bold">{resultadosLactokit.valoracion}</div>
+                    <div className="mt-2 text-slate-700">{resultadosLactokit.descripcion}</div>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="p-4 text-sm text-slate-400 text-center">Esta muestra todavía no tiene resultados de Lactokit cargados.</div>
+              )
             ) : (
-              <div className="p-4 text-sm text-slate-400 text-center">
-                Esta muestra todavía no tiene resultados cargados.
-              </div>
+              // Taukit (HeliFan)
+              r ? (
+                <div className="p-4 space-y-3">
+                  <div className="flex items-center justify-between bg-slate-900 text-white rounded-lg px-4 py-3">
+                    <span className="text-sm text-slate-300">Incremento sobre basal (Δ ‰)</span>
+                    <span className="text-2xl font-semibold font-mono">{r.testValue.toFixed(1)}</span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="border border-slate-200 rounded-lg p-3">
+                      <div className="text-xs text-slate-400 uppercase tracking-wider mb-1.5">Minuto 0 (basal)</div>
+                      <div className="space-y-1 text-sm">
+                        <div className="flex justify-between"><span className="text-slate-500">CO₂</span><span className="font-mono text-slate-900">{r.basalCO2.toFixed(5)}</span></div>
+                        <div className="flex justify-between"><span className="text-slate-500">Delta</span><span className="font-mono text-slate-900">{r.basalDelta.toFixed(2)}</span></div>
+                      </div>
+                    </div>
+                    <div className="border border-slate-200 rounded-lg p-3">
+                      <div className="text-xs text-slate-400 uppercase tracking-wider mb-1.5">Minuto 30 (post)</div>
+                      <div className="space-y-1 text-sm">
+                        <div className="flex justify-between"><span className="text-slate-500">CO₂</span><span className="font-mono text-slate-900">{r.postCO2.toFixed(5)}</span></div>
+                        <div className="flex justify-between"><span className="text-slate-500">Delta</span><span className="font-mono text-slate-900">{r.postDelta.toFixed(2)}</span></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="text-xs text-slate-400">Cargado el <span className="font-mono">{r.cargadoEn}</span></div>
+                </div>
+              ) : (
+                <div className="p-4 text-sm text-slate-400 text-center">Esta muestra todavía no tiene resultados cargados.</div>
+              )
             )}
           </div>
 
@@ -268,6 +358,7 @@ export function ValidacionModal({ muestra, onCerrar, onActualizada }: Props) {
               {error}
             </div>
           )}
+
         </div>
 
         {/* Confirmación de reinicio (reemplaza el footer mientras está activa) */}

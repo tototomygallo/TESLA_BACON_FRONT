@@ -28,8 +28,8 @@ export function useMuestras() {
   }, [recargar]);
 
   const ingresarLote = useCallback(
-    async (codigos: string[]): Promise<ResultadoIngreso> => {
-      const resultado = await api.ingresarLote(codigos);
+    async (codigos: string[], usuarioId: string): Promise<ResultadoIngreso> => {
+      const resultado = await api.ingresarLote(codigos, usuarioId);
       // Refrescar lista después de un ingreso
       await recargar();
       return resultado;

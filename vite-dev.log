@@ -3,151 +3,288 @@
 > vite --host 127.0.0.1
 
 
-  [32m[1mVITE[22m v6.4.2[39m  [2mready in [0m[1m424[22m[2m[0m ms[22m
+  [32m[1mVITE[22m v6.4.2[39m  [2mready in [0m[1m1072[22m[2m[0m ms[22m
 
   [32m➜[39m  [1mLocal[22m:   [36mhttp://127.0.0.1:[1m5173[22m/[39m
-[2m09:46:06[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/Topbar.tsx, /src/index.css[22m
-[2m09:46:06[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/Topbar.tsx, /src/index.css[22m
-[2m09:46:10[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m09:47:02[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m09:47:02[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m09:47:26[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/Topbar.tsx, /src/index.css[22m
-[2m09:47:27[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m09:47:54[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/Topbar.tsx, /src/index.css[22m
-[2m09:47:54[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m09:55:21[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/Topbar.tsx, /src/index.css[22m
-[2m09:55:22[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m10:05:09[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m10:05:09[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m10:10:14[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m10:11:11[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m10:11:22[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m10:11:24[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m10:11:26[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m10:11:49[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m10:11:50[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m10:12:39[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m10:12:47[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m10:13:52[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m10:13:53[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m10:13:59[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m10:14:04[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m10:14:24[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m10:14:31[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m10:14:37[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m10:18:30[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m10:18:30[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m10:25:30[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m10:26:32[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m10:26:35[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m10:27:39[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/Topbar.tsx, /src/index.css[22m
-[2m10:27:45[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/Topbar.tsx, /src/index.css[22m
-[2m10:27:47[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/Topbar.tsx, /src/index.css[22m
-[2m10:27:48[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/Topbar.tsx, /src/index.css[22m
-[2m10:28:33[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m10:28:40[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m10:28:44[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m10:28:45[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m10:28:51[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m10:28:54[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m10:28:55[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m10:28:55[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m11:47:24[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/MetricCard.tsx, /src/index.css[22m
-[2m11:47:24[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/MetricCard.tsx, /src/index.css[22m
-[2m11:47:31[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/MetricCard.tsx, /src/index.css[22m
-[2m11:48:22[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/MetricCard.tsx, /src/index.css[22m
-[2m11:48:52[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/MetricCard.tsx, /src/index.css[22m
-[2m11:59:13[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
-[2m12:00:21[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/DashboardPage.tsx, /src/index.css[22m
-[2m12:03:04[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
-[2m12:12:25[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/ControlPrevio.tsx, /src/index.css[22m
-[2m12:12:27[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/ControlPrevio.tsx, /src/index.css[22m
-[2m12:12:39[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/ControlPrevio.tsx, /src/index.css[22m
-[2m12:12:46[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/ControlPrevio.tsx, /src/index.css[22m
-[2m12:12:50[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/ControlPrevio.tsx, /src/index.css[22m
-[2m12:22:54[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/ScannerPage.tsx, /src/index.css[22m
-[2m12:22:54[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/ScannerPage.tsx, /src/index.css[22m
-[2m12:26:48[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/ScannerPage.tsx, /src/index.css[22m
-[2m12:27:01[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/ScannerPage.tsx, /src/index.css[22m
-[2m12:29:50[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/ScannerPage.tsx, /src/index.css[22m
-[2m12:34:32[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/ControlPrevio.tsx, /src/index.css[22m
-[2m12:39:00[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/MetricCard.tsx, /src/index.css[22m
-[2m12:41:52[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
-[2m12:41:52[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/Topbar.tsx, /src/index.css[22m
-[2m12:42:46[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/Topbar.tsx, /src/index.css[22m
-[2m12:44:13[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/Topbar.tsx, /src/index.css[22m
-[2m12:45:51[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css[22m
-[2m12:55:58[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/components/ValidacionModal.tsx, /src/components/ControlPrevio.tsx[22m
-[2m12:56:18[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/components/ValidacionModal.tsx, /src/components/ControlPrevio.tsx[22m
-[2m12:56:28[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/components/ValidacionModal.tsx, /src/components/ControlPrevio.tsx[22m
-[2m12:56:46[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/components/ValidacionModal.tsx, /src/components/ControlPrevio.tsx[22m
-[2m12:57:53[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/Topbar.tsx, /src/index.css[22m
-[2m12:57:53[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
-[2m12:58:17[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/components/ValidacionModal.tsx, /src/components/ControlPrevio.tsx[22m
-[2m01:07:05[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/components/ValidacionModal.tsx, /src/components/ControlPrevio.tsx[22m
-[2m01:07:14[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/components/ValidacionModal.tsx, /src/components/ControlPrevio.tsx[22m
-[2m01:07:22[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/components/ValidacionModal.tsx, /src/components/ControlPrevio.tsx[22m
-[2m01:09:32[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/components/ValidacionModal.tsx, /src/components/ControlPrevio.tsx[22m
-[2m01:09:37[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/components/ValidacionModal.tsx, /src/components/ControlPrevio.tsx[22m
-[2m01:09:53[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/components/ValidacionModal.tsx, /src/components/ControlPrevio.tsx[22m
-[2m01:10:06[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/components/ValidacionModal.tsx, /src/components/ControlPrevio.tsx[22m
-[2m01:10:46[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/components/ValidacionModal.tsx, /src/components/ControlPrevio.tsx[22m
-[2m01:10:53[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/components/ValidacionModal.tsx, /src/components/ControlPrevio.tsx[22m
-[2m01:12:47[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/components/ValidacionModal.tsx, /src/components/ControlPrevio.tsx[22m
-[2m09:19:38[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/components/ValidacionModal.tsx, /src/components/ControlPrevio.tsx[22m
-[2m09:20:08[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/components/ValidacionModal.tsx, /src/components/ControlPrevio.tsx[22m
-[2m09:20:16[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/components/ValidacionModal.tsx, /src/components/ControlPrevio.tsx[22m
-[2m09:20:28[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/components/ValidacionModal.tsx, /src/components/ControlPrevio.tsx[22m
-[2m09:22:25[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/components/ValidacionModal.tsx, /src/components/ControlPrevio.tsx[22m
-[2m09:22:38[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/components/ValidacionModal.tsx, /src/components/ControlPrevio.tsx[22m
-[2m09:22:48[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/components/ValidacionModal.tsx, /src/components/ControlPrevio.tsx[22m
-[2m09:45:28[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/components/ValidacionModal.tsx, /src/components/ControlPrevio.tsx[22m
-[2m09:45:41[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/components/ValidacionModal.tsx, /src/components/ControlPrevio.tsx[22m
-[2m09:46:02[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/components/ValidacionModal.tsx, /src/components/ControlPrevio.tsx[22m
-[2m09:46:05[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/components/ValidacionModal.tsx, /src/components/ControlPrevio.tsx[22m
-[2m09:56:03[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/components/ValidacionModal.tsx, /src/components/ControlPrevio.tsx[22m
-[2m09:56:08[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/components/ValidacionModal.tsx, /src/components/ControlPrevio.tsx[22m
-[2m10:06:40[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/components/ValidacionModal.tsx, /src/components/ControlPrevio.tsx[22m
-[2m10:06:46[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/components/ValidacionModal.tsx, /src/components/ControlPrevio.tsx[22m
-[2m10:06:54[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/components/ValidacionModal.tsx, /src/components/ControlPrevio.tsx[22m
-[2m10:32:30[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
-[2m10:47:37[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/components/ValidacionModal.tsx, /src/components/ControlPrevio.tsx[22m
-[2m10:47:38[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/components/ValidacionModal.tsx, /src/components/ControlPrevio.tsx[22m
-[2m10:50:18[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
-[2m11:12:03[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/components/ValidacionModal.tsx, /src/components/ControlPrevio.tsx[22m
-[2m11:12:55[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m11:13:05[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m11:13:47[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m11:14:04[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m11:26:24[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/components/ValidacionModal.tsx, /src/components/ControlPrevio.tsx[22m
-[2m11:26:47[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/components/ValidacionModal.tsx, /src/components/ControlPrevio.tsx[22m
-[2m11:27:03[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/components/ValidacionModal.tsx, /src/components/ControlPrevio.tsx[22m
-[2m11:27:26[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/CargaTxtPage.tsx, /src/index.css[22m
-[2m11:28:04[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/components/ValidacionModal.tsx, /src/components/ControlPrevio.tsx[22m
-[2m11:28:12[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/components/ValidacionModal.tsx, /src/components/ControlPrevio.tsx[22m
-[2m02:51:57[22m [36m[1m[vite][22m[39m [32m.env changed, restarting server...[39m
-[2m02:51:57[22m [36m[1m[vite][22m[39m [32m.env.development changed, restarting server...[39m
-[2m02:51:58[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m Re-optimizing dependencies because vite config has changed
-[2m02:51:59[22m [36m[1m[vite][22m[39m server restarted.
-[2m02:56:18[22m [36m[1m[vite][22m[39m [32m.env changed, restarting server...[39m
-[2m02:56:18[22m [36m[1m[vite][22m[39m server restarted.
-[2m04:10:02[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
-[2m04:10:02[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
-[2m04:10:37[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/CargaTxtPage.tsx, /src/index.css[22m
-[2m04:10:40[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/CargaTxtPage.tsx, /src/index.css[22m
-[2m04:10:43[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/CargaTxtPage.tsx, /src/index.css[22m
-[2m04:11:35[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/ConfiguracionPage.tsx, /src/index.css[22m
-[2m04:11:38[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/ConfiguracionPage.tsx, /src/index.css[22m
-[2m04:11:43[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/ConfiguracionPage.tsx, /src/index.css[22m
-[2m04:29:58[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m04:29:58[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
-[2m04:36:48[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/Topbar.tsx, /src/index.css[22m
-[2m04:48:45[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/Topbar.tsx, /src/index.css[22m
-[2m04:10:08[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/ConfiguracionPage.tsx, /src/index.css[22m
-[2m04:10:15[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/ConfiguracionPage.tsx, /src/index.css[22m
-[2m04:10:23[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/ConfiguracionPage.tsx, /src/index.css[22m
-[2m04:10:30[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/ConfiguracionPage.tsx, /src/index.css[22m
-[2m04:10:45[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/ConfiguracionPage.tsx, /src/index.css[22m
-[2m04:10:55[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/ConfiguracionPage.tsx, /src/index.css[22m
-[2m04:11:04[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/ConfiguracionPage.tsx, /src/index.css[22m
-[2m04:11:16[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/ConfiguracionPage.tsx, /src/index.css[22m
+[2m09:53:44[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/DashboardPage.tsx, /src/index.css[22m
+[2m09:56:51[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/DashboardPage.tsx, /src/index.css[22m
+[2m10:19:23[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/types/index.ts[22m
+[2m10:19:31[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/ScannerPage.tsx, /src/pages/LoginPage.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/pages/ConfiguracionPage.tsx, /src/components/ControlPrevio.tsx, /src/components/ValidacionModal.tsx[22m
+[2m10:19:53[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m10:20:02[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m10:20:22[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/DashboardPage.tsx, /src/index.css[22m
+[2m10:20:48[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/ControlPrevio.tsx, /src/index.css[22m
+[2m10:20:59[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/ControlPrevio.tsx, /src/index.css[22m
+[2m10:21:22[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/ScannerPage.tsx, /src/index.css[22m
+[2m10:21:41[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/ScannerPage.tsx, /src/index.css[22m
+[2m10:22:01[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/CargaTxtPage.tsx, /src/index.css[22m
+[2m10:43:06[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/CargaTxtPage.tsx, /src/index.css[22m
+[2m11:13:59[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/ScannerPage.tsx, /src/pages/LoginPage.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/pages/ConfiguracionPage.tsx, /src/components/ControlPrevio.tsx, /src/components/ValidacionModal.tsx, /src/components/LactokitCargaGrid.tsx[22m
+[2m11:14:30[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/ScannerPage.tsx, /src/pages/LoginPage.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/pages/ConfiguracionPage.tsx, /src/components/ControlPrevio.tsx, /src/components/ValidacionModal.tsx, /src/components/LactokitCargaGrid.tsx[22m
+[2m11:14:59[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/ScannerPage.tsx, /src/pages/LoginPage.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/pages/ConfiguracionPage.tsx, /src/components/ControlPrevio.tsx, /src/components/ValidacionModal.tsx, /src/components/LactokitCargaGrid.tsx[22m
+[2m11:28:21[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/ScannerPage.tsx, /src/pages/LoginPage.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/pages/ConfiguracionPage.tsx, /src/components/ControlPrevio.tsx, /src/components/ValidacionModal.tsx, /src/components/LactokitCargaGrid.tsx[22m
+[2m11:28:42[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/ScannerPage.tsx, /src/pages/LoginPage.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/pages/ConfiguracionPage.tsx, /src/components/ControlPrevio.tsx, /src/components/ValidacionModal.tsx, /src/components/LactokitCargaGrid.tsx[22m
+[2m11:28:51[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+[2m11:28:59[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+[2m11:29:13[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/CargaTxtPage.tsx, /src/index.css[22m
+[2m11:29:23[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/LactokitCargaGrid.tsx, /src/index.css[22m
+[2m11:29:32[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/ValidacionModal.tsx, /src/index.css[22m
+[2m11:29:40[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m11:29:54[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/ScannerPage.tsx, /src/pages/LoginPage.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/pages/ConfiguracionPage.tsx, /src/components/ControlPrevio.tsx, /src/components/ValidacionModal.tsx, /src/components/LactokitCargaGrid.tsx[22m
+[2m11:30:13[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/CargaTxtPage.tsx, /src/index.css[22m
+[2m11:50:02[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/DashboardPage.tsx, /src/index.css[22m
+[2m11:50:21[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/DashboardPage.tsx, /src/index.css[22m
+[2m11:54:52[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/DashboardPage.tsx, /src/index.css[22m
+[2m11:55:07[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/DashboardPage.tsx, /src/index.css[22m
+[2m11:55:16[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/DashboardPage.tsx, /src/index.css[22m
+[2m11:55:39[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/DashboardPage.tsx, /src/index.css[22m
+[2m11:56:13[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/DashboardPage.tsx, /src/index.css[22m
+[2m12:39:28[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m12:39:37[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m12:39:44[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m12:45:54[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/DashboardPage.tsx, /src/index.css[22m
+[2m12:45:56[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/DashboardPage.tsx, /src/index.css[22m
+[2m12:48:49[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/DashboardPage.tsx, /src/index.css[22m
+[2m12:56:03[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/DashboardPage.tsx, /src/index.css[22m
+[2m12:56:09[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/DashboardPage.tsx, /src/index.css[22m
+[2m12:59:01[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+[2m01:04:05[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/Topbar.tsx, /src/index.css[22m
+[2m01:04:11[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/Topbar.tsx, /src/index.css[22m
+[2m01:04:19[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+[2m01:04:25[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+[2m01:04:31[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+[2m01:04:45[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+[2m01:04:53[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/DashboardPage.tsx, /src/index.css[22m
+[2m01:04:59[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/DashboardPage.tsx, /src/index.css[22m
+[2m01:05:10[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/DashboardPage.tsx, /src/index.css[22m
+[2m01:05:25[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/DashboardPage.tsx, /src/index.css[22m
+[2m01:05:45[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m01:05:52[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m01:06:07[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m01:06:20[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m01:24:30[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+[2m01:24:35[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+[2m01:24:40[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+[2m01:24:53[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+[2m01:25:08[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/Topbar.tsx, /src/index.css[22m
+[2m01:25:16[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/Topbar.tsx, /src/index.css[22m
+[2m01:25:37[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m01:25:52[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m01:26:00[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m01:26:16[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/DashboardPage.tsx, /src/index.css[22m
+[2m01:26:32[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/DashboardPage.tsx, /src/index.css[22m
+[2m01:26:41[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/DashboardPage.tsx, /src/index.css[22m
+[2m01:32:16[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/CargaTxtPage.tsx, /src/index.css[22m
+[2m01:32:47[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/CargaTxtPage.tsx, /src/index.css[22m
+[2m01:32:53[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/CargaTxtPage.tsx, /src/index.css[22m
+[2m01:33:03[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/CargaTxtPage.tsx, /src/index.css[22m
+[2m01:33:19[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/CargaTxtPage.tsx, /src/index.css[22m
+[2m01:33:35[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/CargaTxtPage.tsx, /src/index.css[22m
+[2m03:26:23[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/CargaTxtPage.tsx, /src/index.css[22m
+[2m03:26:36[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/CargaTxtPage.tsx, /src/index.css[22m
+[2m03:26:50[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/CargaTxtPage.tsx, /src/index.css[22m
+[2m03:27:03[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/CargaTxtPage.tsx, /src/index.css[22m
+[2m03:28:30[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/LactokitCargaGrid.tsx, /src/index.css[22m
+[2m03:28:38[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/LactokitCargaGrid.tsx, /src/index.css[22m
+[2m03:28:47[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/LactokitCargaGrid.tsx, /src/index.css[22m
+[2m03:29:15[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/LactokitCargaGrid.tsx, /src/index.css[22m
+[2m03:29:37[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/CargaTxtPage.tsx, /src/index.css[22m
+[2m03:30:16[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/CargaTxtPage.tsx, /src/index.css[22m
+[2m03:41:58[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/LactokitCargaGrid.tsx, /src/index.css[22m
+[2m03:42:08[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/LactokitCargaGrid.tsx, /src/index.css[22m
+[2m03:42:23[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/LactokitCargaGrid.tsx, /src/index.css[22m
+[2m03:42:38[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/LactokitCargaGrid.tsx, /src/index.css[22m
+[2m03:56:43[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/CargaTxtPage.tsx, /src/index.css[22m
+[2m03:56:53[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/CargaTxtPage.tsx, /src/index.css[22m
+[2m03:57:11[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/CargaTxtPage.tsx, /src/index.css[22m
+[2m04:17:25[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/LactokitCargaGrid.tsx, /src/index.css[22m
+[2m04:17:31[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/LactokitCargaGrid.tsx, /src/index.css[22m
+[2m04:17:39[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/LactokitCargaGrid.tsx, /src/index.css[22m
+[2m04:17:45[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/LactokitCargaGrid.tsx, /src/index.css[22m
+[2m10:52:21[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/DashboardPage.tsx, /src/index.css[22m
+[2m11:00:05[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/DashboardPage.tsx, /src/index.css[22m
+[2m11:00:17[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/DashboardPage.tsx, /src/index.css[22m
+[2m11:00:26[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/DashboardPage.tsx, /src/index.css[22m
+[2m11:00:44[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m11:00:57[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m11:01:05[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m11:02:30[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m11:02:44[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m11:11:44[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/types/index.ts[22m
+[2m11:12:00[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/ScannerPage.tsx, /src/pages/LoginPage.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/pages/ConfiguracionPage.tsx, /src/components/ControlPrevio.tsx, /src/components/ValidacionModal.tsx, /src/components/LactokitCargaGrid.tsx[22m
+[2m11:12:10[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+[2m11:12:21[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/CargaTxtPage.tsx, /src/index.css[22m
+[2m11:12:29[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m11:13:19[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/ScannerPage.tsx, /src/pages/LoginPage.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/pages/ConfiguracionPage.tsx, /src/components/ControlPrevio.tsx, /src/components/ValidacionModal.tsx, /src/components/LactokitCargaGrid.tsx[22m
+[2m10:11:31[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/types/index.ts[22m
+[2m10:11:40[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/ScannerPage.tsx, /src/pages/LoginPage.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/pages/ConfiguracionPage.tsx, /src/components/ControlPrevio.tsx, /src/components/ValidacionModal.tsx, /src/components/LactokitCargaGrid.tsx[22m
+[2m10:11:52[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/ScannerPage.tsx, /src/pages/LoginPage.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/pages/ConfiguracionPage.tsx, /src/components/ControlPrevio.tsx, /src/components/ValidacionModal.tsx, /src/components/LactokitCargaGrid.tsx[22m
+[2m10:12:23[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/ScannerPage.tsx, /src/pages/LoginPage.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/pages/ConfiguracionPage.tsx, /src/components/ControlPrevio.tsx, /src/components/ValidacionModal.tsx, /src/components/LactokitCargaGrid.tsx[22m
+[2m10:30:21[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/ScannerPage.tsx, /src/pages/LoginPage.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/pages/ConfiguracionPage.tsx, /src/components/ControlPrevio.tsx, /src/components/ValidacionModal.tsx, /src/components/LactokitCargaGrid.tsx[22m
+[2m10:31:22[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/ScannerPage.tsx, /src/pages/LoginPage.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/pages/ConfiguracionPage.tsx, /src/components/ControlPrevio.tsx, /src/components/ValidacionModal.tsx, /src/components/LactokitCargaGrid.tsx[22m
+[2m10:31:56[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/ConfiguracionPage.tsx, /src/index.css[22m
+[2m10:32:06[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/ConfiguracionPage.tsx, /src/index.css[22m
+[2m10:32:20[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/ConfiguracionPage.tsx, /src/index.css[22m
+[2m10:32:32[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/ConfiguracionPage.tsx, /src/index.css[22m
+[2m10:32:41[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/LoginPage.tsx, /src/index.css[22m
+[2m10:37:49[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/ConfiguracionPage.tsx, /src/index.css[22m
+[2m10:38:17[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/ConfiguracionPage.tsx, /src/index.css[22m
+[2m10:38:36[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/ConfiguracionPage.tsx, /src/index.css[22m
+[2m12:26:55[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/ConfiguracionPage.tsx, /src/index.css[22m
+[2m01:28:48[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/ConfiguracionPage.tsx, /src/index.css[22m
+[2m01:28:48[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/ConfiguracionPage.tsx, /src/index.css[22m
+[2m01:29:25[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/ConfiguracionPage.tsx, /src/index.css[22m
+[2m01:29:41[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/ConfiguracionPage.tsx, /src/index.css[22m
+[2m01:33:42[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/ScannerPage.tsx, /src/pages/LoginPage.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/pages/ConfiguracionPage.tsx, /src/components/ControlPrevio.tsx, /src/components/ValidacionModal.tsx, /src/components/LactokitCargaGrid.tsx[22m
+[2m01:33:52[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/ScannerPage.tsx, /src/pages/LoginPage.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/pages/ConfiguracionPage.tsx, /src/components/ControlPrevio.tsx, /src/components/ValidacionModal.tsx, /src/components/LactokitCargaGrid.tsx[22m
+[2m01:34:02[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/ScannerPage.tsx, /src/pages/LoginPage.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/pages/ConfiguracionPage.tsx, /src/components/ControlPrevio.tsx, /src/components/ValidacionModal.tsx, /src/components/LactokitCargaGrid.tsx[22m
+[2m01:34:21[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/types/index.ts[22m
+[2m01:43:46[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/ScannerPage.tsx, /src/pages/LoginPage.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/pages/ConfiguracionPage.tsx, /src/components/ControlPrevio.tsx, /src/components/ValidacionModal.tsx, /src/components/LactokitCargaGrid.tsx[22m
+[2m01:43:46[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/ScannerPage.tsx, /src/pages/LoginPage.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/pages/ConfiguracionPage.tsx, /src/components/ControlPrevio.tsx, /src/components/ValidacionModal.tsx, /src/components/LactokitCargaGrid.tsx[22m
+[2m05:30:49[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/Topbar.tsx, /src/index.css[22m
+[2m05:30:58[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/Topbar.tsx, /src/index.css[22m
+[2m05:31:23[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/Topbar.tsx, /src/index.css[22m
+[2m05:31:35[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/Topbar.tsx, /src/index.css[22m
+[2m05:31:46[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/ScannerPage.tsx, /src/pages/LoginPage.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/pages/ConfiguracionPage.tsx, /src/components/ControlPrevio.tsx, /src/components/ValidacionModal.tsx, /src/components/LactokitCargaGrid.tsx[22m
+[2m05:31:59[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/ScannerPage.tsx, /src/pages/LoginPage.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/pages/ConfiguracionPage.tsx, /src/components/ControlPrevio.tsx, /src/components/ValidacionModal.tsx, /src/components/LactokitCargaGrid.tsx[22m
+[2m05:32:13[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/ScannerPage.tsx, /src/pages/LoginPage.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/pages/ConfiguracionPage.tsx, /src/components/ControlPrevio.tsx, /src/components/ValidacionModal.tsx, /src/components/LactokitCargaGrid.tsx[22m
+[2m05:32:33[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/ScannerPage.tsx, /src/pages/LoginPage.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/pages/ConfiguracionPage.tsx, /src/components/ControlPrevio.tsx, /src/components/ValidacionModal.tsx, /src/components/LactokitCargaGrid.tsx[22m
+[2m05:34:08[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+[2m12:46:07[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m12:46:07[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m12:46:15[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/ScannerPage.tsx, /src/pages/LoginPage.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/pages/ConfiguracionPage.tsx, /src/components/ControlPrevio.tsx, /src/components/ValidacionModal.tsx, /src/components/LactokitCargaGrid.tsx, /src/pages/AdministracionPage.tsx[22m
+[2m12:46:22[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/ScannerPage.tsx, /src/pages/LoginPage.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/pages/ConfiguracionPage.tsx, /src/components/ControlPrevio.tsx, /src/components/ValidacionModal.tsx, /src/components/LactokitCargaGrid.tsx, /src/pages/AdministracionPage.tsx[22m
+[2m12:46:31[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/ScannerPage.tsx, /src/pages/LoginPage.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/pages/ConfiguracionPage.tsx, /src/components/ControlPrevio.tsx, /src/components/ValidacionModal.tsx, /src/components/LactokitCargaGrid.tsx, /src/pages/AdministracionPage.tsx[22m
+[2m03:10:28[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/ScannerPage.tsx, /src/index.css[22m
+[2m03:10:47[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/ScannerPage.tsx, /src/index.css[22m
+[2m03:11:23[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m03:11:32[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m03:11:41[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m03:55:34[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m03:55:34[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m03:55:45[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m03:55:45[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m04:02:50[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m04:02:50[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m10:24:34[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m10:24:34[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m10:24:35[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m10:24:36[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m10:25:22[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m10:25:23[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m10:28:34[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m10:28:49[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m11:25:12[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m11:25:12[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m11:25:15[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m11:25:18[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m11:25:20[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m11:25:24[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m11:25:30[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m11:27:15[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m11:27:16[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m11:27:18[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m11:27:27[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m11:27:35[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m11:27:49[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m11:27:52[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m11:27:56[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m11:27:58[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m11:31:19[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m11:31:31[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m11:45:41[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/Topbar.tsx, /src/index.css[22m
+[2m11:45:41[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/Topbar.tsx, /src/index.css[22m
+[2m11:45:50[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/DashboardPage.tsx, /src/index.css[22m
+[2m11:45:56[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/ScannerPage.tsx, /src/index.css[22m
+[2m11:46:04[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/ScannerPage.tsx, /src/index.css[22m
+[2m11:49:51[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m11:51:27[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m11:51:36[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m11:51:57[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m12:12:01[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m12:12:40[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m12:12:51[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m12:13:02[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m12:29:25[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/types/index.ts[22m
+[2m12:29:33[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/ScannerPage.tsx, /src/pages/LoginPage.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/pages/ConfiguracionPage.tsx, /src/components/ControlPrevio.tsx, /src/components/ValidacionModal.tsx, /src/components/LactokitCargaGrid.tsx, /src/pages/AdministracionPage.tsx[22m
+[2m12:29:42[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/ScannerPage.tsx, /src/pages/LoginPage.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/pages/ConfiguracionPage.tsx, /src/components/ControlPrevio.tsx, /src/components/ValidacionModal.tsx, /src/components/LactokitCargaGrid.tsx, /src/pages/AdministracionPage.tsx[22m
+[2m12:29:52[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/ScannerPage.tsx, /src/pages/LoginPage.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/pages/ConfiguracionPage.tsx, /src/components/ControlPrevio.tsx, /src/components/ValidacionModal.tsx, /src/components/LactokitCargaGrid.tsx, /src/pages/AdministracionPage.tsx[22m
+[2m12:30:05[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/ValidacionModal.tsx, /src/index.css[22m
+[2m12:30:16[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/ValidacionModal.tsx, /src/index.css[22m
+[2m12:34:20[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/ValidacionModal.tsx, /src/index.css[22m
+[2m12:34:33[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/ValidacionModal.tsx, /src/index.css[22m
+[2m12:35:01[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/ValidacionModal.tsx, /src/index.css[22m
+[2m12:35:09[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/ValidacionModal.tsx, /src/index.css[22m
+[2m12:35:18[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/ValidacionModal.tsx, /src/index.css[22m
+[2m12:35:43[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m12:35:53[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m12:36:02[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m12:36:10[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m08:47:56[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m08:48:19[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m08:51:02[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/types/index.ts[22m
+[2m08:51:11[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/ScannerPage.tsx, /src/pages/LoginPage.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/pages/ConfiguracionPage.tsx, /src/components/ControlPrevio.tsx, /src/components/ValidacionModal.tsx, /src/components/LactokitCargaGrid.tsx, /src/pages/AdministracionPage.tsx[22m
+[2m08:51:20[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/ScannerPage.tsx, /src/pages/LoginPage.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/pages/ConfiguracionPage.tsx, /src/components/ControlPrevio.tsx, /src/components/ValidacionModal.tsx, /src/components/LactokitCargaGrid.tsx, /src/pages/AdministracionPage.tsx[22m
+[2m08:51:28[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/ScannerPage.tsx, /src/pages/LoginPage.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/pages/ConfiguracionPage.tsx, /src/components/ControlPrevio.tsx, /src/components/ValidacionModal.tsx, /src/components/LactokitCargaGrid.tsx, /src/pages/AdministracionPage.tsx[22m
+[2m08:51:43[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/ScannerPage.tsx, /src/pages/LoginPage.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/pages/ConfiguracionPage.tsx, /src/components/ControlPrevio.tsx, /src/components/ValidacionModal.tsx, /src/components/LactokitCargaGrid.tsx, /src/pages/AdministracionPage.tsx[22m
+[2m08:51:58[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m08:52:11[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m08:52:23[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m08:53:16[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m09:56:04[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/CargaTxtPage.tsx, /src/index.css[22m
+[2m09:56:04[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/CargaTxtPage.tsx, /src/index.css[22m
+[2m09:56:07[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/CargaTxtPage.tsx, /src/index.css[22m
+[2m09:56:11[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/CargaTxtPage.tsx, /src/index.css[22m
+[2m09:56:13[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/CargaTxtPage.tsx, /src/index.css[22m
+[2m09:56:15[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/CargaTxtPage.tsx, /src/index.css[22m
+[2m09:56:19[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/CargaTxtPage.tsx, /src/index.css[22m
+[2m09:56:20[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/CargaTxtPage.tsx, /src/index.css[22m
+[2m09:56:22[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/CargaTxtPage.tsx, /src/index.css[22m
+[2m09:56:26[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/CargaTxtPage.tsx, /src/index.css[22m
+[2m09:56:28[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/CargaTxtPage.tsx, /src/index.css[22m
+[2m09:56:31[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/CargaTxtPage.tsx, /src/index.css[22m
+[2m09:56:34[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/CargaTxtPage.tsx, /src/index.css[22m
+[2m09:59:42[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/LactokitCargaGrid.tsx, /src/index.css[22m
+[2m09:59:42[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/LactokitCargaGrid.tsx, /src/index.css[22m
+[2m10:02:48[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/LactokitCargaGrid.tsx, /src/index.css[22m
+[2m10:04:59[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m10:05:09[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m10:06:38[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m10:06:56[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m10:07:06[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m10:08:26[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/MuestrasPage.tsx, /src/index.css[22m
+[2m10:10:39[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/LactokitCargaGrid.tsx, /src/index.css[22m
+[2m10:13:27[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/LactokitCargaGrid.tsx, /src/index.css[22m
+[2m10:15:21[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/LactokitCargaGrid.tsx, /src/index.css[22m
+[2m10:15:30[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/ScannerPage.tsx, /src/pages/LoginPage.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/pages/ConfiguracionPage.tsx, /src/components/ControlPrevio.tsx, /src/components/ValidacionModal.tsx, /src/components/LactokitCargaGrid.tsx, /src/pages/AdministracionPage.tsx[22m
+[2m10:15:39[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/ScannerPage.tsx, /src/pages/LoginPage.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/pages/ConfiguracionPage.tsx, /src/components/ControlPrevio.tsx, /src/components/ValidacionModal.tsx, /src/components/LactokitCargaGrid.tsx, /src/pages/AdministracionPage.tsx[22m
+[2m10:15:51[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css, /src/App.tsx, /src/pages/ScannerPage.tsx, /src/pages/LoginPage.tsx, /src/pages/MuestrasPage.tsx, /src/pages/CargaTxtPage.tsx, /src/pages/ConfiguracionPage.tsx, /src/components/ControlPrevio.tsx, /src/components/ValidacionModal.tsx, /src/components/LactokitCargaGrid.tsx, /src/pages/AdministracionPage.tsx[22m
+[2m10:16:21[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/types/index.ts[22m
+[2m09:25:41[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/ValidacionModal.tsx, /src/index.css[22m
+[2m09:27:16[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/ValidacionModal.tsx, /src/index.css[22m
+[2m09:27:29[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/ValidacionModal.tsx, /src/index.css[22m
+[2m09:27:46[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/ValidacionModal.tsx, /src/index.css[22m
+[2m09:27:54[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mpage reload [39m[2msrc/types/index.ts[22m
+[2m09:33:06[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/Topbar.tsx, /src/index.css[22m
+[2m09:33:18[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m09:33:27[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m09:33:37[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m09:33:46[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m09:34:02[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m09:34:10[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m10:09:01[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m10:09:01[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m10:21:56[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m10:22:50[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m10:23:02[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m10:23:13[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m10:30:09[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m10:34:17[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m10:34:17[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m10:40:08[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m10:40:08[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/AdministracionPage.tsx, /src/index.css[22m
+[2m11:50:47[22m [36m[1m[vite][22m[39m [32m.env changed, restarting server...[39m
+[2m11:50:47[22m [36m[1m[vite][22m[39m [32m.env changed, restarting server...[39m
+[2m11:50:47[22m [36m[1m[vite][22m[39m server restarted.
+[2m11:50:52[22m [36m[1m[vite][22m[39m [32m.env.development changed, restarting server...[39m
+[2m11:50:52[22m [36m[1m[vite][22m[39m server restarted.

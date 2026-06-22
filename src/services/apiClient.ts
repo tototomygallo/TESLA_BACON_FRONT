@@ -1,11 +1,13 @@
 import type {
   BaconMuestra,
   Muestra,
+  ProtocoloEditado,
   ResultadoCargaTxt,
   ResultadoIngreso,
   ResumenDiario,
   Usuario,
   UsuarioConfiguracion,
+  ValidacionMuestraResponse,
 } from '../types';
 
 // ============================================
@@ -53,20 +55,23 @@ export interface ApiClient {
 
   // --- Muestras ---
   listarMuestras(): Promise<Muestra[]>;
-  ingresarLote(codigos: string[]): Promise<ResultadoIngreso>;
+  ingresarLote(codigos: string[], usuarioId: string): Promise<ResultadoIngreso>;
 
   // --- Carga de resultados del HeliFan ---
-  cargarResultadosTxt(contenidoTxt: string): Promise<ResultadoCargaTxt>;
+  cargarResultadosTxt(
+    contenidoTxt: string,
+    usuarioId: string,
+  ): Promise<ResultadoCargaTxt>;
 
   // --- Validación bioquímica (scope 2.7) ---
   // Aprobar: en_validacion → completado
-  validarMuestra(protocolo: string): Promise<Muestra>;
+  validarMuestra(protocolo: string, usuarioId: string): Promise<ValidacionMuestraResponse>;
   // Reiniciar: borra los resultados de una muestra con error para
   // poder recargar otro TXT (solo si tiene error y no está anulada).
-  reiniciarMuestra(protocolo: string): Promise<Muestra>;
+  reiniciarMuestra(protocolo: string, usuarioId: string): Promise<Muestra>;
 
   // --- Etiquetas: marca como 'en_proceso' al imprimir (scope 2.4) ---
-  imprimirEtiquetas(protocolo: string): Promise<Muestra>;
+  imprimirEtiquetas(protocolo: string, usuarioId: string): Promise<Muestra>;
 
   // --- Resumen del día ---
   obtenerHistorial(): Promise<ResumenDiario[]>;
@@ -74,6 +79,30 @@ export interface ApiClient {
 
   // --- Informes PDF (placeholder, se implementa en próxima iteración) ---
   obtenerInformePdf(protocolo: string): Promise<Blob>;
+
+  // --- Resultados Lactokit ---
+  guardarResultadosLactokit(
+    protocolo: string,
+    datos: { h2: Array<number | null>; ch4: Array<number | null>; co2: Array<number | null>; confirmar?: boolean },
+    usuarioId: string,
+  ): Promise<Muestra>;
+
+  // --- AdministraciÃ³n ---
+  eliminarSerieAdmin(
+    numeroSerie: string,
+    motivo: string,
+    usuarioId: string,
+  ): Promise<void>;
+  corregirPacienteAdmin(
+    numeroSerie: string,
+    datos: { nombre?: string; apellido?: string; dni?: string; motivo: string },
+    usuarioId: string,
+  ): Promise<Muestra>;
+  listarProtocolosEditadosAdmin(usuarioId: string): Promise<ProtocoloEditado[]>;
+  enviarMailBacon(
+    datos: { asunto: string; mensaje: string; archivos: File[] },
+    usuarioId: string,
+  ): Promise<void>;
 }
 
 // Error tipado para que los componentes puedan distinguir casos.

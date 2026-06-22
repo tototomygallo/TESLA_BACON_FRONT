@@ -69,7 +69,7 @@ export function ConfiguracionPage({ usuario }: Props) {
     setCargandoUsuarios(true);
     setErrorUsuarios(null);
     api
-      .listarUsuariosConfiguracion(usuario.id)
+      .listarUsuariosConfiguracion(usuario.username)
       .then((lista) => {
         setUsuarios(lista);
         setResetUsuarioId((actual) => {
@@ -88,7 +88,7 @@ export function ConfiguracionPage({ usuario }: Props) {
         ),
       )
       .finally(() => setCargandoUsuarios(false));
-  }, [esAdmin, usuario.id]);
+  }, [esAdmin, usuario.username]);
 
   useEffect(() => {
     if (!mensajePassword && !errorPassword) return;
@@ -144,7 +144,7 @@ export function ConfiguracionPage({ usuario }: Props) {
 
     setCreandoUsuario(true);
     try {
-      const creado = await api.crearUsuarioConfiguracion(usuario.id, {
+      const creado = await api.crearUsuarioConfiguracion(usuario.username, {
         usuario: formCrear.usuario,
         nombre: formCrear.nombre,
         email: formCrear.email,
@@ -185,7 +185,7 @@ export function ConfiguracionPage({ usuario }: Props) {
     setErrorUsuarios(null);
 
     try {
-      const actualizado = await api.actualizarUsuarioConfiguracion(usuario.id, {
+      const actualizado = await api.actualizarUsuarioConfiguracion(usuario.username, {
         id: usuarioEditado.id,
         usuario: usuarioEditado.usuario,
         email: usuarioEditado.email,
@@ -220,7 +220,7 @@ export function ConfiguracionPage({ usuario }: Props) {
     setErrorUsuarios(null);
 
     try {
-      await api.eliminarUsuarioConfiguracion(usuario.id, usuarioAEliminar.id);
+      await api.eliminarUsuarioConfiguracion(usuario.username, usuarioAEliminar.id);
       setUsuarios((actuales) =>
         actuales.filter((u) => u.id !== usuarioAEliminar.id),
       );
@@ -267,7 +267,7 @@ export function ConfiguracionPage({ usuario }: Props) {
     setReseteandoPassword(true);
     try {
       await api.resetPasswordUsuarioConfiguracion(
-        usuario.id,
+        usuario.username,
         resetUsuarioId,
         resetPassword,
       );
@@ -299,7 +299,7 @@ export function ConfiguracionPage({ usuario }: Props) {
 
     setGuardandoPassword(true);
     try {
-      await api.cambiarPasswordActual(usuario.id, actual, nueva);
+      await api.cambiarPasswordActual(usuario.username, actual, nueva);
       setActual('');
       setNueva('');
       setConfirmacion('');
@@ -774,7 +774,7 @@ function normalizarUsername(value: string | undefined): string {
 }
 
 function usernameLogueado(usuario: Usuario): string {
-  return normalizarUsername(usuario.nombre || usuario.id);
+  return normalizarUsername(usuario.username || usuario.nombre || usuario.id);
 }
 
 function puedeModificarUsuario(

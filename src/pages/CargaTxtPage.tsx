@@ -1,12 +1,14 @@
 import { useRef, useState } from 'react';
+import { LactokitCargaGrid } from '../components/LactokitCargaGrid';
 import { api } from '../services';
-import type { ResultadoCargaTxt } from '../types';
+import type { ResultadoCargaTxt, Usuario } from '../types';
 
 interface Props {
+  usuario: Usuario;
   onCargado: () => void; // callback para refrescar la lista de muestras
 }
 
-export function CargaTxtPage({ onCargado }: Props) {
+export function CargaTxtPage({ usuario, onCargado }: Props) {
   const [archivo, setArchivo] = useState<File | null>(null);
   const [contenido, setContenido] = useState<string>('');
   const [resultado, setResultado] = useState<ResultadoCargaTxt | null>(null);
@@ -14,6 +16,7 @@ export function CargaTxtPage({ onCargado }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [arrastrando, setArrastrando] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [modoCarga, setModoCarga] = useState<'taukit' | 'lactokit'>('taukit');
 
   const procesarArchivo = (f: File) => {
     setError(null);
@@ -52,7 +55,7 @@ export function CargaTxtPage({ onCargado }: Props) {
     setEnviando(true);
     setError(null);
     try {
-      const res = await api.cargarResultadosTxt(contenido);
+      const res = await api.cargarResultadosTxt(contenido, usuario.username);
       setResultado(res);
       onCargado();
       // Limpiar input para permitir cargar otro archivo
@@ -79,9 +82,23 @@ export function CargaTxtPage({ onCargado }: Props) {
     ? contenido.split(/\r?\n/).slice(0, 8).join('\n')
     : '';
 
+  // Vista Lactokit: sidebar "Tipo de estudio" a la izquierda + grilla de carga
+  if (modoCarga === 'lactokit') {
+    return (
+      <div className="flex gap-6 mx-[calc(50%-50vw)] px-4 lg:px-6">
+        <TipoEstudioSidebar modoCarga={modoCarga} setModoCarga={setModoCarga} />
+        <div className="min-w-0 flex-1">
+          <LactokitCargaGrid usuarioId={usuario.username} onGuardado={() => onCargado()} />
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div className="lg:col-span-2 space-y-4">
+    <div className="flex gap-6 mx-[calc(50%-50vw)] px-4 lg:px-6">
+      <TipoEstudioSidebar modoCarga={modoCarga} setModoCarga={setModoCarga} />
+      <div className="min-w-0 flex-1 grid grid-cols-1 xl:grid-cols-3 gap-6">
+      <div className="xl:col-span-2 space-y-4">
         <div>
           <h2 className="text-2xl font-semibold text-slate-900 tracking-tight">
             Carga de resultados
@@ -235,15 +252,72 @@ export function CargaTxtPage({ onCargado }: Props) {
           </div>
           <pre className="text-[10px] font-mono text-slate-500 leading-relaxed overflow-x-auto">
 {`t/min   12CO2/%  Delta,c/‰  TestValue  TestID
-   0    1,69228   -25,96      -0,2    PROTOCOLO-INTERNO
+   0    1,69228   -25,96      -0,2    001-001-XXXXXXXX
   30    1,66703   -26,15
-   0    2,09735   -23,77      28,0    PROTOCOLO-INTERNO
+   0    2,09735   -23,77      28,0    001-001-XXXXXXXX
   30    1,84998     4,17
    ...`}
           </pre>
         </div>
       </div>
+      </div>
     </div>
+  );
+}
+
+// ============================================
+// Sidebar "Tipo de estudio" (vista Lactokit)
+// ============================================
+function TipoEstudioSidebar({
+  modoCarga,
+  setModoCarga,
+}: {
+  modoCarga: 'taukit' | 'lactokit';
+  setModoCarga: (m: 'taukit' | 'lactokit') => void;
+}) {
+  const opciones: Array<{ id: 'taukit' | 'lactokit'; label: string; color: string }> = [
+    { id: 'taukit', label: 'Taukit', color: 'text-blue-600' },
+    { id: 'lactokit', label: 'Lactokit', color: 'text-violet-600' },
+  ];
+
+  return (
+    <aside className="w-[150px] flex-shrink-0 self-start lg:sticky lg:top-24">
+      <div className="px-1 pb-2 text-[11px] font-semibold text-slate-500 uppercase tracking-wide whitespace-nowrap">
+        Tipo de estudio
+      </div>
+      <div className="space-y-1">
+        {opciones.map((o) => {
+          const activo = modoCarga === o.id;
+          return (
+            <button
+              key={o.id}
+              onClick={() => setModoCarga(o.id)}
+              className={`w-full flex items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium transition-colors ${
+                activo
+                  ? 'bg-violet-50 text-violet-800'
+                  : 'text-slate-700 hover:bg-slate-50'
+              }`}
+            >
+              <span className={activo ? 'text-violet-600' : o.color}>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3" />
+                </svg>
+              </span>
+              {o.label}
+            </button>
+          );
+        })}
+      </div>
+    </aside>
   );
 }
 

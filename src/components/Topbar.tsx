@@ -8,6 +8,7 @@ export type Vista =
   | 'muestras'
   | 'scanner'
   | 'carga_txt'
+  | 'administracion'
   | 'configuracion';
 
 interface Props {
@@ -17,11 +18,12 @@ interface Props {
   onLogout: () => void;
 }
 
-const tabs: Array<{ id: Vista; label: string }> = [
-  { id: 'resumen', label: 'Resumen del día' },
+const tabs: Array<{ id: Vista; label: string; adminOnly?: boolean }> = [
+  { id: 'resumen', label: 'Resúmen del día' },
   { id: 'muestras', label: 'Muestras' },
   { id: 'scanner', label: 'Ingreso por scanner' },
   { id: 'carga_txt', label: 'Carga de resultados' },
+  { id: 'administracion', label: 'Operación', adminOnly: true },
   { id: 'configuracion', label: 'Configuración' },
 ];
 
@@ -45,7 +47,9 @@ export function Topbar({ usuario, vista, setVista, onLogout }: Props) {
           </div>
 
           <nav className="flex items-center gap-1.5 rounded-xl bg-slate-100/80 p-1 border border-slate-200/80 shadow-inner overflow-x-auto">
-            {tabs.map((t) => (
+            {tabs
+              .filter((t) => !t.adminOnly || usuario.rol === 'admin')
+              .map((t) => (
               <button
                 key={t.id}
                 onClick={() => setVista(t.id)}

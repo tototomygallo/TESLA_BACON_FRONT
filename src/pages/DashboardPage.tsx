@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { MetricCard } from '../components/MetricCard';
 import type { Muestra, ResumenDiario } from '../types';
+import { etiquetaTipoEstudioMayus, type FiltroEstudio } from '../utils/estudios';
 
 interface Props {
   historial: ResumenDiario[];
@@ -52,87 +53,126 @@ function resumenDesdeMuestras(
   };
 }
 
+type FilaHistorial = ResumenDiario & {
+  tipoEstudio: 'taukit' | 'lactokit';
+};
+
+function resumenPorTipo(
+  fecha: string,
+  tipoEstudio: 'taukit' | 'lactokit',
+  muestras: Muestra[],
+): FilaHistorial {
+  // Cada fila por tipo se calcula SOLO con las muestras de ese tipo.
+  // No se usa el historial agregado del backend (es por día, no por tipo),
+  // para no atribuir muestras de un tipo al otro.
+  return {
+    ...resumenDesdeMuestras(
+      fecha,
+      muestras.filter((m) => m.tipoEstudio === tipoEstudio),
+    ),
+    tipoEstudio,
+  };
+}
+
 export function DashboardPage({ historial, muestras }: Props) {
   const hoy = fechaHoyLocal();
   const [fechaSeleccionada, setFechaSeleccionada] = useState(hoy);
   const [busquedaHistorial, setBusquedaHistorial] = useState('');
+  const [filtroEstudio, setFiltroEstudio] = useState<FiltroEstudio>('todos');
+
+  const muestrasFiltradas = useMemo(() => {
+    if (filtroEstudio === 'todos') return muestras;
+    return muestras.filter((m) => m.tipoEstudio === filtroEstudio);
+  }, [muestras, filtroEstudio]);
 
   const resumenesDiarios = useMemo<ResumenDiario[]>(() => {
     const historialPorFecha = new Map(historial.map((h) => [h.fecha, h]));
     const fechas = new Set<string>([
       ...historial.map((h) => h.fecha),
-      ...muestras.map((m) => m.fechaIngreso.slice(0, 10)),
+      ...muestrasFiltradas.map((m) => m.fechaIngreso.slice(0, 10)),
       hoy,
     ]);
 
     return [...fechas].map((fecha) =>
-      resumenDesdeMuestras(fecha, muestras, historialPorFecha.get(fecha)),
+      resumenDesdeMuestras(
+        fecha,
+        muestrasFiltradas,
+        // El historial del backend es por día (no por tipo): solo se usa como
+        // fallback cuando NO hay filtro de tipo, para no atribuir mal los totales.
+        filtroEstudio === 'todos' ? historialPorFecha.get(fecha) : undefined,
+      ),
     );
-  }, [historial, muestras, hoy]);
+  }, [historial, muestrasFiltradas, filtroEstudio, hoy]);
 
   const resumenHoy = useMemo<ResumenDiario>(() => {
     if (fechaSeleccionada === hoy) {
-      // Cálculo en vivo desde las muestras actuales (3 estados oficiales).
-      const muestrasHoy = muestras.filter((m) =>
+      const muestrasHoy = muestrasFiltradas.filter((m) =>
         m.fechaIngreso.startsWith(hoy),
       );
       const ingresadas = muestrasHoy.length;
-      // Procesadas = ya pasó del estado "Recibido" (carga de TXT completada).
       const procesadas = muestrasHoy.filter(
         (m) =>
           m.estado === 'en_proceso' ||
           m.estado === 'en_validacion' ||
           m.estado === 'completado',
       ).length;
-      const finalizadas = muestrasHoy.filter(
-        (m) => m.estado === 'completado',
-      ).length;
-      // Pendientes = todavía no completadas (sigue en pipeline).
-      const pendientes = muestrasHoy.filter(
-        (m) => m.estado !== 'completado',
-      ).length;
+      const finalizadas = muestrasHoy.filter((m) => m.estado === 'completado').length;
+      const pendientes = muestrasHoy.filter((m) => m.estado !== 'completado').length;
       const historialHoy = historial.find((h) => h.fecha === hoy);
-      const discrepancias = historialHoy?.discrepancias ?? 0;
-      const rechazados = historialHoy?.rechazados ?? [];
       return {
         fecha: hoy,
         ingresadas,
         procesadas,
         finalizadas,
         pendientes,
-        discrepancias,
-        rechazados,
+        discrepancias: historialHoy?.discrepancias ?? 0,
+        rechazados: historialHoy?.rechazados ?? [],
       };
     }
-    return (
-      resumenesDiarios.find((h) => h.fecha === fechaSeleccionada) ?? {
-        fecha: fechaSeleccionada,
-        ingresadas: 0,
-        procesadas: 0,
-        finalizadas: 0,
-        pendientes: 0,
-        discrepancias: 0,
-        rechazados: [],
-      }
-    );
-  }, [fechaSeleccionada, historial, muestras, hoy, resumenesDiarios]);
+
+    const seleccionado = resumenesDiarios.find((h) => h.fecha === fechaSeleccionada);
+    return seleccionado ?? {
+      fecha: fechaSeleccionada,
+      ingresadas: 0,
+      procesadas: 0,
+      finalizadas: 0,
+      pendientes: 0,
+      discrepancias: 0,
+      rechazados: [],
+    };
+  }, [fechaSeleccionada, historial, muestrasFiltradas, hoy, resumenesDiarios]);
 
   const esHoy = fechaSeleccionada === hoy;
 
-  const historialOrdenado = useMemo(() => {
-    return [...resumenesDiarios]
-      .filter(
-        (h) => !busquedaHistorial || h.fecha.includes(busquedaHistorial),
+  const historialOrdenado = useMemo<FilaHistorial[]>(() => {
+    const fechas = new Set<string>([
+      ...historial.map((h) => h.fecha),
+      ...muestras.map((m) => m.fechaIngreso.slice(0, 10)),
+      hoy,
+    ]);
+    const tipos =
+      filtroEstudio === 'todos'
+        ? (['taukit', 'lactokit'] as const)
+        : ([filtroEstudio] as const);
+
+    return [...fechas]
+      .filter((fecha) => !busquedaHistorial || fecha.includes(busquedaHistorial))
+      .flatMap((fecha) =>
+        tipos.map((tipo) => resumenPorTipo(fecha, tipo, muestras)),
       )
-      .sort((a, b) => b.fecha.localeCompare(a.fecha));
-  }, [resumenesDiarios, busquedaHistorial]);
+      .sort((a, b) => {
+        const porFecha = b.fecha.localeCompare(a.fecha);
+        if (porFecha !== 0) return porFecha;
+        return a.tipoEstudio.localeCompare(b.tipoEstudio);
+      });
+  }, [historial, muestras, filtroEstudio, busquedaHistorial, hoy]);
 
   return (
     <div className="space-y-6">
       <div className="flex items-end justify-between flex-wrap gap-4">
         <div>
           <h2 className="text-2xl font-semibold text-slate-900 tracking-tight">
-            Resumen del día
+            Resúmen del día
           </h2>
           <p className="text-sm text-slate-500 mt-0.5 capitalize">
             {formatearFecha(fechaSeleccionada)}{' '}
@@ -143,25 +183,43 @@ export function DashboardPage({ historial, muestras }: Props) {
             )}
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <label className="text-xs font-semibold text-slate-600 uppercase tracking-wider">
-            Ver fecha:
-          </label>
-          <input
-            type="date"
-            value={fechaSeleccionada}
-            max={hoy}
-            onChange={(e) => setFechaSeleccionada(e.target.value)}
-            className="px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-          />
-          {!esHoy && (
-            <button
-              onClick={() => setFechaSeleccionada(hoy)}
-              className="text-xs px-3 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 font-medium"
+
+        <div className="flex items-end gap-4">
+          <div className="flex items-center gap-2">
+            <label className="text-xs font-semibold text-slate-600 uppercase tracking-wider">
+              Tipo de estudio:
+            </label>
+            <select
+              value={filtroEstudio}
+              onChange={(e) => setFiltroEstudio(e.target.value as FiltroEstudio)}
+              className="px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
             >
-              Hoy
-            </button>
-          )}
+              <option value="todos">Todos</option>
+              <option value="taukit">Taukit</option>
+              <option value="lactokit">Lactokit</option>
+            </select>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <label className="text-xs font-semibold text-slate-600 uppercase tracking-wider">
+              Ver fecha:
+            </label>
+            <input
+              type="date"
+              value={fechaSeleccionada}
+              max={hoy}
+              onChange={(e) => setFechaSeleccionada(e.target.value)}
+              className="px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+            />
+            {!esHoy && (
+              <button
+                onClick={() => setFechaSeleccionada(hoy)}
+                className="text-xs px-3 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 font-medium"
+              >
+                Hoy
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -228,14 +286,12 @@ export function DashboardPage({ historial, muestras }: Props) {
                   {resumenHoy.discrepancias}
                 </span>
                 <span className="text-sm text-slate-600">
-                  código{resumenHoy.discrepancias !== 1 ? 's' : ''} rechazado
-                  {resumenHoy.discrepancias !== 1 ? 's' : ''} por no figurar como enviado{resumenHoy.discrepancias !== 1 ? 's' : ''} en BACON
+                  código{resumenHoy.discrepancias !== 1 ? 's' : ''} rechazado{resumenHoy.discrepancias !== 1 ? 's' : ''} por no figurar como enviado{resumenHoy.discrepancias !== 1 ? 's' : ''} en BACON
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Detalle de cada código rechazado */}
           {resumenHoy.rechazados.length > 0 && (
             <div className="border-t border-red-100">
               <table className="w-full">
@@ -310,6 +366,9 @@ export function DashboardPage({ historial, muestras }: Props) {
                 <th className="text-left text-xs font-semibold text-slate-200 uppercase tracking-wider px-4 py-3">
                   Fecha
                 </th>
+                <th className="text-left text-xs font-semibold text-slate-200 uppercase tracking-wider px-4 py-3">
+                  Tipo de Estudio
+                </th>
                 <th className="text-right text-xs font-semibold text-slate-200 uppercase tracking-wider px-4 py-3">
                   Ingresadas
                 </th>
@@ -331,10 +390,7 @@ export function DashboardPage({ historial, muestras }: Props) {
             <tbody>
               {historialOrdenado.length === 0 ? (
                 <tr>
-                  <td
-                    colSpan={7}
-                    className="text-center py-12 text-slate-400 text-sm"
-                  >
+                  <td colSpan={8} className="text-center py-12 text-slate-400 text-sm">
                     Sin registros para los filtros aplicados
                   </td>
                 </tr>
@@ -344,10 +400,8 @@ export function DashboardPage({ historial, muestras }: Props) {
                   const esSeleccionada = h.fecha === fechaSeleccionada;
                   return (
                     <tr
-                      key={h.fecha}
-                      className={`border-b border-slate-100 hover:bg-slate-50/50 transition-colors ${
-                        esSeleccionada ? 'bg-emerald-50/30' : ''
-                      }`}
+                      key={`${h.fecha}-${h.tipoEstudio}`}
+                      className={`border-b border-slate-100 hover:bg-slate-50/50 transition-colors ${esSeleccionada ? 'bg-emerald-50/30' : ''}`}
                     >
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
@@ -360,6 +414,11 @@ export function DashboardPage({ historial, muestras }: Props) {
                             </span>
                           )}
                         </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="text-xs font-semibold text-slate-600">
+                          {etiquetaTipoEstudioMayus(h.tipoEstudio)}
+                        </span>
                       </td>
                       <td className="px-4 py-3 text-right text-sm text-slate-900 font-medium font-mono">
                         {h.ingresadas}
@@ -380,9 +439,7 @@ export function DashboardPage({ historial, muestras }: Props) {
                             {h.discrepancias}
                           </span>
                         ) : (
-                          <span className="text-sm text-slate-300 font-mono">
-                            0
-                          </span>
+                          <span className="text-sm text-slate-300 font-mono">0</span>
                         )}
                       </td>
                       <td className="px-4 py-3 text-right">

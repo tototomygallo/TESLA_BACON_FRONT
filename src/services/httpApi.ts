@@ -1,11 +1,13 @@
 import type {
   BaconMuestra,
   Muestra,
+  ProtocoloEditado,
   ResultadoCargaTxt,
   ResultadoIngreso,
   ResumenDiario,
   Usuario,
   UsuarioConfiguracion,
+  ValidacionMuestraResponse,
 } from '../types';
 import { ApiError, type ApiClient } from './apiClient';
 
@@ -20,6 +22,14 @@ type UsuarioConfiguracionBackend = Partial<UsuarioConfiguracion> & {
   name?: string;
   active?: boolean;
   estado?: string | boolean;
+};
+
+type UsuarioBackend = Partial<Usuario> & {
+  user?: string;
+  username?: string;
+  usuario?: string;
+  userId?: string;
+  name?: string;
 };
 
 async function request<T>(
@@ -69,6 +79,37 @@ if (!response.ok) {
   return JSON.parse(text) as T;
 }
 
+async function requestFormData<T>(
+  path: string,
+  formData: FormData,
+  usuarioId: string,
+): Promise<T> {
+  let response: Response;
+  try {
+    response = await fetch(`${BASE_URL}${path}`, {
+      method: 'POST',
+      headers: { 'X-User-Id': usuarioId },
+      body: formData,
+    });
+  } catch {
+    throw new ApiError('No se pudo conectar al servidor', 'NETWORK');
+  }
+
+  if (!response.ok) {
+    let detail = `Error ${response.status}`;
+    try {
+      const data = await response.json();
+      detail = data.detail || detail;
+    } catch {}
+    throw new ApiError(detail, response.status === 422 ? 'VALIDATION' : 'UNKNOWN');
+  }
+
+  if (response.status === 204) return undefined as T;
+  const text = await response.text();
+  if (!text) return undefined as T;
+  return JSON.parse(text) as T;
+}
+
 function normalizarUsuarioConfiguracion(
   usuario: UsuarioConfiguracionBackend,
 ): UsuarioConfiguracion {
@@ -102,12 +143,40 @@ function normalizarUsuarioConfiguracion(
   };
 }
 
+function normalizarUsuario(usuario: UsuarioBackend): Usuario {
+  const id = String(
+    usuario.id ??
+      usuario.userId ??
+      usuario.username ??
+      usuario.usuario ??
+      usuario.user ??
+      '',
+  );
+  const username = String(
+    usuario.username ??
+      usuario.usuario ??
+      usuario.user ??
+      usuario.userId ??
+      usuario.id ??
+      id,
+  );
+
+  return {
+    id,
+    username,
+    nombre: String(usuario.nombre ?? usuario.name ?? username),
+    rol: (usuario.rol ?? 'tecnico') as Usuario['rol'],
+    passwordExpired: usuario.passwordExpired,
+  };
+}
+
 export const httpApi: ApiClient = {
   async login(userId: string, password: string): Promise<Usuario> {
-    return request<Usuario>('/auth/login', {
+    const usuario = await request<UsuarioBackend>('/auth/login', {
       method: 'POST',
-      body: JSON.stringify({ userId, password }),
+      body: JSON.stringify({ username: userId, password }),
     });
+    return normalizarUsuario(usuario);
   },
 
   async cambiarPasswordActual(
@@ -226,38 +295,48 @@ export const httpApi: ApiClient = {
     return request<Muestra[]>('/muestras');
   },
 
-  async ingresarLote(codigos: string[]): Promise<ResultadoIngreso> {
+  async ingresarLote(codigos: string[], usuarioId: string): Promise<ResultadoIngreso> {
     return request<ResultadoIngreso>('/muestras/ingresar-lote', {
       method: 'POST',
+      headers: { 'X-User-Id': usuarioId },
       body: JSON.stringify({ codigos }),
     });
   },
 
-  async cargarResultadosTxt(contenidoTxt: string): Promise<ResultadoCargaTxt> {
+  async cargarResultadosTxt(
+    contenidoTxt: string,
+    usuarioId: string,
+  ): Promise<ResultadoCargaTxt> {
     // Se envía como text/plain para que el back haga el parseo
     // (o como JSON {contenido: ...} si así lo prefiere el back).
     return request<ResultadoCargaTxt>('/muestras/cargar-txt', {
       method: 'POST',
-      headers: { 'Content-Type': 'text/plain' },
+      headers: { 'Content-Type': 'text/plain', 'X-User-Id': usuarioId },
       body: contenidoTxt,
     });
   },
 
-  async validarMuestra(protocolo: string): Promise<Muestra> {
-    return request<Muestra>(`/muestras/${protocolo}/validar`, {
+  async validarMuestra(
+    protocolo: string,
+    usuarioId: string,
+  ): Promise<ValidacionMuestraResponse> {
+    return request<ValidacionMuestraResponse>(`/muestras/${protocolo}/validar`, {
       method: 'POST',
+      headers: { 'X-User-Id': usuarioId },
     });
   },
 
-  async reiniciarMuestra(protocolo: string): Promise<Muestra> {
+  async reiniciarMuestra(protocolo: string, usuarioId: string): Promise<Muestra> {
     return request<Muestra>(`/muestras/${protocolo}/reiniciar`, {
       method: 'POST',
+      headers: { 'X-User-Id': usuarioId },
     });
   },
 
-  async imprimirEtiquetas(protocolo: string): Promise<Muestra> {
+  async imprimirEtiquetas(protocolo: string, usuarioId: string): Promise<Muestra> {
     return request<Muestra>(`/muestras/${protocolo}/imprimir-etiquetas`, {
       method: 'POST',
+      headers: { 'X-User-Id': usuarioId },
     });
   },
 
@@ -275,10 +354,70 @@ export const httpApi: ApiClient = {
   },
 
   async obtenerInformePdf(protocolo: string): Promise<Blob> {
-    const response = await fetch(`${BASE_URL}/informes/${protocolo}/pdf`);
+    const response = await fetch(`${BASE_URL}/muestras/${encodeURIComponent(protocolo)}/pdf`);
     if (!response.ok) {
       throw new ApiError('No se pudo generar el PDF', 'UNKNOWN');
     }
     return response.blob();
+  },
+
+  async guardarResultadosLactokit(
+    protocolo: string,
+    datos: { h2: Array<number | null>; ch4: Array<number | null>; co2: Array<number | null>; confirmar?: boolean },
+    usuarioId: string,
+  ): Promise<Muestra> {
+    return request<Muestra>(`/muestras/${encodeURIComponent(protocolo)}/resultados-lactokit`, {
+      method: 'POST',
+      headers: { 'X-User-Id': usuarioId },
+      body: JSON.stringify(datos),
+    });
+  },
+
+  async eliminarSerieAdmin(
+    numeroSerie: string,
+    motivo: string,
+    usuarioId: string,
+  ): Promise<void> {
+    await request<unknown>(`/admin/series/${encodeURIComponent(numeroSerie)}`, {
+      method: 'DELETE',
+      headers: { 'X-User-Id': usuarioId },
+      body: JSON.stringify({ motivo }),
+    });
+  },
+
+  async corregirPacienteAdmin(
+    numeroSerie: string,
+    datos: { nombre?: string; apellido?: string; dni?: string; motivo: string },
+    usuarioId: string,
+  ): Promise<Muestra> {
+    return request<Muestra>(
+      `/admin/series/${encodeURIComponent(numeroSerie)}/paciente`,
+      {
+        method: 'PATCH',
+        headers: { 'X-User-Id': usuarioId },
+        body: JSON.stringify(datos),
+      },
+    );
+  },
+
+  async listarProtocolosEditadosAdmin(
+    usuarioId: string,
+  ): Promise<ProtocoloEditado[]> {
+    return request<ProtocoloEditado[]>('/admin/protocolos-editados', {
+      headers: { 'X-User-Id': usuarioId },
+    });
+  },
+
+  async enviarMailBacon(
+    datos: { asunto: string; mensaje: string; archivos: File[] },
+    usuarioId: string,
+  ): Promise<void> {
+    const formData = new FormData();
+    formData.append('asunto', datos.asunto);
+    formData.append('mensaje', datos.mensaje);
+    datos.archivos.forEach((archivo) => {
+      formData.append('archivos', archivo);
+    });
+    await requestFormData<unknown>('/admin/contacto-bacon', formData, usuarioId);
   },
 };

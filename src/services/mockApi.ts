@@ -1,11 +1,13 @@
 import type {
   BaconMuestra,
   Muestra,
+  ProtocoloEditado,
   ResultadoCargaTxt,
   ResultadoIngreso,
   ResumenDiario,
   Usuario,
   UsuarioConfiguracion,
+  ValidacionMuestraResponse,
 } from '../types';
 import { ApiError, type ApiClient } from './apiClient';
 import {
@@ -19,6 +21,7 @@ import { parsearTxt } from './txtParser';
 
 let _muestras: Muestra[] = [...MUESTRAS_INICIALES];
 let _historial: ResumenDiario[] = generarHistorialMock();
+let _protocolosEditados: ProtocoloEditado[] = [];
 let _usuariosConfig: UsuarioConfiguracion[] = [
   { id: 'tec1', usuario: 'tec1', email: 'tec1@diagnosticotesla.com', nombre: 'Técnico 1', rol: 'tecnico', activo: true },
   { id: 'bio1', usuario: 'bio1', email: 'bio1@diagnosticotesla.com', nombre: 'Bioquímico 1', rol: 'bioquimico', activo: true },
@@ -184,7 +187,7 @@ export const mockApi: ApiClient = {
     return delay([..._muestras]);
   },
 
-  async ingresarLote(codigos: string[]): Promise<ResultadoIngreso> {
+  async ingresarLote(codigos: string[], _usuarioId: string): Promise<ResultadoIngreso> {
     const ingresadas: Muestra[] = [];
     const rechazadas: string[] = [];
     const duplicadas: string[] = [];
@@ -251,7 +254,10 @@ export const mockApi: ApiClient = {
   // - Si el TXT trae error del equipo (postDelta = -10000):
   //     incrementar intentosFallidos, marcar tieneError, no cambiar estado.
   // - TestIDs sin match: reportar como noEncontrados.
-  async cargarResultadosTxt(contenidoTxt: string): Promise<ResultadoCargaTxt> {
+  async cargarResultadosTxt(
+    contenidoTxt: string,
+    _usuarioId: string,
+  ): Promise<ResultadoCargaTxt> {
     const parseado = parsearTxt(contenidoTxt);
     const ahora = new Date().toISOString().slice(0, 16).replace('T', ' ');
 
@@ -337,7 +343,10 @@ export const mockApi: ApiClient = {
   // Aprobar una muestra: en_validacion → completado.
   // No se puede validar una muestra bloqueada (intentosFallidos >= 2)
   // ni una que no esté en estado en_validacion.
-  async validarMuestra(protocolo: string): Promise<Muestra> {
+  async validarMuestra(
+    protocolo: string,
+    _usuarioId: string,
+  ): Promise<ValidacionMuestraResponse> {
     const muestra = _muestras.find((m) => m.protocolo === protocolo);
     if (!muestra) {
       throw new ApiError('Muestra no encontrada', 'NOT_FOUND');
@@ -362,13 +371,27 @@ export const mockApi: ApiClient = {
     _muestras = _muestras.map((m) =>
       m.protocolo === protocolo ? actualizada : m,
     );
-    return delay(actualizada);
+    return delay({
+      ...actualizada,
+      pdfGenerado: true,
+      pdfVerificado: true,
+      pdfVerificacion: {
+        success: true,
+        nombre_esperado: `${muestra.codigoTauKit}.pdf`,
+        archivo: {
+          nombre: `${muestra.codigoTauKit}.pdf`,
+          fecha_subida: fechaHoraLocal(),
+          tamaño: '224.13 KB',
+          url: `/storage/resultados/${muestra.codigoTauKit}.pdf`,
+        },
+      },
+    });
   },
 
   // Reiniciar una muestra: consume un intento del TauKit.
   // Cada TauKit tiene 2 tubos = 2 oportunidades.
   // Si al reiniciar ya usó ambas oportunidades → se anula.
-  async reiniciarMuestra(protocolo: string): Promise<Muestra> {
+  async reiniciarMuestra(protocolo: string, _usuarioId: string): Promise<Muestra> {
     const muestra = _muestras.find((m) => m.protocolo === protocolo);
     if (!muestra) {
       throw new ApiError('Muestra no encontrada', 'NOT_FOUND');
@@ -426,7 +449,7 @@ export const mockApi: ApiClient = {
   // ============================================
   // Etiquetas: recibido → en_proceso (scope 2.4)
   // ============================================
-  async imprimirEtiquetas(protocolo: string): Promise<Muestra> {
+  async imprimirEtiquetas(protocolo: string, _usuarioId: string): Promise<Muestra> {
     const muestra = _muestras.find((m) => m.protocolo === protocolo);
     if (!muestra) {
       throw new ApiError('Muestra no encontrada', 'NOT_FOUND');
@@ -443,6 +466,106 @@ export const mockApi: ApiClient = {
       m.protocolo === protocolo ? actualizada : m,
     );
     return delay(actualizada);
+  },
+
+  async guardarResultadosLactokit(
+    protocolo: string,
+    datos: { h2: Array<number | null>; ch4: Array<number | null>; co2: Array<number | null>; confirmar?: boolean },
+    _usuarioId: string,
+  ): Promise<Muestra> {
+    const idx = _muestras.findIndex((m) => m.protocolo === protocolo);
+    if (idx === -1) throw new ApiError('Muestra no encontrada', 'NOT_FOUND');
+    const muestra = _muestras[idx];
+    const ahora = fechaHoraLocal();
+    const resultados = {
+      h2: datos.h2,
+      ch4: datos.ch4,
+      co2: datos.co2,
+      valoracion: '1' as const,
+      descripcion: 'Resultado mock',
+      cargadoEn: ahora,
+    };
+    const actualizado: Muestra = {
+      ...muestra,
+      resultadosLactokit: resultados,
+      estado: datos.confirmar ? 'en_validacion' : muestra.estado,
+    };
+    _muestras = _muestras.map((m, i) => (i === idx ? actualizado : m));
+    return delay(actualizado, 100);
+  },
+
+  async eliminarSerieAdmin(
+    numeroSerie: string,
+    _motivo: string,
+    usuarioId: string,
+  ): Promise<void> {
+    const usuario = USUARIOS_MOCK[usuarioId.trim().toLowerCase()];
+    if (usuario?.rol !== 'admin') throw new ApiError('No autorizado', 'FORBIDDEN');
+    _muestras = _muestras.filter(
+      (m) => m.codigoTauKit !== numeroSerie && m.codigoLactokit !== numeroSerie,
+    );
+    return delay(undefined);
+  },
+
+  async corregirPacienteAdmin(
+    numeroSerie: string,
+    datos: { nombre?: string; apellido?: string; dni?: string; motivo: string },
+    usuarioId: string,
+  ): Promise<Muestra> {
+    const usuario = USUARIOS_MOCK[usuarioId.trim().toLowerCase()];
+    if (usuario?.rol !== 'admin') throw new ApiError('No autorizado', 'FORBIDDEN');
+    const muestra = _muestras.find(
+      (m) => m.codigoTauKit === numeroSerie || m.codigoLactokit === numeroSerie,
+    );
+    if (!muestra) throw new ApiError('Muestra no encontrada', 'NOT_FOUND');
+    const actualizada: Muestra = {
+      ...muestra,
+      paciente: {
+        ...muestra.paciente,
+        nombre: datos.nombre ?? muestra.paciente.nombre,
+        apellido: datos.apellido ?? muestra.paciente.apellido,
+        dni: datos.dni ?? muestra.paciente.dni,
+      },
+    };
+    const camposEditados = [
+      datos.nombre !== undefined ? 'nombre' : null,
+      datos.apellido !== undefined ? 'apellido' : null,
+      datos.dni !== undefined ? 'dni' : null,
+    ].filter((campo): campo is string => Boolean(campo));
+    _protocolosEditados = [
+      {
+        protocolo: muestra.protocolo,
+        numeroSerie: numeroSerie,
+        tipoEstudio: muestra.tipoEstudio,
+        fechaIngreso: muestra.fechaIngreso,
+        fechaEdicion: fechaHoraLocal(),
+        motivo: datos.motivo,
+        usuario: usuarioId,
+        camposEditados,
+      },
+      ..._protocolosEditados,
+    ];
+    _muestras = _muestras.map((m) =>
+      m.protocolo === muestra.protocolo ? actualizada : m,
+    );
+    return delay(actualizada);
+  },
+
+  async listarProtocolosEditadosAdmin(
+    usuarioId: string,
+  ): Promise<ProtocoloEditado[]> {
+    const usuario = USUARIOS_MOCK[usuarioId.trim().toLowerCase()];
+    if (usuario?.rol !== 'admin') throw new ApiError('No autorizado', 'FORBIDDEN');
+    return delay([..._protocolosEditados]);
+  },
+
+  async enviarMailBacon(
+    _datos: { asunto: string; mensaje: string; archivos: File[] },
+    usuarioId: string,
+  ): Promise<void> {
+    const usuario = USUARIOS_MOCK[usuarioId.trim().toLowerCase()];
+    if (usuario?.rol !== 'admin') throw new ApiError('No autorizado', 'FORBIDDEN');
+    return delay(undefined);
   },
 
   async obtenerHistorial(): Promise<ResumenDiario[]> {
