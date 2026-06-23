@@ -10,6 +10,12 @@ import type {
   ValidacionMuestraResponse,
 } from '../types';
 import { ApiError, type ApiClient } from './apiClient';
+import {
+  clearTokens,
+  getAccessToken,
+  getRefreshToken,
+  setTokens,
+} from './authToken';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '/api';
 
@@ -32,45 +38,125 @@ type UsuarioBackend = Partial<Usuario> & {
   name?: string;
 };
 
-async function request<T>(
+// Respuesta del nuevo /auth/login (el usuario viene anidado y trae los tokens).
+type LoginResponse = {
+  usuario: UsuarioBackend;
+  token: string;
+  tokenType?: string;
+  expiresIn?: number;
+  refreshToken: string;
+  refreshExpiresIn?: number;
+};
+
+type RefreshResponse = {
+  token: string;
+  refreshToken: string;
+};
+
+// ============================================
+// Núcleo de auth: Bearer + refresh + logout
+// ============================================
+
+// Avisa a la app que la sesión se cayó (token vencido/ inválido y el refresh
+// también falló). App.tsx escucha este evento y hace el logout.
+function emitirLogout(mensaje: string): void {
+  clearTokens();
+  window.dispatchEvent(new CustomEvent('auth:logout', { detail: { mensaje } }));
+}
+
+// Un único refresh en vuelo: si varias requests reciben 401 a la vez,
+// comparten el mismo intento de refresh.
+let refreshEnCurso: Promise<boolean> | null = null;
+
+async function intentarRefresh(): Promise<boolean> {
+  if (refreshEnCurso) return refreshEnCurso;
+
+  const refreshToken = getRefreshToken();
+  if (!refreshToken) return false;
+
+  refreshEnCurso = (async () => {
+    try {
+      const res = await fetch(`${BASE_URL}/auth/refresh`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refreshToken }),
+      });
+      if (!res.ok) return false;
+      const data = (await res.json()) as RefreshResponse;
+      if (!data.token || !data.refreshToken) return false;
+      setTokens(data.token, data.refreshToken);
+      return true;
+    } catch {
+      return false;
+    }
+  })();
+
+  try {
+    return await refreshEnCurso;
+  } finally {
+    refreshEnCurso = null;
+  }
+}
+
+// fetch con Authorization: Bearer. Ante un 401 intenta refrescar una vez y
+// reintenta la request original; si el refresh falla, dispara el logout.
+async function fetchConAuth(
   path: string,
-  options: RequestInit = {},
-): Promise<T> {
+  options: RequestInit,
+  reintento = false,
+): Promise<Response> {
+  const accessToken = getAccessToken();
+  const headers: Record<string, string> = {
+    ...((options.headers as Record<string, string>) ?? {}),
+  };
+  if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
+
   let response: Response;
   try {
-    response = await fetch(`${BASE_URL}${path}`, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...(options.headers as Record<string, string> ?? {}),
-      },
-    });
+    response = await fetch(`${BASE_URL}${path}`, { ...options, headers });
   } catch {
     throw new ApiError('No se pudo conectar al servidor', 'NETWORK');
   }
 
-if (!response.ok) {
-  let detail = `Error ${response.status}`;
+  if (response.status === 401 && !reintento && getRefreshToken()) {
+    const refrescado = await intentarRefresh();
+    if (refrescado) {
+      return fetchConAuth(path, options, true);
+    }
+    emitirLogout('Tu sesión expiró. Iniciá sesión de nuevo.');
+  }
 
-  try {
-    const data = await response.json();
-    detail = data.detail || detail;
-  } catch {}
-
-  if (response.status === 401)
-    throw new ApiError(detail, 'UNAUTHORIZED');
-
-  if (response.status === 403)
-    throw new ApiError(detail, 'FORBIDDEN');
-
-  if (response.status === 404)
-    throw new ApiError(detail, 'NOT_FOUND');
-
-  if (response.status === 422)
-    throw new ApiError(detail, 'VALIDATION');
-
-  throw new ApiError(detail, 'UNKNOWN');
+  return response;
 }
+
+function mapearError(status: number, detail: string): ApiError {
+  if (status === 401) return new ApiError(detail, 'UNAUTHORIZED');
+  if (status === 403) return new ApiError(detail, 'FORBIDDEN');
+  if (status === 404) return new ApiError(detail, 'NOT_FOUND');
+  if (status === 422) return new ApiError(detail, 'VALIDATION');
+  return new ApiError(detail, 'UNKNOWN');
+}
+
+async function request<T>(
+  path: string,
+  options: RequestInit = {},
+): Promise<T> {
+  const response = await fetchConAuth(path, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...((options.headers as Record<string, string>) ?? {}),
+    },
+  });
+
+  if (!response.ok) {
+    let detail = `Error ${response.status}`;
+    try {
+      const data = await response.json();
+      detail = data.detail || detail;
+    } catch {}
+    throw mapearError(response.status, detail);
+  }
 
   if (response.status === 204) return undefined as T;
 
@@ -82,18 +168,9 @@ if (!response.ok) {
 async function requestFormData<T>(
   path: string,
   formData: FormData,
-  usuarioId: string,
 ): Promise<T> {
-  let response: Response;
-  try {
-    response = await fetch(`${BASE_URL}${path}`, {
-      method: 'POST',
-      headers: { 'X-User-Id': usuarioId },
-      body: formData,
-    });
-  } catch {
-    throw new ApiError('No se pudo conectar al servidor', 'NETWORK');
-  }
+  // Sin Content-Type: el browser arma el multipart/form-data con su boundary.
+  const response = await fetchConAuth(path, { method: 'POST', body: formData });
 
   if (!response.ok) {
     let detail = `Error ${response.status}`;
@@ -101,7 +178,7 @@ async function requestFormData<T>(
       const data = await response.json();
       detail = data.detail || detail;
     } catch {}
-    throw new ApiError(detail, response.status === 422 ? 'VALIDATION' : 'UNKNOWN');
+    throw mapearError(response.status, detail);
   }
 
   if (response.status === 204) return undefined as T;
@@ -172,21 +249,26 @@ function normalizarUsuario(usuario: UsuarioBackend): Usuario {
 
 export const httpApi: ApiClient = {
   async login(userId: string, password: string): Promise<Usuario> {
-    const usuario = await request<UsuarioBackend>('/auth/login', {
+    // Empezamos limpio para no arrastrar tokens de una sesión anterior.
+    clearTokens();
+    const data = await request<LoginResponse>('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ username: userId, password }),
     });
-    return normalizarUsuario(usuario);
+    if (data.token && data.refreshToken) {
+      setTokens(data.token, data.refreshToken);
+    }
+    return normalizarUsuario(data.usuario);
   },
 
   async cambiarPasswordActual(
-    usuarioId: string,
+    _usuarioId: string,
     actual: string,
     nueva: string,
   ): Promise<void> {
+    // El back cambia la contraseña del usuario del token; userId se ignora.
     await request<unknown>('/auth/cambiar-password', {
       method: 'POST',
-      headers: { 'X-User-Id': usuarioId },
       body: JSON.stringify({
         passwordActual: actual,
         passwordNueva: nueva,
@@ -195,19 +277,16 @@ export const httpApi: ApiClient = {
   },
 
   async listarUsuariosConfiguracion(
-    usuarioId: string,
+    _usuarioId: string,
   ): Promise<UsuarioConfiguracion[]> {
     const usuarios = await request<UsuarioConfiguracionBackend[]>(
       '/configuracion/usuarios',
-      {
-        headers: { 'X-User-Id': usuarioId },
-      },
     );
     return usuarios.map(normalizarUsuarioConfiguracion);
   },
 
   async crearUsuarioConfiguracion(
-    usuarioId: string,
+    _usuarioId: string,
     usuario: Pick<
       UsuarioConfiguracion,
       'usuario' | 'email' | 'nombre' | 'rol' | 'activo'
@@ -217,7 +296,6 @@ export const httpApi: ApiClient = {
       '/configuracion/usuarios',
       {
         method: 'POST',
-        headers: { 'X-User-Id': usuarioId },
         body: JSON.stringify({
           username: usuario.usuario,
           name: usuario.nombre,
@@ -232,7 +310,7 @@ export const httpApi: ApiClient = {
   },
 
   async actualizarUsuarioConfiguracion(
-    usuarioId: string,
+    _usuarioId: string,
     usuario: Pick<
       UsuarioConfiguracion,
       'id' | 'usuario' | 'email' | 'nombre' | 'rol' | 'activo'
@@ -242,7 +320,6 @@ export const httpApi: ApiClient = {
       `/configuracion/usuarios/${encodeURIComponent(usuario.id)}`,
       {
         method: 'PATCH',
-        headers: { 'X-User-Id': usuarioId },
         body: JSON.stringify({
           username: usuario.usuario,
           name: usuario.nombre,
@@ -256,7 +333,7 @@ export const httpApi: ApiClient = {
   },
 
   async resetPasswordUsuarioConfiguracion(
-    usuarioId: string,
+    _usuarioId: string,
     usuarioEditadoId: string,
     passwordNueva: string,
   ): Promise<void> {
@@ -264,21 +341,19 @@ export const httpApi: ApiClient = {
       `/configuracion/usuarios/${encodeURIComponent(usuarioEditadoId)}/reset-password`,
       {
         method: 'POST',
-        headers: { 'X-User-Id': usuarioId },
         body: JSON.stringify({ passwordNueva }),
       },
     );
   },
 
   async eliminarUsuarioConfiguracion(
-    usuarioId: string,
+    _usuarioId: string,
     usuarioEditadoId: string,
   ): Promise<void> {
     await request<unknown>(
       `/configuracion/usuarios/${encodeURIComponent(usuarioEditadoId)}`,
       {
         method: 'DELETE',
-        headers: { 'X-User-Id': usuarioId },
       },
     );
   },
@@ -295,48 +370,44 @@ export const httpApi: ApiClient = {
     return request<Muestra[]>('/muestras');
   },
 
-  async ingresarLote(codigos: string[], usuarioId: string): Promise<ResultadoIngreso> {
+  async ingresarLote(codigos: string[], _usuarioId: string): Promise<ResultadoIngreso> {
     return request<ResultadoIngreso>('/muestras/ingresar-lote', {
       method: 'POST',
-      headers: { 'X-User-Id': usuarioId },
       body: JSON.stringify({ codigos }),
     });
   },
 
   async cargarResultadosTxt(
     contenidoTxt: string,
-    usuarioId: string,
+    _usuarioId: string,
   ): Promise<ResultadoCargaTxt> {
     // Se envía como text/plain para que el back haga el parseo
     // (o como JSON {contenido: ...} si así lo prefiere el back).
     return request<ResultadoCargaTxt>('/muestras/cargar-txt', {
       method: 'POST',
-      headers: { 'Content-Type': 'text/plain', 'X-User-Id': usuarioId },
+      headers: { 'Content-Type': 'text/plain' },
       body: contenidoTxt,
     });
   },
 
   async validarMuestra(
     protocolo: string,
-    usuarioId: string,
+    _usuarioId: string,
   ): Promise<ValidacionMuestraResponse> {
     return request<ValidacionMuestraResponse>(`/muestras/${protocolo}/validar`, {
       method: 'POST',
-      headers: { 'X-User-Id': usuarioId },
     });
   },
 
-  async reiniciarMuestra(protocolo: string, usuarioId: string): Promise<Muestra> {
+  async reiniciarMuestra(protocolo: string, _usuarioId: string): Promise<Muestra> {
     return request<Muestra>(`/muestras/${protocolo}/reiniciar`, {
       method: 'POST',
-      headers: { 'X-User-Id': usuarioId },
     });
   },
 
-  async imprimirEtiquetas(protocolo: string, usuarioId: string): Promise<Muestra> {
+  async imprimirEtiquetas(protocolo: string, _usuarioId: string): Promise<Muestra> {
     return request<Muestra>(`/muestras/${protocolo}/imprimir-etiquetas`, {
       method: 'POST',
-      headers: { 'X-User-Id': usuarioId },
     });
   },
 
@@ -354,9 +425,12 @@ export const httpApi: ApiClient = {
   },
 
   async obtenerInformePdf(protocolo: string): Promise<Blob> {
-    const response = await fetch(`${BASE_URL}/muestras/${encodeURIComponent(protocolo)}/pdf`);
+    const response = await fetchConAuth(
+      `/muestras/${encodeURIComponent(protocolo)}/pdf`,
+      { method: 'GET' },
+    );
     if (!response.ok) {
-      throw new ApiError('No se pudo generar el PDF', 'UNKNOWN');
+      throw mapearError(response.status, 'No se pudo generar el PDF');
     }
     return response.blob();
   },
@@ -364,11 +438,10 @@ export const httpApi: ApiClient = {
   async guardarResultadosLactokit(
     protocolo: string,
     datos: { h2: Array<number | null>; ch4: Array<number | null>; co2: Array<number | null>; confirmar?: boolean },
-    usuarioId: string,
+    _usuarioId: string,
   ): Promise<Muestra> {
     return request<Muestra>(`/muestras/${encodeURIComponent(protocolo)}/resultados-lactokit`, {
       method: 'POST',
-      headers: { 'X-User-Id': usuarioId },
       body: JSON.stringify(datos),
     });
   },
@@ -376,11 +449,10 @@ export const httpApi: ApiClient = {
   async eliminarSerieAdmin(
     numeroSerie: string,
     motivo: string,
-    usuarioId: string,
+    _usuarioId: string,
   ): Promise<void> {
     await request<unknown>(`/admin/series/${encodeURIComponent(numeroSerie)}`, {
       method: 'DELETE',
-      headers: { 'X-User-Id': usuarioId },
       body: JSON.stringify({ motivo }),
     });
   },
@@ -388,29 +460,26 @@ export const httpApi: ApiClient = {
   async corregirPacienteAdmin(
     numeroSerie: string,
     datos: { nombre?: string; apellido?: string; dni?: string; motivo: string },
-    usuarioId: string,
+    _usuarioId: string,
   ): Promise<Muestra> {
     return request<Muestra>(
       `/admin/series/${encodeURIComponent(numeroSerie)}/paciente`,
       {
         method: 'PATCH',
-        headers: { 'X-User-Id': usuarioId },
         body: JSON.stringify(datos),
       },
     );
   },
 
   async listarProtocolosEditadosAdmin(
-    usuarioId: string,
+    _usuarioId: string,
   ): Promise<ProtocoloEditado[]> {
-    return request<ProtocoloEditado[]>('/admin/protocolos-editados', {
-      headers: { 'X-User-Id': usuarioId },
-    });
+    return request<ProtocoloEditado[]>('/admin/protocolos-editados');
   },
 
   async enviarMailBacon(
     datos: { asunto: string; mensaje: string; archivos: File[] },
-    usuarioId: string,
+    _usuarioId: string,
   ): Promise<void> {
     const formData = new FormData();
     formData.append('asunto', datos.asunto);
@@ -418,6 +487,6 @@ export const httpApi: ApiClient = {
     datos.archivos.forEach((archivo) => {
       formData.append('archivos', archivo);
     });
-    await requestFormData<unknown>('/admin/contacto-bacon', formData, usuarioId);
+    await requestFormData<unknown>('/admin/contacto-bacon', formData);
   },
 };
