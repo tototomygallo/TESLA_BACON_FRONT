@@ -5,7 +5,9 @@ import type { Muestra, ResultadoIngreso } from '../types';
 // Hook que encapsula el estado y operaciones sobre muestras.
 // Los componentes solo se preocupan por usar los datos, no por
 // cómo se obtienen.
-export function useMuestras() {
+// `habilitado` evita pedir datos antes de tener sesión (token). Si no, la
+// primera carga saldría sin Authorization y el back respondería 401.
+export function useMuestras(habilitado: boolean) {
   const [muestras, setMuestras] = useState<Muestra[]>([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -24,8 +26,9 @@ export function useMuestras() {
   }, []);
 
   useEffect(() => {
+    if (!habilitado) return;
     recargar();
-  }, [recargar]);
+  }, [habilitado, recargar]);
 
   const ingresarLote = useCallback(
     async (codigos: string[], usuarioId: string): Promise<ResultadoIngreso> => {

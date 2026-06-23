@@ -44,8 +44,8 @@ export default function App() {
     cargando: cargandoMuestras,
     ingresarLote,
     recargar: recargarMuestras,
-  } = useMuestras();
-  const { historial, recargar: recargarHistorial } = useHistorial();
+  } = useMuestras(usuario != null);
+  const { historial, recargar: recargarHistorial } = useHistorial(usuario != null);
 
   const cerrarSesion = useCallback((mensaje?: string) => {
     localStorage.removeItem('usuario');

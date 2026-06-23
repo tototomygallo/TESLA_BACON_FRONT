@@ -2,7 +2,9 @@ import { useCallback, useEffect, useState } from 'react';
 import { api } from '../services';
 import type { ResumenDiario } from '../types';
 
-export function useHistorial() {
+// `habilitado` evita pedir datos antes de tener sesión (token). Si no, la
+// primera carga saldría sin Authorization y el back respondería 401.
+export function useHistorial(habilitado: boolean) {
   const [historial, setHistorial] = useState<ResumenDiario[]>([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -21,8 +23,9 @@ export function useHistorial() {
   }, []);
 
   useEffect(() => {
+    if (!habilitado) return;
     recargar();
-  }, [recargar]);
+  }, [habilitado, recargar]);
 
   return { historial, cargando, error, recargar };
 }
