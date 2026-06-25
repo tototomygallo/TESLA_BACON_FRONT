@@ -118,7 +118,15 @@ export interface ResultadoLactokit {
   h2: Array<number | null>; // 8 valores (uno por frasco) o más/menos según backend
   ch4: Array<number | null>;
   co2: Array<number | null>;
-  valoracion: '1' | '2' | '3' | '4' | 'ERROR';
+  // Valoración del informe (códigos definidos por el backend):
+  // 1 repetir por mala práctica (CO2<1,4% en ≥4 frascos) · 2 malabsorción con
+  // elevación de H2 · 3 con elevación de CH4 · 4 con H2 y CH4 · 5 no compatible
+  // · 6 igual que 2/3/4/5 + aviso de repetir por CO2 (3 frascos con CO2<1,4%).
+  valoracion: '1' | '2' | '3' | '4' | '5' | '6';
+  // Sub-condición de la valoración 6 (b=H2, c=CH4, d=H2 y CH4, e=no compatible).
+  // El backend la manda solo cuando valoracion === '6'; null en el resto.
+  condicion?: string | null;
+  // Texto del informe. Para la valoración 6 vienen dos líneas separadas por \n.
   descripcion: string;
   cargadoEn: string; // 'YYYY-MM-DD HH:mm'
 }

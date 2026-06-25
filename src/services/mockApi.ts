@@ -402,7 +402,7 @@ export const mockApi: ApiClient = {
   // Reiniciar una muestra: consume un intento del TauKit.
   // Cada TauKit tiene 2 tubos = 2 oportunidades.
   // Si al reiniciar ya usó ambas oportunidades → se anula.
-  async reiniciarMuestra(protocolo: string, _usuarioId: string): Promise<Muestra> {
+  async reiniciarMuestra(protocolo: string, _usuarioId: string): Promise<ValidacionMuestraResponse> {
     const muestra = _muestras.find((m) => m.protocolo === protocolo);
     if (!muestra) {
       throw new ApiError('Muestra no encontrada', 'NOT_FOUND');
@@ -440,7 +440,8 @@ export const mockApi: ApiClient = {
       _muestras = _muestras.map((m) =>
         m.protocolo === protocolo ? anulada : m,
       );
-      return delay(anulada);
+      // El informe de anulación se sube/verifica en BACON (mock: OK directo).
+      return delay({ ...anulada, pdfGenerado: true, pdfVerificado: true });
     }
 
     // Todavía tiene 1 oportunidad más: reiniciar

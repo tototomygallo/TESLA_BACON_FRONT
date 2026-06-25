@@ -68,7 +68,9 @@ export interface ApiClient {
   validarMuestra(protocolo: string, usuarioId: string): Promise<ValidacionMuestraResponse>;
   // Reiniciar: borra los resultados de una muestra con error para
   // poder recargar otro TXT (solo si tiene error y no está anulada).
-  reiniciarMuestra(protocolo: string, usuarioId: string): Promise<Muestra>;
+  // Si este reinicio agota el TauKit, la muestra queda anulada y el informe
+  // de anulación se sube/verifica en BACON: por eso devuelve los campos pdf*.
+  reiniciarMuestra(protocolo: string, usuarioId: string): Promise<ValidacionMuestraResponse>;
 
   // --- Etiquetas: marca como 'en_proceso' al imprimir (scope 2.4) ---
   imprimirEtiquetas(protocolo: string, usuarioId: string): Promise<Muestra>;

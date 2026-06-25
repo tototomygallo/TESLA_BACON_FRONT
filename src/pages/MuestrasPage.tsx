@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { EstadoBadge, ErrorBadge } from '../components/EstadoBadge';
 import { ValidacionModal } from '../components/ValidacionModal';
 import { generarEtiquetasMuestra } from '../services/etiquetas';
-import { api } from '../services';
+import { api, ApiError } from '../services';
 import type { Estado, Muestra, Usuario } from '../types';
 import { codigoMuestra, etiquetaTipoEstudio, type FiltroEstudio } from '../utils/estudios';
 
@@ -122,6 +122,28 @@ export function MuestrasPage({
   // Muestra cuyo modal de validación está abierto (null = cerrado)
   const [muestraEnValidacion, setMuestraEnValidacion] =
     useState<Muestra | null>(null);
+
+  // El PDF se trae con fetch autenticado (manda el Bearer y maneja el refresh).
+  // No se puede abrir por URL directa: la navegación del browser no lleva el
+  // token y el back responde 401. Bajamos el blob y disparamos la descarga.
+  const descargarPdf = async (protocolo: string) => {
+    setErrorAccion(null);
+    try {
+      const blob = await api.obtenerInformePdf(protocolo);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `informe-${protocolo}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+    } catch (e) {
+      setErrorAccion(
+        e instanceof ApiError ? e.message : 'No se pudo descargar el PDF',
+      );
+    }
+  };
 
   const filtradas = useMemo(() => {
     return muestras.filter((m) => {
@@ -566,10 +588,7 @@ export function MuestrasPage({
                         )}
                         {(m.estado === 'completado' || m.estado === 'anulado') && (
                           <button
-                            onClick={() => {
-                              const base = import.meta.env.VITE_API_BASE_URL ?? '/api';
-                              window.open(`${base}/muestras/${encodeURIComponent(m.protocolo)}/pdf`, '_blank');
-                            }}
+                            onClick={() => descargarPdf(m.protocolo)}
                             className="text-xs px-2.5 py-1 rounded-md border border-slate-300 text-slate-700 hover:bg-slate-50 transition-colors font-medium"
                           >
                             Ver PDF

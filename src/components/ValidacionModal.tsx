@@ -3,6 +3,37 @@ import { api, ApiError } from '../services';
 import { EstadoBadge, ErrorBadge } from './EstadoBadge';
 import type { Muestra } from '../types';
 
+// Tablas de referencia de Lactokit (significado definido por el backend).
+const CONDICIONES_LACTOKIT: Array<{ id: string; texto: string }> = [
+  { id: 'a', texto: 'Si hay cuatro frascos o más donde el valor de CO2 es menor a 1,4%. → valoración 1' },
+  { id: 'b', texto: 'Si H2 en cualquier punto es mayor a 20 ppm respecto del basal. → valoración 2' },
+  { id: 'c', texto: 'Si CH4 es mayor a 10 ppm en cualquier frasco. → valoración 3' },
+  { id: 'd', texto: 'Si se cumplen las condiciones "b" y "c" en simultáneo. → valoración 4' },
+  { id: 'e', texto: 'Si no es "b", "c" o "d". → valoración 5' },
+  { id: 'f', texto: 'Si en tres frascos el valor de CO2 es menor a 1,4%. Agrega la valoración de "b", "c", "d" o "e". → valoración 6' },
+];
+
+const VALORACIONES_LACTOKIT: Array<{ id: string; texto: string }> = [
+  { id: '1', texto: 'SE DEBE REPETIR LA PRUEBA POR MALA PRÁCTICA EN LA RECOGIDA DE LAS MUESTRAS DE ALIENTO (CO2 < 1,4%).' },
+  { id: '2', texto: 'RESULTADO COMPATIBLE CON MALABSORCION DE LACTOSA CON ELEVACION DE HIDROGENO. SI EL PACIENTE REPORTA SINTOMAS, ENTONCES ESTARIAMOS FRENTE A UNA INTOLERANCIA A LA LACTOSA.' },
+  { id: '3', texto: 'RESULTADO COMPATIBLE CON MALABSORCION DE LACTOSA CON ELEVACION DE METANO. SI EL PACIENTE REPORTA SINTOMAS, ENTONCES ESTARIAMOS FRENTE A UNA INTOLERANCIA A LA LACTOSA.' },
+  { id: '4', texto: 'RESULTADO COMPATIBLE CON MALABSORCION DE LACTOSA CON ELEVACION DE HIDROGENO Y METANO. SI EL PACIENTE REPORTA SINTOMAS, ENTONCES ESTARIAMOS FRENTE A UNA INTOLERANCIA A LA LACTOSA.' },
+  { id: '5', texto: 'RESULTADO NO COMPATIBLE CON MALABSORCION DE LACTOSA.' },
+  { id: '6', texto: 'La valoración que corresponda (2, 3, 4 o 5) + aviso: "DEBIDO A QUE VARIAS MUESTRAS CONTENIAN CO2 < 1,4%, SE SUGIERE REPETIR LA PRUEBA."' },
+];
+
+// Para la valoración 6, deduce la condición cumplida (b/c/d/e) a partir del
+// texto del informe. Es inferencia por texto: si el back cambia el wording,
+// simplemente no se muestra el sufijo (queda "6" a secas).
+function condicionDeValoracion6(descripcion: string): string {
+  const d = descripcion.toUpperCase();
+  if (d.includes('HIDROGENO Y METANO')) return 'd';
+  if (d.includes('NO COMPATIBLE')) return 'e';
+  if (d.includes('HIDROGENO')) return 'b';
+  if (d.includes('METANO')) return 'c';
+  return '';
+}
+
 interface Props {
   muestra: Muestra;
   usuarioId: string;
@@ -54,6 +85,7 @@ export function ValidacionModal({
     setEnviando(true);
     setError(null);
     try {
+      // validar solo pasa en_validacion → completado (nunca anula).
       const respuesta = await api.validarMuestra(muestra.protocolo, usuarioId);
       if (respuesta.pdfVerificado !== true) {
         setError('No se pudo verificar la subida del PDF en BACON. La muestra no se marcó como completada.');
@@ -61,9 +93,8 @@ export function ValidacionModal({
       }
       onActualizada();
       onCerrar();
-      // La validación fue exitosa (status 200), pero el backend puede avisar
-      // que el informe no se pudo enviar por mail. En ese caso mostramos un
-      // aviso amarillo en vez del mensaje de éxito.
+      // El backend puede avisar que el informe no se pudo enviar por mail. En
+      // ese caso mostramos un aviso amarillo en vez del mensaje de éxito.
       if (respuesta.advertencia) {
         onValidacionConAdvertencia?.(respuesta.advertencia);
       } else {
@@ -87,9 +118,28 @@ export function ValidacionModal({
     setEnviando(true);
     setError(null);
     try {
-      await api.reiniciarMuestra(muestra.protocolo, usuarioId);
+      const respuesta = await api.reiniciarMuestra(muestra.protocolo, usuarioId);
       onActualizada();
+
+      // Si este reinicio agotó las 2 mediciones del TauKit, la muestra queda
+      // anulada y el informe de anulación se sube/verifica en BACON.
+      if (respuesta.estado === 'anulado' && respuesta.pdfVerificado !== true) {
+        // Se anuló, pero el informe NO se pudo verificar en BACON. No cerramos
+        // el modal para que el aviso quede visible.
+        setError('La muestra se anuló, pero el informe de anulación no se pudo verificar en BACON. Revisá BACON.');
+        return;
+      }
+
       onCerrar();
+      // Anulada + informe verificado OK: confirmación (o aviso amarillo si el
+      // mail falló pero la subida a BACON sí se verificó).
+      if (respuesta.estado === 'anulado') {
+        if (respuesta.advertencia) {
+          onValidacionConAdvertencia?.(respuesta.advertencia);
+        } else {
+          onValidacionExitosa?.('Informe de anulación subido correctamente. Verificación exitosa.');
+        }
+      }
     } catch (e) {
       setError(
         e instanceof ApiError ? e.message : 'Error al reiniciar la muestra',
@@ -192,22 +242,15 @@ export function ValidacionModal({
                           </tr>
                         </thead>
                         <tbody>
-                          <tr className="border-b border-slate-200">
-                            <td className="px-3 py-2 align-top font-semibold">c</td>
-                            <td className="px-3 py-2">Si H2 en cualquier punto es {'>'}20ppm respecto del basal: Hay malabsorción de azúcares con elevación de hidrógeno.</td>
-                          </tr>
-                          <tr className="border-b border-slate-200">
-                            <td className="px-3 py-2 align-top font-semibold">d</td>
-                            <td className="px-3 py-2">Si CH4 es mayor a 10ppm en cualquier frasco: Hay malabsorción de azúcares con elevación de metano.</td>
-                          </tr>
-                          <tr className="border-b border-slate-200">
-                            <td className="px-3 py-2 align-top font-semibold">e</td>
-                            <td className="px-3 py-2">Si se cumple condición c y d en simultáneo: Hay malabsorción de azúcares con elevación de hidrógeno y metano.</td>
-                          </tr>
-                          <tr>
-                            <td className="px-3 py-2 align-top font-semibold">g</td>
-                            <td className="px-3 py-2">Si no se cumple ninguna de las condiciones anteriores: Resultado compatible con malabsorción de azúcares.</td>
-                          </tr>
+                          {CONDICIONES_LACTOKIT.map((c, i) => (
+                            <tr
+                              key={c.id}
+                              className={i < CONDICIONES_LACTOKIT.length - 1 ? 'border-b border-slate-200' : ''}
+                            >
+                              <td className="px-3 py-2 align-top font-semibold">{c.id}</td>
+                              <td className="px-3 py-2">{c.texto}</td>
+                            </tr>
+                          ))}
                         </tbody>
                       </table>
                     </div>
@@ -224,22 +267,15 @@ export function ValidacionModal({
                           </tr>
                         </thead>
                         <tbody>
-                          <tr className="border-b border-slate-200">
-                            <td className="px-3 py-2 font-semibold">1</td>
-                            <td className="px-3 py-2">Resultado no compatible con malabsorción de lactosa.</td>
-                          </tr>
-                          <tr className="border-b border-slate-200">
-                            <td className="px-3 py-2 font-semibold">2</td>
-                            <td className="px-3 py-2">Resultado compatible con malabsorción de lactosa con elevación de hidrógeno y metano, si el paciente reporta síntomas, entonces estaríamos frente a una.</td>
-                          </tr>
-                          <tr className="border-b border-slate-200">
-                            <td className="px-3 py-2 font-semibold">3</td>
-                            <td className="px-3 py-2">Resultado compatible con malabsorción de lactosa con elevación de hidrógeno, si el paciente reporta síntomas, entonces estaríamos frente a una.</td>
-                          </tr>
-                          <tr className="border-b border-slate-200">
-                            <td className="px-3 py-2 font-semibold">4</td>
-                            <td className="px-3 py-2">Resultado compatible con malabsorción de lactosa con elevación de metano, si el paciente reporta síntomas, entonces estaríamos frente a una.</td>
-                          </tr>
+                          {VALORACIONES_LACTOKIT.map((v, i) => (
+                            <tr
+                              key={v.id}
+                              className={i < VALORACIONES_LACTOKIT.length - 1 ? 'border-b border-slate-200' : ''}
+                            >
+                              <td className="px-3 py-2 align-top font-semibold">{v.id}</td>
+                              <td className="px-3 py-2">{v.texto}</td>
+                            </tr>
+                          ))}
                         </tbody>
                       </table>
                     </div>
@@ -276,8 +312,12 @@ export function ValidacionModal({
 
                   <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
                     <div className="font-semibold">Valoración del informe</div>
-                    <div className="mt-2 text-2xl font-bold">{resultadosLactokit.valoracion}</div>
-                    <div className="mt-2 text-slate-700">{resultadosLactokit.descripcion}</div>
+                    <div className="mt-2 text-2xl font-bold">
+                      {resultadosLactokit.valoracion === '6'
+                        ? `6${resultadosLactokit.condicion ?? condicionDeValoracion6(resultadosLactokit.descripcion ?? '')}`
+                        : resultadosLactokit.valoracion}
+                    </div>
+                    <div className="mt-2 whitespace-pre-line text-slate-700">{resultadosLactokit.descripcion}</div>
                   </div>
                 </div>
               ) : (

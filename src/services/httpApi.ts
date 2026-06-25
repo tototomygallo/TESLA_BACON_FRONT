@@ -399,8 +399,8 @@ export const httpApi: ApiClient = {
     });
   },
 
-  async reiniciarMuestra(protocolo: string, _usuarioId: string): Promise<Muestra> {
-    return request<Muestra>(`/muestras/${protocolo}/reiniciar`, {
+  async reiniciarMuestra(protocolo: string, _usuarioId: string): Promise<ValidacionMuestraResponse> {
+    return request<ValidacionMuestraResponse>(`/muestras/${protocolo}/reiniciar`, {
       method: 'POST',
     });
   },
