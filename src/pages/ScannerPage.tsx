@@ -55,6 +55,13 @@ export function ScannerPage({ muestras, onIngresar }: Props) {
       : muestrasBacon.filter((m) => !codigosIngresados.has(m.numero_serie))
           .length;
 
+  // El lote no trajo nada nuevo: todo lo escaneado ya estaba ingresado.
+  const soloDuplicadas =
+    !!alerta &&
+    alerta.ingresadas.length === 0 &&
+    alerta.rechazadas.length === 0 &&
+    alerta.duplicadas.length > 0;
+
   const agregarCodigo = (cod: string) => {
     const limpio = cod.trim().toUpperCase();
     if (!limpio) return;
@@ -117,21 +124,26 @@ export function ScannerPage({ muestras, onIngresar }: Props) {
         <div
           className="rounded-xl border bg-white p-5 space-y-3"
           style={{
-            borderColor: alerta.rechazadas.length > 0 ? '#fca5a5' : '#86efac',
+            borderColor: alerta.rechazadas.length > 0
+              ? '#fca5a5'
+              : soloDuplicadas
+                ? '#fcd34d'
+                : '#86efac',
           }}
         >
           <div className="flex items-start gap-3">
             <div
               className={`w-10 h-10 rounded-lg flex items-center justify-center text-xl flex-shrink-0 ${
-                alerta.rechazadas.length > 0 ? 'bg-amber-50' : 'bg-emerald-50'
+                alerta.rechazadas.length > 0 || soloDuplicadas ? 'bg-amber-50' : 'bg-emerald-50'
               }`}
             >
-              {alerta.rechazadas.length > 0 ? '⚠' : '✓'}
+              {alerta.rechazadas.length > 0 || soloDuplicadas ? '⚠' : '✓'}
             </div>
             <div className="flex-1">
                 <div className="font-semibold text-slate-900">
-                  Se cargó {alerta.ingresadas.length} muestra
-                  {alerta.ingresadas.length !== 1 ? 's' : ''}
+                  {soloDuplicadas
+                    ? 'No se ingresaron muestras nuevas'
+                    : `Se cargó ${alerta.ingresadas.length} muestra${alerta.ingresadas.length !== 1 ? 's' : ''}`}
                 </div>
                 {alerta.ingresadas.length > 0 && (
                   <div className="text-sm text-slate-600 mt-1">
@@ -169,8 +181,22 @@ export function ScannerPage({ muestras, onIngresar }: Props) {
                 </div>
               )}
               {alerta.duplicadas.length > 0 && (
-                <div className="text-sm text-amber-700 mt-2">
-                  {alerta.duplicadas.length} ya estaban ingresadas previamente.
+                <div className="text-sm text-amber-700 mt-3">
+                  {alerta.duplicadas.length} muestra
+                  {alerta.duplicadas.length !== 1 ? 's' : ''} ya
+                  {alerta.duplicadas.length !== 1 ? ' estaban' : ' estaba'}{' '}
+                  ingresada{alerta.duplicadas.length !== 1 ? 's' : ''} previamente
+                  (no se reenvían a BACON):
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {alerta.duplicadas.map((c) => (
+                      <span
+                        key={c}
+                        className="text-xs px-2 py-0.5 rounded bg-amber-50 border border-amber-200 text-amber-800 font-mono"
+                      >
+                        {c}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>

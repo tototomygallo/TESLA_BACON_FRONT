@@ -62,7 +62,11 @@ export function ControlPrevio({ codigosIngresados }: Props) {
     return etiquetaTipoEstudioMayus(tipoDesdeCodigo(num));
   }
 
-  const ordenadas = [...muestrasBacon].sort((a,b) => {
+  // Solo las pendientes de ingreso: las que BACON envió y todavía no están
+  // en el sistema. Las ya ingresadas no se listan acá.
+  const ordenadas = muestrasBacon
+    .filter((m) => !codigosIngresados.has(m.numero_serie))
+    .sort((a,b) => {
     if (sortBy === 'paciente') {
       const aName = (a.paciente.nombre ?? '');
       const bName = (b.paciente.nombre ?? '');
@@ -164,6 +168,11 @@ export function ControlPrevio({ codigosIngresados }: Props) {
       ) : muestrasBacon.length === 0 ? (
         <div className="px-5 py-8 text-center text-sm text-slate-400">
           BACON no reporta muestras enviadas en este momento.
+        </div>
+      ) : ordenadas.length === 0 ? (
+        <div className="px-5 py-8 text-center text-sm text-slate-400">
+          No hay muestras pendientes: todas las enviadas por BACON ya fueron
+          ingresadas al sistema.
         </div>
       ) : (
         <>
