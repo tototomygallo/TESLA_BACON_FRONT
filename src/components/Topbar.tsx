@@ -8,7 +8,8 @@ export type Vista =
   | 'scanner'
   | 'carga_txt'
   | 'administracion'
-  | 'configuracion';
+  | 'configuracion'
+  | 'asistencia';
 
 interface Props {
   usuario: Usuario;
@@ -18,7 +19,7 @@ interface Props {
 }
 
 const tabs: Array<{ id: Vista; label: string; adminOnly?: boolean }> = [
-  { id: 'resumen', label: 'Resúmen del día' },
+  { id: 'resumen', label: 'Resumen del día' },
   { id: 'muestras', label: 'Muestras' },
   { id: 'scanner', label: 'Ingreso por scanner' },
   { id: 'carga_txt', label: 'Carga de resultados' },
@@ -59,6 +60,18 @@ export function Topbar({ usuario, vista, setVista, onLogout }: Props) {
         </div>
 
         <div className="flex items-center gap-3 flex-shrink-0">
+          <button
+            onClick={() => setVista('asistencia')}
+            title="Asistencia y documentación"
+            aria-label="Asistencia y documentación"
+            className={`flex h-9 w-9 items-center justify-center rounded-full border text-base font-bold transition-colors ${
+              vista === 'asistencia'
+                ? 'border-violet-300 bg-violet-50 text-violet-700'
+                : 'border-slate-200 bg-white text-slate-500 hover:text-slate-900 hover:border-slate-300 hover:bg-slate-50'
+            }`}
+          >
+            ?
+          </button>
           <div className="text-right hidden sm:block">
             <div className="text-sm font-medium text-slate-900">
               {usuario.nombre}

@@ -147,6 +147,8 @@ export function MuestrasPage({
 
   const filtradas = useMemo(() => {
     return muestras.filter((m) => {
+      // Las muestras dadas de baja desde Operación no se listan acá.
+      if (m.estado === 'eliminado') return false;
       // Filtro por tipo de estudio
       const matchEstudio = filtroEstudio === 'todos' || m.tipoEstudio === filtroEstudio;
       if (!matchEstudio) return false;
@@ -181,6 +183,7 @@ export function MuestrasPage({
   const resumenPeriodo = useMemo(() => {
     const q = busqueda.toLowerCase();
     const base = muestras.filter((m) => {
+      if (m.estado === 'eliminado') return false;
       const matchEstudio = filtroEstudio === 'todos' || m.tipoEstudio === filtroEstudio;
       const matchBusqueda =
         !q ||

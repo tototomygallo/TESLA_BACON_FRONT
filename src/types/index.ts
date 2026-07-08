@@ -11,7 +11,8 @@ export type Rol = 'tecnico' | 'bioquimico' | 'admin';
 // seguir siendo válida para reintentar).
 // 'anulado': el TauKit agotó sus 2 mediciones con error y queda
 // fuera de circulación — hay que usar otro TauKit.
-export type Estado = 'recibido' | 'en_proceso' | 'en_validacion' | 'completado' | 'anulado';
+// 'eliminado': baja lógica desde Operación; no se lista en Muestras.
+export type Estado = 'recibido' | 'en_proceso' | 'en_validacion' | 'completado' | 'anulado' | 'eliminado';
 
 export interface Usuario {
   id: string;

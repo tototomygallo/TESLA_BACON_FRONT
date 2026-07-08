@@ -176,7 +176,7 @@ export function ScannerPage({ muestras, onIngresar }: Props) {
                     ))}
                   </div>
                   <div className="text-xs text-slate-500 mt-2">
-                    Registrado en el Resúmen del día.
+                    Registrado en el Resumen del día.
                   </div>
                 </div>
               )}

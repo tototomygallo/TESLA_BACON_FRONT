@@ -13,10 +13,23 @@ const config: Record<
   en_validacion: { label: 'En validación', bg: 'bg-violet-50',  text: 'text-violet-700',  dot: 'bg-violet-500' },
   completado:    { label: 'Completado',    bg: 'bg-emerald-50', text: 'text-emerald-700', dot: 'bg-emerald-500' },
   anulado:       { label: 'Anulado',       bg: 'bg-slate-100',  text: 'text-slate-600',   dot: 'bg-slate-400' },
+  eliminado:     { label: 'Eliminado',     bg: 'bg-slate-100',  text: 'text-slate-500',   dot: 'bg-slate-400' },
+};
+
+// Fallback por si llega un estado desconocido (dato inesperado del backend):
+// mostramos un badge neutro en vez de crashear la pantalla.
+const configPorDefecto = {
+  label: 'Desconocido',
+  bg: 'bg-slate-100',
+  text: 'text-slate-600',
+  dot: 'bg-slate-400',
 };
 
 export function EstadoBadge({ estado }: Props) {
-  const c = config[estado];
+  const c = config[estado] ?? {
+    ...configPorDefecto,
+    label: estado ? String(estado) : configPorDefecto.label,
+  };
   return (
     <span
       className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ring-1 ring-black/5 ${c.bg} ${c.text}`}

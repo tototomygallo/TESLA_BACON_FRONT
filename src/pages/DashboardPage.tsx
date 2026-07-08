@@ -172,7 +172,7 @@ export function DashboardPage({ historial, muestras }: Props) {
       <div className="flex items-end justify-between flex-wrap gap-4">
         <div>
           <h2 className="text-2xl font-semibold text-slate-900 tracking-tight">
-            Resúmen del día
+            Resumen del día
           </h2>
           <p className="text-sm text-slate-500 mt-0.5 capitalize">
             {formatearFecha(fechaSeleccionada)}{' '}

@@ -3,6 +3,7 @@ import { Topbar, type Vista } from './components/Topbar';
 import { useHistorial } from './hooks/useHistorial';
 import { useMuestras } from './hooks/useMuestras';
 import { AdministracionPage } from './pages/AdministracionPage';
+import { AsistenciaPage } from './pages/AsistenciaPage';
 import { CargaTxtPage } from './pages/CargaTxtPage';
 import { ConfiguracionPage } from './pages/ConfiguracionPage';
 import { DashboardPage } from './pages/DashboardPage';
@@ -160,6 +161,7 @@ export default function App() {
             {vista === 'configuracion' && (
               <ConfiguracionPage usuario={usuario} />
             )}
+            {vista === 'asistencia' && <AsistenciaPage />}
           </>
         )}
       </main>
