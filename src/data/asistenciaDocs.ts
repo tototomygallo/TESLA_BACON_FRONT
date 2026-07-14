@@ -749,25 +749,26 @@ export const SECCIONES_DOC: SeccionDoc[] = [
                   '**Figura 15. Ejemplo de validación bioquímica de una muestra Taukit luego de un reinicio, con el contador Reinicios 1/2 visible.**',
                 tamano: 'media',
               },
+              {
+                tipo: 'imagen',
+                src: '/docs/validacion-taukit-confirmar-reinicio-2.png',
+                alt: 'Confirmación de reinicio de una muestra Taukit con Reinicios 1/2',
+                caption:
+                  '**Figura 16. Confirmación de reinicio de una muestra Taukit con Reinicios 1/2.** Al seleccionar **Reiniciar muestra**, el sistema advierte que si se confirma la acción el contador llegará a **2/2** y el Taukit quedará anulado.',
+                tamano: 'media',
+              },
               { tipo: 'subtitulo', texto: '**8.1.4 Caso con error**' },
               {
                 tipo: 'parrafo',
                 texto:
                   'Cuando el equipo informa un error en la medición, la ventana muestra el detalle del valor detectado y el contador **Reinicios** correspondiente.',
-              },
-              {
-                tipo: 'lista',
-                items: [
-                  'Con **Reinicios 1/2**, la muestra puede revisarse y reiniciarse si corresponde.',
-                  'Si se confirma el reinicio desde **Reinicios 1/2**, el Taukit llega a **Reinicios 2/2** y queda anulado.',
-                ],
-              },
+                },
               {
                 tipo: 'imagen',
                 src: '/docs/validacion-taukit-error.png',
                 alt: 'Muestra Taukit con error detectado y opción de reinicio',
                 caption:
-                  '**Figura 16. Ejemplo de muestra Taukit con error detectado y opción de reinicio.**',
+                  '**Figura 17. Ejemplo de muestra Taukit con error detectado y opción de reinicio.**',
                 tamano: 'media',
               },
             ],
@@ -784,7 +785,7 @@ export const SECCIONES_DOC: SeccionDoc[] = [
                 tipo: 'imagen',
                 src: '/docs/validacion-lactokit.png',
                 alt: 'Ventana de validación bioquímica de una muestra Lactokit',
-                caption: '**Figura 17. Ventana de validación bioquímica para una muestra Lactokit.**',
+                caption: '**Figura 18. Ventana de validación bioquímica para una muestra Lactokit.**',
               },
               { tipo: 'subtitulo', texto: '**Aceptar y completar**' },
               {
