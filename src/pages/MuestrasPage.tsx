@@ -58,7 +58,7 @@ function exportarCsv(muestras: Muestra[]): void {
     'Estudio',
     'Estado',
     'Error',
-    'Intentos fallidos',
+    'Reinicios',
     'Δ ‰ (TestValue)',
     'Lectura basal',
     'Lectura post 30 min',
@@ -76,7 +76,7 @@ function exportarCsv(muestras: Muestra[]): void {
     m.estudio.nombre,
     m.estado,
     m.tieneError ? 'Sí' : 'No',
-    String(m.intentosFallidos),
+    reiniciosUsados(m),
     m.resultados ? String(m.resultados.testValue) : '',
     m.resultados ? String(m.resultados.basalDelta) : '',
     m.resultados ? String(m.resultados.postDelta) : '',
@@ -98,6 +98,34 @@ function exportarCsv(muestras: Muestra[]): void {
   a.download = `muestras-${new Date().toISOString().slice(0, 10)}.csv`;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+function reiniciosUsados(muestra: Muestra): string {
+  if (muestra.tipoEstudio !== 'taukit') return '';
+  return `${Math.min(muestra.intentosFallidos, 2)} de 2`;
+}
+
+function ReiniciosBadge({ muestra }: { muestra: Muestra }) {
+  if (muestra.tipoEstudio !== 'taukit') {
+    return <span className="text-xs text-slate-300">-</span>;
+  }
+
+  const usadas = Math.min(muestra.intentosFallidos, 2);
+  const clases =
+    usadas >= 2
+      ? 'border-red-200 bg-red-50 text-red-700'
+      : usadas === 1
+        ? 'border-amber-200 bg-amber-50 text-amber-700'
+        : 'border-slate-200 bg-slate-50 text-slate-500';
+
+  return (
+    <span
+      title="Cuenta reinicios manuales y errores del equipo"
+      className={`inline-flex min-w-[64px] justify-center rounded-md border px-2 py-1 text-xs font-semibold ${clases}`}
+    >
+      {usadas}/2
+    </span>
+  );
 }
 
 export function MuestrasPage({
@@ -463,13 +491,16 @@ export function MuestrasPage({
               <th className="text-right text-xs font-semibold text-slate-200 uppercase tracking-wider px-4 py-3">
                 Acciones
               </th>
+              <th className="text-center text-xs font-semibold text-slate-200 uppercase tracking-wider px-4 py-3">
+                Reinicios
+              </th>
             </tr>
           </thead>
           <tbody>
             {filtradas.length === 0 ? (
               <tr>
                 <td
-                  colSpan={9}
+                  colSpan={10}
                   className="text-center py-12 text-slate-400 text-sm"
                 >
                   No se encontraron muestras con los filtros aplicados
@@ -598,6 +629,9 @@ export function MuestrasPage({
                           </button>
                         )}
                       </div>
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <ReiniciosBadge muestra={m} />
                     </td>
                   </tr>
                 );

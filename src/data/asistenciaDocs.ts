@@ -423,9 +423,11 @@ export const SECCIONES_DOC: SeccionDoc[] = [
           'Resultado.',
           'Fecha de ingreso.',
           'Acciones disponibles.',
+          'Reinicios.',
         ],
         parrafosPost: [
           'Las acciones visibles cambian según el estado de la muestra y el rol del usuario.',
+          'En muestras Taukit, la columna **Reinicios** muestra cuántos reinicios o errores de equipo lleva registrados la muestra: **0/2** indica que no hubo reinicios ni errores previos, **1/2** indica que ya hubo un reinicio manual o un error de equipo, y **2/2** indica que el Taukit llegó al límite y queda anulado. Esta columna no aplica al circuito Lactokit.',
         ],
         subsecciones: [
           {
@@ -449,9 +451,6 @@ export const SECCIONES_DOC: SeccionDoc[] = [
             items: [
               'Para Taukit, los resultados se cargan mediante la importación del archivo generado por el equipo.',
               'Para Lactokit, los resultados se cargan manualmente desde la grilla correspondiente.',
-            ],
-            parrafosPost: [
-              'En el caso de Lactokit, una carga guardada parcialmente mantiene la muestra en estado En proceso.',
             ],
             imagen: '/docs/muestras-estado-en-proceso.png',
             imagenAlt: 'Muestra en estado En proceso',
@@ -482,7 +481,19 @@ export const SECCIONES_DOC: SeccionDoc[] = [
               {
                 tipo: 'parrafo',
                 texto:
-                  'La condición Con error aparece acompañando al estado principal de la muestra. Puede presentarse como En proceso — Con error o Anulado — Con error, según el intento de procesamiento.',
+                  'La condición Con error aparece acompañando al estado principal de la muestra. Puede presentarse como En proceso — Con error o Anulado — Con error, según la cantidad de reinicios o errores registrados.',
+              },
+              {
+                tipo: 'parrafo',
+                texto:
+                  'Para Taukit, el contador **Reinicios** suma tanto los reinicios manuales como los errores de equipo detectados automáticamente. La muestra queda anulada cuando llega a **2/2**.',
+              },
+              {
+                tipo: 'lista',
+                items: [
+                  '**1/2**: hubo un reinicio manual o un error de equipo.',
+                  '**2/2**: hubo dos reinicios manuales, dos errores de equipo, o un reinicio manual más un error de equipo.',
+                ],
               },
               { tipo: 'subtitulo', texto: 'En proceso — Con error' },
               {
@@ -497,14 +508,14 @@ export const SECCIONES_DOC: SeccionDoc[] = [
                   'La muestra permanece en estado En proceso.',
                   'Se muestra adicionalmente la condición Con error.',
                   'Se habilita la acción **Ver error** únicamente para usuarios con rol Bioquímico o Administrador.',
-                  'La muestra todavía dispone de una oportunidad de procesamiento.',
+                  'La muestra queda con **Reinicios 1/2** y puede revisarse para decidir si corresponde reiniciarla.',
                 ],
               },
               {
                 tipo: 'imagen',
                 src: '/docs/muestras-con-error-en-proceso.png',
                 alt: 'Muestra En proceso — Con error con la acción **Ver error**',
-                caption: '**Figura 6. Muestra en estado En proceso con la condición Con error.** \n El sistema detectó un inconveniente durante el primer intento de medición. Los usuarios Bioquímicos y Administradores pueden utilizar la acción **Ver error** para consultar el detalle y reiniciar la muestra.',
+                caption: '**Figura 6. Muestra en estado En proceso con la condición Con error.** \n El sistema detectó un inconveniente durante la medición. Los usuarios Bioquímicos y Administradores pueden utilizar la acción **Ver error** para consultar el detalle y reiniciar la muestra.',
               },
               {
                 tipo: 'parrafo',
@@ -516,14 +527,14 @@ export const SECCIONES_DOC: SeccionDoc[] = [
                   'Los datos de la muestra y del paciente.',
                   'Los valores registrados en la medición.',
                   'El motivo del error detectado.',
-                  'El intento utilizado y la cantidad de oportunidades restantes.',
+                  'La cantidad de reinicios o errores registrados.',
                   'La acción **Reiniciar muestra**.',
                 ],
               },
               {
                 tipo: 'parrafo',
                 texto:
-                  'Al reiniciar, se eliminan los resultados anteriores, se utiliza el segundo tubo del Taukit y la muestra vuelve a quedar en estado En proceso.',
+                  'Al reiniciar, se eliminan los resultados anteriores y la muestra vuelve a quedar en estado En proceso para recibir una nueva carga de resultados.',
               },
               {
                 tipo: 'imagen',
@@ -531,13 +542,13 @@ export const SECCIONES_DOC: SeccionDoc[] = [
                 alt: 'Ventana **Ver error** con la acción **Reiniciar muestra**',
                 tamano: 'media',
                 caption:
-                  '**Figura 7. Detalle de una muestra En proceso — Con error.** \n La ventana muestra los resultados registrados, el motivo del error, el intento utilizado y las oportunidades restantes. La acción **Reiniciar muestra** está disponible únicamente para usuarios Bioquímicos y Administradores.',
+                  '**Figura 7. Detalle de una muestra En proceso — Con error.** \n La ventana muestra los resultados registrados, el motivo del error y la cantidad de reinicios o errores registrados. La acción **Reiniciar muestra** está disponible únicamente para usuarios Bioquímicos y Administradores.',
               },
               { tipo: 'subtitulo', texto: 'Anulado — Con error' },
               {
                 tipo: 'parrafo',
                 texto:
-                  'Se produce cuando el segundo intento de procesamiento de una muestra Taukit también presenta un resultado incorrecto.',
+                  'Se produce cuando la muestra Taukit llega a **Reinicios 2/2**, ya sea por reinicios manuales, errores del equipo o una combinación de ambos.',
               },
               { tipo: 'parrafo', texto: 'En este caso:' },
               {
@@ -545,7 +556,7 @@ export const SECCIONES_DOC: SeccionDoc[] = [
                 items: [
                   'La muestra pasa a estado Anulado.',
                   'Se mantiene la condición Con error.',
-                  'Ya no quedan oportunidades de procesamiento disponibles.',
+                  'El contador de reinicios llegó a **2/2**.',
                   'No se habilita la acción **Reiniciar muestra**.',
                   'El sistema genera el informe correspondiente a la anulación y lo envía a BACON.',
                   'Para continuar con el estudio deberá utilizarse un nuevo Taukit.',
@@ -560,7 +571,7 @@ export const SECCIONES_DOC: SeccionDoc[] = [
                 tipo: 'imagen',
                 src: '/docs/muestras-con-error-anulado.png',
                 alt: 'Muestra en estado Anulado — Con error',
-                caption: '**Figura 8. Muestra en estado Anulado con la condición Con error.** \n Este estado se presenta cuando el segundo intento de medición también resulta incorrecto. La muestra ya no puede reiniciarse y se habilita la acción **Ver PDF** para consultar el informe de anulación enviado a BACON.'
+                caption: '**Figura 8. Muestra en estado Anulado con la condición Con error.** \n Este estado se presenta cuando el Taukit llega a **Reinicios 2/2**. La muestra ya no puede reiniciarse y se habilita la acción **Ver PDF** para consultar el informe de anulación enviado a BACON.'
               },
               {
                 tipo: 'link',
@@ -599,10 +610,10 @@ export const SECCIONES_DOC: SeccionDoc[] = [
               {
                 tipo: 'parrafo',
                 texto:
-                  'Nota: Estos flujos aplican al circuito de Taukit, ya que permiten reiniciar la muestra utilizando el 2° tubo. En Lactokit no aplica este mecanismo de reinicio.',
+                  'Nota: Estos flujos aplican al circuito de Taukit, ya que permiten reiniciar la muestra cuando es necesario repetir la carga de resultados. En Lactokit no aplica este mecanismo de reinicio.',
               },
             ],
-            imagenCaption: '**Figura 11. Flujos alternativos de procesamiento de una muestra Taukit.** \n El primer flujo muestra un intento inicial fallido seguido de una medición exitosa. El segundo representa dos intentos fallidos, situación en la que la muestra finaliza como **Anulado — Con error**.'
+            imagenCaption: '**Figura 11. Flujos alternativos de procesamiento de una muestra Taukit.** \n El primer flujo muestra un error inicial seguido de una carga exitosa. El segundo representa un caso que llega a **Reinicios 2/2**, situación en la que la muestra finaliza como **Anulado — Con error**.'
           },
         ],
         parrafosFinal: [
@@ -614,8 +625,8 @@ export const SECCIONES_DOC: SeccionDoc[] = [
         titulo: '7. Paginación',
         parrafos: [
           'Debajo de la tabla se muestra la cantidad total de registros encontrados y los controles de navegación entre páginas.',
-          'La opción Por página permite elegir cuántas muestras se desean visualizar simultáneamente.',
-          'Los botones Anterior y Siguiente permiten recorrer las páginas cuando la cantidad de resultados supera el límite seleccionado.',
+          'La opción **Por página** permite elegir cuántas muestras se desean visualizar simultáneamente.',
+          'Los botones **Anterior** y **Siguiente** permiten recorrer las páginas cuando la cantidad de resultados supera el límite seleccionado.',
           'La paginación respeta la búsqueda y todos los filtros aplicados.',
         ],
       },
@@ -623,7 +634,7 @@ export const SECCIONES_DOC: SeccionDoc[] = [
         id: 'validacion',
         titulo: '8. Validación bioquímica',
         parrafos: [
-          'La acción Validar está disponible únicamente para usuarios con rol Bioquímico o Administrador y se habilita cuando la muestra se encuentra en estado En validación.',
+          'La acción **Validar** está disponible únicamente para usuarios con rol Bioquímico o Administrador y se habilita cuando la muestra se encuentra en estado **En validación**.',
           'Desde esta ventana se pueden revisar los datos del paciente, el tipo de estudio y los resultados cargados, antes de definir la acción final sobre la muestra.',
           'El comportamiento de esta validación varía según el tipo de estudio.',
         ],
@@ -643,7 +654,7 @@ export const SECCIONES_DOC: SeccionDoc[] = [
                 caption: '**Figura 12. Ventana de validación bioquímica para una muestra Taukit.**',
                 tamano: 'media',
               },
-              { tipo: 'subtitulo', texto: '**Aceptar y completar**' },
+              { tipo: 'subtitulo', texto: '**8.1.1 Aceptar y completar**' },
               {
                 tipo: 'parrafo',
                 texto:
@@ -675,7 +686,7 @@ export const SECCIONES_DOC: SeccionDoc[] = [
                 alt: 'Confirmación de validación y envío exitoso del informe',
                 caption: '**Figura 13. Confirmación de validación y envío exitoso del informe.**',
               },
-              { tipo: 'subtitulo', texto: '**Reiniciar muestra**' },
+              { tipo: 'subtitulo', texto: '**8.1.2 Reiniciar muestra**' },
               {
                 tipo: 'parrafo',
                 texto:
@@ -690,14 +701,15 @@ export const SECCIONES_DOC: SeccionDoc[] = [
                 tipo: 'lista',
                 items: [
                   'Se eliminan los resultados previamente cargados.',
-                  'La muestra vuelve al estado En proceso.',
+                  'La muestra vuelve al estado **En proceso**.',
                   'Queda lista para esperar una nueva carga de resultados.',
+                  'Se suma un registro en el contador **Reinicios**.',
                 ],
               },
               {
                 tipo: 'parrafo',
                 texto:
-                  'Esta acción se utiliza únicamente en el circuito de Taukit, cuando es necesario repetir la medición.',
+                  'Esta acción se utiliza únicamente en el circuito de Taukit, cuando es necesario repetir la medición. Si la muestra está en **Reinicios 0/2**, el reinicio la deja en **Reinicios 1/2**. Si ya está en **Reinicios 1/2**, confirmar otro reinicio la lleva a **Reinicios 2/2** y el Taukit queda anulado.',
               },
               {
                 tipo: 'imagen',
@@ -706,11 +718,16 @@ export const SECCIONES_DOC: SeccionDoc[] = [
                 caption: '**Figura 14. Confirmación previa al reinicio de una muestra Taukit.**',
                 tamano: 'media',
               },
-              { tipo: 'subtitulo', texto: 'Validación luego de un reinicio' },
+              { tipo: 'subtitulo', texto: '**8.1.3 Validación luego de un reinicio**' },
               {
                 tipo: 'parrafo',
                 texto:
-                  'Si una muestra Taukit ya fue reiniciada previamente y se cargan nuevos resultados, la ventana de validación bioquímica mostrará una advertencia indicando que queda 1 oportunidad disponible.',
+                  'Si una muestra Taukit ya fue reiniciada previamente o tuvo un error de equipo, la ventana de validación bioquímica mostrará el contador **Reinicios 1/2**.',
+              },
+              {
+                tipo: 'parrafo',
+                texto:
+                  'En ese contexto, la confirmación de reinicio advierte que, si se confirma la acción, el contador llegará a **2/2** y el Taukit quedará anulado en ese momento.',
               },
               {
                 tipo: 'parrafo',
@@ -721,7 +738,7 @@ export const SECCIONES_DOC: SeccionDoc[] = [
                 tipo: 'lista',
                 items: [
                   'Si los resultados son correctos, podrá **Aceptar y completar** la muestra.',
-                  'Si los resultados vuelven a ser incorrectos, podrá **Reiniciar muestra** nuevamente, consumiendo así la última oportunidad disponible del kit.',
+                  'Si vuelve a seleccionar **Reiniciar muestra**, el contador llegará a **Reinicios 2/2** y el Taukit quedará anulado.',
                 ],
               },
               {
@@ -729,10 +746,22 @@ export const SECCIONES_DOC: SeccionDoc[] = [
                 src: '/docs/validacion-taukit-reinicio-2.png',
                 alt: 'Validación bioquímica de una muestra Taukit luego de un reinicio',
                 caption:
-                  '**Figura 15. Ejemplo de validación bioquímica de una muestra Taukit luego de un reinicio, con aviso de que queda una oportunidad disponible.**',
+                  '**Figura 15. Ejemplo de validación bioquímica de una muestra Taukit luego de un reinicio, con el contador Reinicios 1/2 visible.**',
                 tamano: 'media',
               },
-              { tipo: 'subtitulo', texto: 'Caso con error' },
+              { tipo: 'subtitulo', texto: '**8.1.4 Caso con error**' },
+              {
+                tipo: 'parrafo',
+                texto:
+                  'Cuando el equipo informa un error en la medición, la ventana muestra el detalle del valor detectado y el contador **Reinicios** correspondiente.',
+              },
+              {
+                tipo: 'lista',
+                items: [
+                  'Con **Reinicios 1/2**, la muestra puede revisarse y reiniciarse si corresponde.',
+                  'Si se confirma el reinicio desde **Reinicios 1/2**, el Taukit llega a **Reinicios 2/2** y queda anulado.',
+                ],
+              },
               {
                 tipo: 'imagen',
                 src: '/docs/validacion-taukit-error.png',
@@ -816,15 +845,15 @@ export const SECCIONES_DOC: SeccionDoc[] = [
         id: 'reinicio',
         titulo: '9. Reinicio de muestra Taukit',
         parrafos: [
-          'Si una muestra Taukit presenta un error, puede reiniciarse para utilizar el segundo tubo disponible.',
-          'El reinicio elimina los resultados cargados anteriormente y consume una nueva oportunidad de procesamiento.',
-          'Cuando se agotan las dos oportunidades disponibles, la muestra queda anulada y deberá utilizarse un nuevo Taukit.',
+          'Si una muestra Taukit presenta un error o sus resultados deben repetirse, puede reiniciarse para permitir una nueva carga de resultados.',
+          'El reinicio elimina los resultados cargados anteriormente y suma un registro en el contador **Reinicios**.',
+          'El mismo contador también suma los errores de equipo detectados automáticamente. Cuando llega a **2/2**, la muestra queda anulada y deberá utilizarse un nuevo Taukit.',
         ],
         infos: [
           {
             tipo: 'advertencia',
             texto:
-              'Reiniciar una muestra elimina los resultados cargados anteriormente y consume una oportunidad de procesamiento del kit.',
+              'Reiniciar una muestra elimina los resultados cargados anteriormente y suma un registro en **Reinicios**. Si con esa acción llega a **2/2**, el Taukit queda anulado.',
           },
         ],
         parrafosFinal: [
@@ -843,9 +872,9 @@ export const SECCIONES_DOC: SeccionDoc[] = [
             ],
           },
           {
-            titulo: 'La muestra Taukit agotó sus oportunidades',
+            titulo: 'La muestra Taukit llegó a Reinicios 2/2',
             parrafos: [
-              'Una muestra Taukit que ya utilizó sus dos oportunidades de medición no puede volver a validarse ni reiniciarse.',
+              'Una muestra Taukit que llegó a **Reinicios 2/2** no puede volver a validarse ni reiniciarse.',
               'Para continuar con el procesamiento deberá utilizarse un nuevo Taukit.',
             ],
           },
@@ -879,7 +908,7 @@ export const SECCIONES_DOC: SeccionDoc[] = [
       {
         pregunta: '¿Qué sucede cuando reinicio una muestra Taukit?',
         respuesta:
-          'Se eliminan los resultados cargados anteriormente y se consume una nueva oportunidad de procesamiento del kit.',
+          'Se eliminan los resultados cargados anteriormente y se suma un registro en **Reinicios**. Si el contador llega a **2/2**, el Taukit queda anulado.',
       },
       {
         pregunta: '¿Cómo vuelvo a imprimir una etiqueta?',
@@ -1130,6 +1159,7 @@ export const SECCIONES_DOC: SeccionDoc[] = [
           'El archivo puede subirse desde el área de carga mediante selección manual o arrastrándolo dentro de la pantalla.',
           'Antes de procesar el archivo, el sistema muestra una vista previa de su contenido para facilitar la revisión.',
           'Al confirmar la carga, el sistema lee el archivo, identifica cada muestra y la asocia con el protocolo correspondiente.',
+          'Si el TXT es idéntico al último archivo cargado, el sistema muestra el aviso **Este TXT ya fue subido** y no procesa ningún resultado. En ese caso, se debe verificar que el archivo corresponda a una medición nueva antes de volver a cargarlo.',
         ],
         contenido: [
           {
@@ -1137,6 +1167,15 @@ export const SECCIONES_DOC: SeccionDoc[] = [
             src: '/docs/carga-taukit-preview.png',
             alt: 'Vista previa del archivo TXT adjunto',
             caption: '**Figura 2. Vista previa archivo txt adjunto.**',
+          },
+          { tipo: 'subtitulo', texto: '**Aviso de TXT duplicado**' },
+          {
+            tipo: 'imagen',
+            src: '/docs/carga-taukit-txt-duplicado.png',
+            alt: 'Aviso de TXT duplicado',
+            caption:
+              '**Figura 3. Aviso de TXT duplicado.** El sistema muestra este mensaje cuando el archivo seleccionado es idéntico al último TXT cargado. En ese caso no se procesa ningún resultado y se debe verificar que el archivo corresponda a una medición nueva.',
+            tamano: 'media',
           },
         ],
       },
@@ -1146,6 +1185,7 @@ export const SECCIONES_DOC: SeccionDoc[] = [
         parrafos: [
           'Durante la carga del archivo TXT, el sistema lee la información generada por el equipo, identifica cada muestra y la asocia con el protocolo correspondiente.',
           'Una vez procesado el archivo, se muestra un resumen con el resultado de la carga, permitiendo identificar rápidamente qué muestras fueron cargadas correctamente y cuáles requieren revisión.',
+          'Cuando el archivo es idéntico al último TXT cargado, no se muestra este resumen porque el sistema no procesa el contenido nuevamente.',
           'El resultado puede incluir:',
         ],
         items: [
@@ -1165,7 +1205,7 @@ export const SECCIONES_DOC: SeccionDoc[] = [
             src: '/docs/carga-taukit-resultado.png',
             alt: 'Resultado de la carga Taukit',
             caption:
-              '**Figura 3. Resultado de la carga Taukit.** El sistema informa el detalle del procesamiento del archivo TXT, agrupando las muestras según el resultado obtenido.',
+              '**Figura 4. Resultado de la carga Taukit.** El sistema informa el detalle del procesamiento del archivo TXT, agrupando las muestras según el resultado obtenido.',
           },
         ],
         infos: [
@@ -1422,7 +1462,7 @@ export const SECCIONES_DOC: SeccionDoc[] = [
         titulo: '1.2 Muestra anulada',
         parrafos: [
           'Este informe se genera cuando una muestra Taukit no puede continuar procesándose.',
-          'Puede ocurrir cuando se agotaron las oportunidades de medición disponibles y la muestra queda en estado Anulado.',
+          'Puede ocurrir cuando la muestra llega a **Reinicios 2/2** y queda en estado Anulado.',
           'Al anularse la muestra:',
         ],
         items: [
@@ -1442,7 +1482,7 @@ export const SECCIONES_DOC: SeccionDoc[] = [
             alt: 'Informe Taukit de muestra anulada',
             tamano: 'media',
             caption:
-              '**Figura 2. Informe Taukit de muestra anulada.** Ejemplo del informe generado cuando la muestra Taukit agotó sus oportunidades de procesamiento y fue anulada.',
+              '**Figura 2. Informe Taukit de muestra anulada.** Ejemplo del informe generado cuando la muestra Taukit llegó a **Reinicios 2/2** y fue anulada.',
           },
         ],
       },

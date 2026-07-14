@@ -12,6 +12,7 @@ export function CargaTxtPage({ usuario, onCargado }: Props) {
   const [archivo, setArchivo] = useState<File | null>(null);
   const [contenido, setContenido] = useState<string>('');
   const [resultado, setResultado] = useState<ResultadoCargaTxt | null>(null);
+  const [avisoDuplicado, setAvisoDuplicado] = useState(false);
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [arrastrando, setArrastrando] = useState(false);
@@ -56,6 +57,15 @@ export function CargaTxtPage({ usuario, onCargado }: Props) {
     setError(null);
     try {
       const res = await api.cargarResultadosTxt(contenido, usuario.username);
+      // TXT idéntico al último subido: el backend no procesó nada. Mostramos un
+      // aviso y descartamos el resto de la respuesta (arrays vacíos).
+      if (res.txtDuplicado) {
+        setAvisoDuplicado(true);
+        setArchivo(null);
+        setContenido('');
+        if (inputRef.current) inputRef.current.value = '';
+        return;
+      }
       setResultado(res);
       onCargado();
       // Limpiar input para permitir cargar otro archivo
@@ -96,6 +106,9 @@ export function CargaTxtPage({ usuario, onCargado }: Props) {
 
   return (
     <div className="flex gap-6 mx-[calc(50%-50vw)] px-4 lg:px-6">
+      {avisoDuplicado && (
+        <ModalTxtDuplicado onCerrar={() => setAvisoDuplicado(false)} />
+      )}
       <TipoEstudioSidebar modoCarga={modoCarga} setModoCarga={setModoCarga} />
       <div className="min-w-0 flex-1 grid grid-cols-1 xl:grid-cols-3 gap-6">
       <div className="xl:col-span-2 space-y-4">
@@ -239,10 +252,6 @@ export function CargaTxtPage({ usuario, onCargado }: Props) {
               <span className="text-emerald-400">·</span> Las que tienen error
               previo se pisan; las completadas se ignoran
             </li>
-            <li className="flex gap-2">
-              <span className="text-emerald-400">·</span> Los controles del
-              equipo se descartan automáticamente
-            </li>
           </ul>
         </div>
 
@@ -318,6 +327,47 @@ function TipoEstudioSidebar({
         })}
       </div>
     </aside>
+  );
+}
+
+// ============================================
+// Modal de aviso: TXT idéntico al último subido (no se procesó)
+// ============================================
+function ModalTxtDuplicado({ onCerrar }: { onCerrar: () => void }) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4"
+      onClick={onCerrar}
+    >
+      <div
+        className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-start gap-3">
+          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-amber-50 text-xl">
+            ⚠️
+          </div>
+          <div className="flex-1">
+            <h3 className="font-semibold text-slate-900">
+              Este TXT ya fue subido
+            </h3>
+            <p className="mt-1 text-sm text-slate-600 leading-relaxed">
+              El archivo es idéntico al último que se cargó, por lo que{' '}
+              <span className="font-medium text-slate-800">no se procesó nada</span>.
+              Verificá que sea una medición nueva.
+            </p>
+          </div>
+        </div>
+        <div className="mt-5 flex justify-end">
+          <button
+            onClick={onCerrar}
+            className="rounded-md bg-slate-900 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-slate-700"
+          >
+            Entendido
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -413,10 +463,10 @@ function ResultadoCarga({
         <DetalleProtocolos titulo="Reintentados (recargados tras reinicio)" protocolos={resultado.cargadosReintentando} color="violet" />
       )}
       {resultado.conErrorEquipo.length > 0 && (
-        <DetalleProtocolos titulo="Con error del equipo — quedan intentos" protocolos={resultado.conErrorEquipo} color="red" />
+        <DetalleProtocolos titulo="Con error del equipo — revisar reinicio" protocolos={resultado.conErrorEquipo} color="red" />
       )}
       {resultado.anuladas.length > 0 && (
-        <DetalleProtocolos titulo="Anuladas — TauKit agotó sus 2 mediciones" protocolos={resultado.anuladas} color="red" />
+        <DetalleProtocolos titulo="Anuladas — Reinicios 2/2" protocolos={resultado.anuladas} color="red" />
       )}
       {resultado.noEncontrados.length > 0 && (
         <DetalleProtocolos titulo="TestIDs no encontrados en el sistema" protocolos={resultado.noEncontrados} color="amber" />

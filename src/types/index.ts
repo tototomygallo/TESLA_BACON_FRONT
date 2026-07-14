@@ -177,6 +177,10 @@ export interface ResultadoMuestra {
 
 // Resultado de procesar una carga de TXT (sección 2.6 del scope).
 export interface ResultadoCargaTxt {
+  // El backend detectó que el TXT es idéntico al último subido: NO procesó nada.
+  // Cuando es true, todos los arrays vienen vacíos y controles/erroresParseo en 0;
+  // el front muestra un aviso y descarta el resto de la respuesta.
+  txtDuplicado?: boolean;
   // Protocolos que pasaron a 'en_validacion' con resultados nuevos.
   cargadosOk: string[];
   // Protocolos que pasaron a 'en_validacion' pisando un error previo

@@ -21,6 +21,8 @@ import { parsearTxt } from './txtParser';
 
 let _muestras: Muestra[] = [...MUESTRAS_INICIALES];
 let _historial: ResumenDiario[] = generarHistorialMock();
+// Último TXT procesado: sirve para detectar recargas idénticas (txtDuplicado).
+let _ultimoTxt: string | null = null;
 let _protocolosEditados: ProtocoloEditado[] = [];
 let _usuariosConfig: UsuarioConfiguracion[] = [
   { id: 'tec1', usuario: 'tec1', email: 'tec1@diagnosticotesla.com', nombre: 'Técnico 1', rol: 'tecnico', activo: true },
@@ -259,6 +261,23 @@ export const mockApi: ApiClient = {
     contenidoTxt: string,
     _usuarioId: string,
   ): Promise<ResultadoCargaTxt> {
+    // Si el TXT es idéntico al último subido, no se procesa nada (txtDuplicado).
+    if (_ultimoTxt !== null && contenidoTxt === _ultimoTxt) {
+      return delay({
+        txtDuplicado: true,
+        cargadosOk: [],
+        cargadosReintentando: [],
+        conErrorEquipo: [],
+        anuladas: [],
+        noEncontrados: [],
+        yaCompletados: [],
+        yaAnuladas: [],
+        requierenReinicio: [],
+        controles: 0,
+        erroresParseo: 0,
+      });
+    }
+
     const parseado = parsearTxt(contenidoTxt);
     const ahora = new Date().toISOString().slice(0, 16).replace('T', ' ');
 
@@ -332,6 +351,7 @@ export const mockApi: ApiClient = {
     }
 
     _muestras = _muestras.map((m) => cambios.get(m.protocolo) ?? m);
+    _ultimoTxt = contenidoTxt;
 
     return delay({
       cargadosOk,

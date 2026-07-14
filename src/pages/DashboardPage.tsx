@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { MetricCard } from '../components/MetricCard';
 import type { Muestra, ResumenDiario } from '../types';
-import { etiquetaTipoEstudioMayus, type FiltroEstudio } from '../utils/estudios';
+import { etiquetaTipoEstudioMayus, tipoDesdeCodigo, type FiltroEstudio } from '../utils/estudios';
 
 interface Props {
   historial: ResumenDiario[];
@@ -53,6 +53,23 @@ function resumenDesdeMuestras(
   };
 }
 
+function filtrarHistorialPorTipo(
+  historial: ResumenDiario | undefined,
+  tipoEstudio: 'taukit' | 'lactokit',
+): ResumenDiario | undefined {
+  if (!historial) return undefined;
+
+  const rechazados = historial.rechazados.filter(
+    (d) => tipoDesdeCodigo(d.codigo) === tipoEstudio,
+  );
+
+  return {
+    ...historial,
+    discrepancias: rechazados.length,
+    rechazados,
+  };
+}
+
 type FilaHistorial = ResumenDiario & {
   tipoEstudio: 'taukit' | 'lactokit';
 };
@@ -61,14 +78,16 @@ function resumenPorTipo(
   fecha: string,
   tipoEstudio: 'taukit' | 'lactokit',
   muestras: Muestra[],
+  historial?: ResumenDiario,
 ): FilaHistorial {
-  // Cada fila por tipo se calcula SOLO con las muestras de ese tipo.
-  // No se usa el historial agregado del backend (es por día, no por tipo),
-  // para no atribuir muestras de un tipo al otro.
+  // Cada fila por tipo calcula sus muestras y suma solo las discrepancias cuyo
+  // código corresponde a ese tipo. Los rechazados no generan muestra, por eso
+  // se distribuyen desde el historial del día.
   return {
     ...resumenDesdeMuestras(
       fecha,
       muestras.filter((m) => m.tipoEstudio === tipoEstudio),
+      filtrarHistorialPorTipo(historial, tipoEstudio),
     ),
     tipoEstudio,
   };
@@ -97,9 +116,9 @@ export function DashboardPage({ historial, muestras }: Props) {
       resumenDesdeMuestras(
         fecha,
         muestrasFiltradas,
-        // El historial del backend es por día (no por tipo): solo se usa como
-        // fallback cuando NO hay filtro de tipo, para no atribuir mal los totales.
-        filtroEstudio === 'todos' ? historialPorFecha.get(fecha) : undefined,
+        filtroEstudio === 'todos'
+          ? historialPorFecha.get(fecha)
+          : filtrarHistorialPorTipo(historialPorFecha.get(fecha), filtroEstudio),
       ),
     );
   }, [historial, muestrasFiltradas, filtroEstudio, hoy]);
@@ -119,14 +138,18 @@ export function DashboardPage({ historial, muestras }: Props) {
       const finalizadas = muestrasHoy.filter((m) => m.estado === 'completado').length;
       const pendientes = muestrasHoy.filter((m) => m.estado !== 'completado').length;
       const historialHoy = historial.find((h) => h.fecha === hoy);
+      const historialFiltrado =
+        filtroEstudio === 'todos'
+          ? historialHoy
+          : filtrarHistorialPorTipo(historialHoy, filtroEstudio);
       return {
         fecha: hoy,
         ingresadas,
         procesadas,
         finalizadas,
         pendientes,
-        discrepancias: historialHoy?.discrepancias ?? 0,
-        rechazados: historialHoy?.rechazados ?? [],
+        discrepancias: historialFiltrado?.discrepancias ?? 0,
+        rechazados: historialFiltrado?.rechazados ?? [],
       };
     }
 
@@ -145,6 +168,7 @@ export function DashboardPage({ historial, muestras }: Props) {
   const esHoy = fechaSeleccionada === hoy;
 
   const historialOrdenado = useMemo<FilaHistorial[]>(() => {
+    const historialPorFecha = new Map(historial.map((h) => [h.fecha, h]));
     const fechas = new Set<string>([
       ...historial.map((h) => h.fecha),
       ...muestras.map((m) => m.fechaIngreso.slice(0, 10)),
@@ -158,7 +182,9 @@ export function DashboardPage({ historial, muestras }: Props) {
     return [...fechas]
       .filter((fecha) => !busquedaHistorial || fecha.includes(busquedaHistorial))
       .flatMap((fecha) =>
-        tipos.map((tipo) => resumenPorTipo(fecha, tipo, muestras)),
+        tipos.map((tipo) =>
+          resumenPorTipo(fecha, tipo, muestras, historialPorFecha.get(fecha)),
+        ),
       )
       .sort((a, b) => {
         const porFecha = b.fecha.localeCompare(a.fecha);

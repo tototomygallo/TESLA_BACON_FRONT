@@ -121,7 +121,7 @@ export function ValidacionModal({
       const respuesta = await api.reiniciarMuestra(muestra.protocolo, usuarioId);
       onActualizada();
 
-      // Si este reinicio agotó las 2 mediciones del TauKit, la muestra queda
+      // Si este reinicio lleva el contador a 2/2, la muestra queda
       // anulada y el informe de anulación se sube/verifica en BACON.
       if (respuesta.estado === 'anulado' && respuesta.pdfVerificado !== true) {
         // Se anuló, pero el informe NO se pudo verificar en BACON. No cerramos
@@ -364,8 +364,8 @@ export function ValidacionModal({
                 No es posible generar el informe requerido con esta muestra.
               </div>
               <div className="text-xs text-red-600 mt-1">
-                El TauKit agotó sus 2 mediciones. Se debe usar otro
-                TauKit para este paciente.
+                El TauKit llegó a Reinicios 2/2. Se debe usar otro TauKit
+                para este paciente.
               </div>
             </div>
           )}
@@ -389,16 +389,17 @@ export function ValidacionModal({
                 )}
               </div>
               <div className="text-xs text-amber-600 pt-1 border-t border-amber-200">
-                Intento {muestra.intentosFallidos} de 2 · Queda {2 - muestra.intentosFallidos} oportunidad{2 - muestra.intentosFallidos !== 1 ? 'es' : ''}.
-                Al reiniciar se usa el 2do tubo del TauKit.
+                Reinicios: <span className="font-semibold">{muestra.intentosFallidos}/2</span>.
+                Esta medición quedó registrada con error del equipo.
               </div>
             </div>
           )}
 
-          {/* Info de intentos para muestras sin error pero ya con 1 intento gastado */}
+          {/* Info de reinicios para muestras sin error pero con 1 registro previo */}
           {!muestra.tieneError && muestra.intentosFallidos > 0 && !bloqueada && (
             <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-2 text-xs text-blue-700">
-              Este TauKit ya usó {muestra.intentosFallidos} de 2 oportunidades. Si se reinicia, esta será la última.
+              Reinicios: <span className="font-semibold">{muestra.intentosFallidos}/2</span>.
+              La muestra ya fue reiniciada o tuvo un error previo.
             </div>
           )}
 
@@ -420,15 +421,14 @@ export function ValidacionModal({
             <div className="text-xs text-amber-700">
               {muestra.intentosFallidos >= 1 ? (
                 <>
-                  Este TauKit ya usó <span className="font-semibold">1 de sus 2 oportunidades</span>.
-                  Si la segunda muestra también falla, el TauKit se <span className="font-semibold">ANULARÁ</span> y
-                  deberán usar otro.
+                  Este TauKit ya tiene <span className="font-semibold">1 reinicio/error registrado</span>.
+                  Si confirmás este reinicio, llegará a <span className="font-semibold">2 de 2</span> y el TauKit quedará <span className="font-semibold">ANULADO ahora</span>.
                 </>
               ) : (
                 <>
                   Se borrarán los resultados y la muestra volverá a "En proceso"
                   para cargar nuevos resultados del HeliFan.
-                  Este TauKit tiene <span className="font-semibold">2 oportunidades</span>; esta será la primera usada.
+                  Este será el <span className="font-semibold">primer reinicio</span> registrado del TauKit.
                 </>
               )}
             </div>
