@@ -161,7 +161,7 @@ export default function App() {
             {vista === 'configuracion' && (
               <ConfiguracionPage usuario={usuario} />
             )}
-            {vista === 'asistencia' && <AsistenciaPage />}
+            {vista === 'asistencia' && <AsistenciaPage usuario={usuario} />}
           </>
         )}
       </main>

@@ -1,5 +1,7 @@
 import type {
+  AnuladoPendienteRevision,
   BaconMuestra,
+  CompletadoCorreccion,
   Muestra,
   ProtocoloEditado,
   ResultadoCargaTxt,
@@ -24,6 +26,8 @@ let _historial: ResumenDiario[] = generarHistorialMock();
 // Último TXT procesado: sirve para detectar recargas idénticas (txtDuplicado).
 let _ultimoTxt: string | null = null;
 let _protocolosEditados: ProtocoloEditado[] = [];
+let _anuladosPendientesRevision: AnuladoPendienteRevision[] = [];
+let _completadosConValoresCorregidos = new Set<string>();
 let _usuariosConfig: UsuarioConfiguracion[] = [
   { id: 'tec1', usuario: 'tec1', email: 'tec1@diagnosticotesla.com', nombre: 'Técnico 1', rol: 'tecnico', activo: true },
   { id: 'bio1', usuario: 'bio1', email: 'bio1@diagnosticotesla.com', nombre: 'Bioquímico 1', rol: 'bioquimico', activo: true },
@@ -67,6 +71,22 @@ const BACON_ENVIADAS_MOCK: BaconMuestra[] = Object.entries(BACON_DB).map(
     },
   }),
 );
+
+function completadoCorreccionDesdeMuestra(muestra: Muestra): CompletadoCorreccion {
+  if (!muestra.resultados) {
+    throw new ApiError('La muestra no tiene resultados cargados', 'VALIDATION');
+  }
+  return {
+    numeroSerie: muestra.tipoEstudio === 'lactokit'
+      ? muestra.codigoLactokit ?? muestra.codigoTauKit
+      : muestra.codigoTauKit,
+    protocolo: muestra.protocolo,
+    paciente: muestra.paciente,
+    estado: muestra.estado,
+    fechaInforme: muestra.resultados.cargadoEn,
+    resultados: muestra.resultados,
+  };
+}
 
 export const mockApi: ApiClient = {
   async login(userId: string, _password: string): Promise<Usuario> {
@@ -269,6 +289,7 @@ export const mockApi: ApiClient = {
         cargadosReintentando: [],
         conErrorEquipo: [],
         anuladas: [],
+        pendientesAnulacion: [],
         noEncontrados: [],
         yaCompletados: [],
         yaAnuladas: [],
@@ -285,6 +306,7 @@ export const mockApi: ApiClient = {
     const cargadosReintentando: string[] = [];
     const conErrorEquipo: string[] = [];
     const anuladas: string[] = [];
+    const pendientesAnulacion: string[] = [];
     const noEncontrados: string[] = [];
     const yaCompletados: string[] = [];
     const yaAnuladas: string[] = [];
@@ -324,17 +346,17 @@ export const mockApi: ApiClient = {
 
       if (r.tieneErrorEquipo) {
         const nuevosIntentos = muestra.intentosFallidos + 1;
-        // Si llega a 2 intentos fallidos, el TauKit queda anulado:
-        // agotó sus 2 mediciones y hay que usar otro TauKit.
-        const quedaAnulada = nuevosIntentos >= 2;
+        // Si llega a 2 intentos fallidos, el TauKit queda pendiente
+        // de anulación hasta que el rol bioquímico confirme cómo continuar.
+        const quedaPendienteAnulacion = nuevosIntentos >= 2;
         cambios.set(muestra.protocolo, {
           ...muestra,
           tieneError: true,
           intentosFallidos: nuevosIntentos,
-          estado: quedaAnulada ? 'anulado' : muestra.estado,
+          estado: quedaPendienteAnulacion ? 'pendiente_anulacion' : muestra.estado,
           resultados: resultadoCargado,
         });
-        if (quedaAnulada) anuladas.push(muestra.protocolo);
+        if (quedaPendienteAnulacion) pendientesAnulacion.push(muestra.protocolo);
         else conErrorEquipo.push(muestra.protocolo);
       } else {
         cambios.set(muestra.protocolo, {
@@ -358,6 +380,7 @@ export const mockApi: ApiClient = {
       cargadosReintentando,
       conErrorEquipo,
       anuladas,
+      pendientesAnulacion,
       noEncontrados,
       yaCompletados,
       yaAnuladas,
@@ -368,7 +391,7 @@ export const mockApi: ApiClient = {
   },
 
   // ============================================
-  // Validación bioquímica (scope 2.7)
+  // Validación del bioquímico (scope 2.7)
   // ============================================
 
   // Aprobar una muestra: en_validacion → completado.
@@ -448,20 +471,20 @@ export const mockApi: ApiClient = {
 
     const nuevosIntentos = muestra.intentosFallidos + 1;
 
-    // Si ya gastó las 2 oportunidades del TauKit → anular
+    // Si ya gastó las 2 oportunidades del TauKit, queda pendiente de anulación.
     if (nuevosIntentos >= 2) {
-      const anulada: Muestra = {
+      const pendiente: Muestra = {
         ...muestra,
-        estado: 'anulado',
+        estado: 'pendiente_anulacion',
         tieneError: true,
         intentosFallidos: nuevosIntentos,
         // Conserva los resultados para que se puedan consultar
       };
       _muestras = _muestras.map((m) =>
-        m.protocolo === protocolo ? anulada : m,
+        m.protocolo === protocolo ? pendiente : m,
       );
-      // El informe de anulación se sube/verifica en BACON (mock: OK directo).
-      return delay({ ...anulada, pdfGenerado: true, pdfVerificado: true });
+      // No se envía nada a BACON en este paso: queda pendiente de confirmación.
+      return delay(pendiente);
     }
 
     // Todavía tiene 1 oportunidad más: reiniciar
@@ -476,6 +499,102 @@ export const mockApi: ApiClient = {
       m.protocolo === protocolo ? actualizada : m,
     );
     return delay(actualizada);
+  },
+
+  async listarPendientesAnulacion(): Promise<Muestra[]> {
+    const derivadosARevision = new Set(
+      _anuladosPendientesRevision.map((r) => r.protocolo),
+    );
+    return delay(
+      _muestras.filter(
+        (m) =>
+          m.estado === 'pendiente_anulacion' &&
+          !derivadosARevision.has(m.protocolo),
+      ),
+    );
+  },
+
+  async confirmarAnulacion(
+    protocolo: string,
+    _usuarioId: string,
+  ): Promise<ValidacionMuestraResponse> {
+    const muestra = _muestras.find((m) => m.protocolo === protocolo);
+    if (!muestra) throw new ApiError('Muestra no encontrada', 'NOT_FOUND');
+    if (muestra.estado !== 'pendiente_anulacion') {
+      throw new ApiError('La muestra no está pendiente de anulación', 'VALIDATION');
+    }
+
+    const anulada: Muestra = {
+      ...muestra,
+      estado: 'anulado',
+      tieneError: true,
+    };
+    _muestras = _muestras.map((m) =>
+      m.protocolo === protocolo ? anulada : m,
+    );
+    return delay({ ...anulada, pdfGenerado: true, pdfVerificado: true });
+  },
+
+  async marcarMalAnulado(
+    protocolo: string,
+    datos: { motivo: 'Error en la carga de resultados' | 'Otro'; detalle: string | null; usuarioId?: string },
+  ): Promise<void> {
+    const muestra = _muestras.find((m) => m.protocolo === protocolo);
+    if (!muestra) throw new ApiError('Muestra no encontrada', 'NOT_FOUND');
+    if (muestra.estado !== 'pendiente_anulacion') {
+      throw new ApiError('La muestra no está pendiente de anulación', 'VALIDATION');
+    }
+    if (datos.motivo === 'Otro' && !datos.detalle?.trim()) {
+      throw new ApiError('El detalle es obligatorio cuando el motivo es Otro', 'VALIDATION');
+    }
+
+    const registro: AnuladoPendienteRevision = {
+      numeroSerie: muestra.tipoEstudio === 'lactokit'
+        ? muestra.codigoLactokit ?? muestra.codigoTauKit
+        : muestra.codigoTauKit,
+      protocolo: muestra.protocolo,
+      paciente: muestra.paciente,
+      estado: muestra.estado,
+      motivo: datos.motivo,
+      detalle: datos.detalle?.trim() || null,
+      usuarioId: datos.usuarioId ?? 'bioquimico',
+      fecha: fechaHoraLocal(),
+      tipoEstudio: muestra.tipoEstudio,
+      intentosFallidos: muestra.intentosFallidos,
+    };
+
+    _anuladosPendientesRevision = [
+      registro,
+      ..._anuladosPendientesRevision.filter((r) => r.protocolo !== protocolo),
+    ];
+    return delay(undefined);
+  },
+
+  async revertirAnulacion(
+    protocolo: string,
+    motivo: string,
+    _usuarioId: string,
+  ): Promise<Muestra> {
+    const muestra = _muestras.find((m) => m.protocolo === protocolo);
+    if (!muestra) throw new ApiError('Muestra no encontrada', 'NOT_FOUND');
+    if (muestra.estado !== 'pendiente_anulacion') {
+      throw new ApiError('La muestra no está pendiente de anulación', 'VALIDATION');
+    }
+    if (!motivo.trim()) {
+      throw new ApiError('El motivo es obligatorio', 'VALIDATION');
+    }
+
+    const revertida: Muestra = {
+      ...muestra,
+      estado: 'en_proceso',
+      tieneError: false,
+      intentosFallidos: 1,
+      resultados: null,
+    };
+    _muestras = _muestras.map((m) =>
+      m.protocolo === protocolo ? revertida : m,
+    );
+    return delay(revertida);
   },
 
   // ============================================
@@ -598,6 +717,133 @@ export const mockApi: ApiClient = {
     const usuario = USUARIOS_MOCK[usuarioId.trim().toLowerCase()];
     if (usuario?.rol !== 'admin') throw new ApiError('No autorizado', 'FORBIDDEN');
     return delay(undefined);
+  },
+
+  async listarAnuladosPendientesRevision(
+    usuarioId: string,
+  ): Promise<AnuladoPendienteRevision[]> {
+    const usuario = USUARIOS_MOCK[usuarioId.trim().toLowerCase()];
+    if (usuario?.rol !== 'admin') throw new ApiError('No autorizado', 'FORBIDDEN');
+    return delay([..._anuladosPendientesRevision]);
+  },
+
+  async revertirAnuladoAEnProceso(
+    protocolo: string,
+    usuarioId: string,
+  ): Promise<Muestra> {
+    const usuario = USUARIOS_MOCK[usuarioId.trim().toLowerCase()];
+    if (usuario?.rol !== 'admin') throw new ApiError('No autorizado', 'FORBIDDEN');
+    const registro = _anuladosPendientesRevision.find((r) => r.protocolo === protocolo);
+    if (!registro) {
+      throw new ApiError('La muestra no está marcada como mal anulada', 'VALIDATION');
+    }
+    const muestra = _muestras.find((m) => m.protocolo === protocolo);
+    if (!muestra) throw new ApiError('Muestra no encontrada', 'NOT_FOUND');
+    if (muestra.estado !== 'pendiente_anulacion') {
+      throw new ApiError('La muestra ya no está pendiente de anulación', 'VALIDATION');
+    }
+
+    const revertida: Muestra = {
+      ...muestra,
+      estado: 'en_proceso',
+      tieneError: false,
+      intentosFallidos: 1,
+      resultados: null,
+    };
+    _muestras = _muestras.map((m) =>
+      m.protocolo === protocolo ? revertida : m,
+    );
+    _anuladosPendientesRevision = _anuladosPendientesRevision.filter(
+      (r) => r.protocolo !== protocolo,
+    );
+    return delay(revertida);
+  },
+
+  async buscarCompletadosCorreccion(
+    q: string,
+    usuarioId: string,
+  ): Promise<CompletadoCorreccion[]> {
+    const usuario = USUARIOS_MOCK[usuarioId.trim().toLowerCase()];
+    if (usuario?.rol !== 'admin') throw new ApiError('No autorizado', 'FORBIDDEN');
+    const query = q.trim().toLowerCase();
+    const queryNumerico = Number(query.replace(',', '.'));
+    const buscaPorResultado = query !== '' && Number.isFinite(queryNumerico);
+    const completadas = _muestras.filter(
+      (m) => m.tipoEstudio === 'taukit' && m.estado === 'completado' && m.resultados,
+    );
+    const filtradas = query
+      ? completadas.filter((m) => {
+          const paciente = `${m.paciente.nombre} ${m.paciente.apellido}`.toLowerCase();
+          const pacienteInverso = `${m.paciente.apellido} ${m.paciente.nombre}`.toLowerCase();
+          return (
+            m.codigoTauKit.toLowerCase().includes(query) ||
+            m.protocolo.toLowerCase().includes(query) ||
+            paciente.includes(query) ||
+            pacienteInverso.includes(query) ||
+            m.paciente.dni.includes(query) ||
+            (buscaPorResultado && m.resultados?.testValue === queryNumerico)
+          );
+        })
+      : completadas;
+    return delay(filtradas.map(completadoCorreccionDesdeMuestra));
+  },
+
+  async cargarValoresCompletadoCorreccion(
+    protocolo: string,
+    valores: {
+      basalCO2: number;
+      postCO2: number;
+      basalDelta: number;
+      postDelta: number;
+      testValue: number;
+      usuarioId: string;
+    },
+  ): Promise<CompletadoCorreccion> {
+    const usuario = USUARIOS_MOCK[valores.usuarioId.trim().toLowerCase()];
+    if (usuario?.rol !== 'admin') throw new ApiError('No autorizado', 'FORBIDDEN');
+    const muestra = _muestras.find((m) => m.protocolo === protocolo);
+    if (!muestra) throw new ApiError('Muestra no encontrada', 'NOT_FOUND');
+    if (muestra.tipoEstudio !== 'taukit' || muestra.estado !== 'completado') {
+      throw new ApiError('Solo se pueden corregir Taukits completados', 'VALIDATION');
+    }
+
+    const actualizada: Muestra = {
+      ...muestra,
+      resultados: {
+        basalCO2: valores.basalCO2,
+        postCO2: valores.postCO2,
+        basalDelta: valores.basalDelta,
+        postDelta: valores.postDelta,
+        testValue: valores.testValue,
+        cargadoEn: fechaHoraLocal(),
+      },
+    };
+    _muestras = _muestras.map((m) =>
+      m.protocolo === protocolo ? actualizada : m,
+    );
+    _completadosConValoresCorregidos.add(protocolo);
+    return delay(completadoCorreccionDesdeMuestra(actualizada));
+  },
+
+  async generarInformeCompletadoCorreccion(
+    protocolo: string,
+    usuarioId: string,
+  ): Promise<ValidacionMuestraResponse> {
+    const usuario = USUARIOS_MOCK[usuarioId.trim().toLowerCase()];
+    if (usuario?.rol !== 'admin') throw new ApiError('No autorizado', 'FORBIDDEN');
+    const muestra = _muestras.find((m) => m.protocolo === protocolo);
+    if (!muestra) throw new ApiError('Muestra no encontrada', 'NOT_FOUND');
+    if (!_completadosConValoresCorregidos.has(protocolo)) {
+      throw new ApiError('Primero cargá los valores corregidos', 'VALIDATION');
+    }
+    _completadosConValoresCorregidos.delete(protocolo);
+    return delay({
+      ...muestra,
+      pdfGenerado: true,
+      pdfVerificado: true,
+      advertencia: null,
+      pdfVerificacion: { success: true },
+    });
   },
 
   async obtenerHistorial(): Promise<ResumenDiario[]> {

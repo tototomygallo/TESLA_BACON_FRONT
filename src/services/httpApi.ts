@@ -1,5 +1,7 @@
 import type {
+  AnuladoPendienteRevision,
   BaconMuestra,
+  CompletadoCorreccion,
   Muestra,
   ProtocoloEditado,
   ResultadoCargaTxt,
@@ -405,6 +407,47 @@ export const httpApi: ApiClient = {
     });
   },
 
+  async listarPendientesAnulacion(): Promise<Muestra[]> {
+    return request<Muestra[]>('/muestras/pendientes-anulacion');
+  },
+
+  async confirmarAnulacion(
+    protocolo: string,
+    _usuarioId: string,
+  ): Promise<ValidacionMuestraResponse> {
+    return request<ValidacionMuestraResponse>(
+      `/muestras/${encodeURIComponent(protocolo)}/confirmar-anulacion`,
+      { method: 'POST' },
+    );
+  },
+
+  async marcarMalAnulado(
+    protocolo: string,
+    datos: { motivo: 'Error en la carga de resultados' | 'Otro'; detalle: string | null; usuarioId?: string },
+  ): Promise<void> {
+    await request<unknown>(
+      `/muestras/${encodeURIComponent(protocolo)}/marcar-mal-anulado`,
+      {
+        method: 'POST',
+        body: JSON.stringify(datos),
+      },
+    );
+  },
+
+  async revertirAnulacion(
+    protocolo: string,
+    motivo: string,
+    _usuarioId: string,
+  ): Promise<Muestra> {
+    return request<Muestra>(
+      `/muestras/${encodeURIComponent(protocolo)}/revertir-anulacion`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ motivo }),
+      },
+    );
+  },
+
   async imprimirEtiquetas(protocolo: string, _usuarioId: string): Promise<Muestra> {
     return request<Muestra>(`/muestras/${protocolo}/imprimir-etiquetas`, {
       method: 'POST',
@@ -488,5 +531,65 @@ export const httpApi: ApiClient = {
       formData.append('archivos', archivo);
     });
     await requestFormData<unknown>('/admin/contacto-bacon', formData);
+  },
+
+  async listarAnuladosPendientesRevision(
+    _usuarioId: string,
+  ): Promise<AnuladoPendienteRevision[]> {
+    return request<AnuladoPendienteRevision[]>(
+      '/operacion/correccion-estados/anulados-pendientes',
+    );
+  },
+
+  async revertirAnuladoAEnProceso(
+    protocolo: string,
+    _usuarioId: string,
+  ): Promise<Muestra> {
+    return request<Muestra>(
+      `/operacion/correccion-estados/${encodeURIComponent(protocolo)}/revertir-a-en-proceso`,
+      { method: 'POST' },
+    );
+  },
+
+  async buscarCompletadosCorreccion(
+    q: string,
+    _usuarioId: string,
+  ): Promise<CompletadoCorreccion[]> {
+    return request<CompletadoCorreccion[]>(
+      `/operacion/correccion-estados/completados/buscar?q=${encodeURIComponent(q)}`,
+    );
+  },
+
+  async cargarValoresCompletadoCorreccion(
+    protocolo: string,
+    valores: {
+      basalCO2: number;
+      postCO2: number;
+      basalDelta: number;
+      postDelta: number;
+      testValue: number;
+      usuarioId: string;
+    },
+  ): Promise<CompletadoCorreccion> {
+    return request<CompletadoCorreccion>(
+      `/operacion/correccion-estados/completados/${encodeURIComponent(protocolo)}/cargar-valores`,
+      {
+        method: 'POST',
+        body: JSON.stringify(valores),
+      },
+    );
+  },
+
+  async generarInformeCompletadoCorreccion(
+    protocolo: string,
+    usuarioId: string,
+  ): Promise<ValidacionMuestraResponse> {
+    return request<ValidacionMuestraResponse>(
+      `/operacion/correccion-estados/completados/${encodeURIComponent(protocolo)}/generar-informe`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ usuarioId }),
+      },
+    );
   },
 };

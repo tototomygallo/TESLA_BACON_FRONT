@@ -384,9 +384,11 @@ function ResultadoCarga({
   const totalOk =
     resultado.cargadosOk.length + resultado.cargadosReintentando.length;
   const requierenReinicio = resultado.requierenReinicio ?? [];
+  const pendientesAnulacion = resultado.pendientesAnulacion ?? [];
   const hayProblemas =
     resultado.conErrorEquipo.length > 0 ||
     resultado.anuladas.length > 0 ||
+    pendientesAnulacion.length > 0 ||
     resultado.noEncontrados.length > 0 ||
     requierenReinicio.length > 0 ||
     resultado.erroresParseo > 0;
@@ -412,7 +414,7 @@ function ResultadoCarga({
           <div className="text-xs text-slate-500 mt-0.5">
             Las muestras cargadas pasaron al estado{' '}
             <span className="text-violet-700 font-medium">En validación</span>{' '}
-            y están listas para revisión bioquímica.
+            y están listas para revisión del bioquímico.
           </div>
         </div>
         <button
@@ -423,11 +425,12 @@ function ResultadoCarga({
         </button>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 text-center">
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-9 gap-2 text-center">
         <ResumenItem label="Cargados OK" valor={resultado.cargadosOk.length} color="emerald" />
         <ResumenItem label="Reintentados" valor={resultado.cargadosReintentando.length} color="violet" />
         <ResumenItem label="Error equipo" valor={resultado.conErrorEquipo.length} color="red" />
         <ResumenItem label="No reiniciada" valor={requierenReinicio.length} color="red" />
+        <ResumenItem label="Pend. de anulación" valor={pendientesAnulacion.length} color="red" />
         <ResumenItem label="Anuladas" valor={resultado.anuladas.length} color="red" />
         <ResumenItem label="No encontrados" valor={resultado.noEncontrados.length} color="amber" />
         <ResumenItem label="Ya completados" valor={resultado.yaCompletados.length} color="slate" />
@@ -465,8 +468,11 @@ function ResultadoCarga({
       {resultado.conErrorEquipo.length > 0 && (
         <DetalleProtocolos titulo="Con error del equipo — revisar reinicio" protocolos={resultado.conErrorEquipo} color="red" />
       )}
+      {pendientesAnulacion.length > 0 && (
+        <DetalleProtocolos titulo="Pendientes de anulación - confirmar en Muestras" protocolos={pendientesAnulacion} color="red" />
+      )}
       {resultado.anuladas.length > 0 && (
-        <DetalleProtocolos titulo="Anuladas — Reinicios 2/2" protocolos={resultado.anuladas} color="red" />
+        <DetalleProtocolos titulo="Anuladas - confirmadas" protocolos={resultado.anuladas} color="red" />
       )}
       {resultado.noEncontrados.length > 0 && (
         <DetalleProtocolos titulo="TestIDs no encontrados en el sistema" protocolos={resultado.noEncontrados} color="amber" />

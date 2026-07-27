@@ -12,6 +12,7 @@ const config: Record<
   en_proceso:    { label: 'En proceso',    bg: 'bg-amber-50',   text: 'text-amber-700',   dot: 'bg-amber-500' },
   en_validacion: { label: 'En validación', bg: 'bg-violet-50',  text: 'text-violet-700',  dot: 'bg-violet-500' },
   completado:    { label: 'Completado',    bg: 'bg-emerald-50', text: 'text-emerald-700', dot: 'bg-emerald-500' },
+  pendiente_anulacion: { label: 'Pendiente de anulación', bg: 'bg-red-50', text: 'text-red-700', dot: 'bg-red-500' },
   anulado:       { label: 'Anulado',       bg: 'bg-slate-100',  text: 'text-slate-600',   dot: 'bg-slate-400' },
   eliminado:     { label: 'Eliminado',     bg: 'bg-slate-100',  text: 'text-slate-500',   dot: 'bg-slate-400' },
 };

@@ -23,6 +23,7 @@ const filtros: Array<{ id: FiltroEstado; label: string }> = [
   { id: 'en_proceso', label: 'En proceso' },
   { id: 'en_validacion', label: 'En validación' },
   { id: 'completado', label: 'Completados' },
+  { id: 'pendiente_anulacion', label: 'Pend. de anulación' },
   { id: 'anulado', label: 'Anulados' },
   { id: 'con_error', label: 'Con error' },
 ];
@@ -150,6 +151,21 @@ export function MuestrasPage({
   // Muestra cuyo modal de validación está abierto (null = cerrado)
   const [muestraEnValidacion, setMuestraEnValidacion] =
     useState<Muestra | null>(null);
+  const [pendientesAnulacion, setPendientesAnulacion] = useState<Muestra[]>([]);
+  const [pendientesAnulacionResueltas, setPendientesAnulacionResueltas] =
+    useState<string[]>([]);
+  const [cargandoPendientesAnulacion, setCargandoPendientesAnulacion] =
+    useState(false);
+  const [seleccionPendientes, setSeleccionPendientes] = useState<string[]>([]);
+  const [confirmarAnulacionAbierta, setConfirmarAnulacionAbierta] =
+    useState(false);
+  const [procesandoAnulacion, setProcesandoAnulacion] = useState(false);
+  const [muestraReversion, setMuestraReversion] = useState<Muestra | null>(null);
+  const [motivoReversion, setMotivoReversion] = useState(
+    'Error en la carga de resultados',
+  );
+  const [detalleReversion, setDetalleReversion] = useState('');
+  const [procesandoReversion, setProcesandoReversion] = useState(false);
 
   // El PDF se trae con fetch autenticado (manda el Bearer y maneja el refresh).
   // No se puede abrir por URL directa: la navegación del browser no lleva el
@@ -236,6 +252,20 @@ export function MuestrasPage({
       conError: base.filter((m) => m.tieneError).length,
     };
   }, [muestras, filtroEstudio, busqueda, fechaDesde, fechaHasta]);
+  const protocolosPendientesSeleccionados = useMemo(
+    () =>
+      seleccionPendientes.filter((protocolo) =>
+        pendientesAnulacion.some((m) => m.protocolo === protocolo),
+      ),
+    [seleccionPendientes, pendientesAnulacion],
+  );
+  const muestraPendienteSeleccionada = useMemo(
+    () =>
+      pendientesAnulacion.find(
+        (m) => m.protocolo === protocolosPendientesSeleccionados[0],
+      ) ?? null,
+    [pendientesAnulacion, protocolosPendientesSeleccionados],
+  );
   const totalPaginas = Math.max(1, Math.ceil(filtradas.length / porPagina));
   const inicioPagina = (pagina - 1) * porPagina;
   const finPagina = inicioPagina + porPagina;
@@ -250,6 +280,49 @@ export function MuestrasPage({
   useEffect(() => {
     if (pagina > totalPaginas) setPagina(totalPaginas);
   }, [pagina, totalPaginas]);
+
+  useEffect(() => {
+    if (!puedeValidar) {
+      setPendientesAnulacion([]);
+      setSeleccionPendientes([]);
+      return;
+    }
+
+    let cancelado = false;
+    async function cargarPendientes() {
+      setCargandoPendientesAnulacion(true);
+      try {
+        const pendientes = await api.listarPendientesAnulacion();
+        if (cancelado) return;
+        setPendientesAnulacion(
+          pendientes.filter(
+            (m) => !pendientesAnulacionResueltas.includes(m.protocolo),
+          ),
+        );
+        setSeleccionPendientes((actual) =>
+          actual.filter((protocolo) =>
+            pendientes.some((m) => m.protocolo === protocolo) &&
+            !pendientesAnulacionResueltas.includes(protocolo),
+          ),
+        );
+      } catch (e) {
+        if (!cancelado) {
+          setErrorAccion(
+            e instanceof Error
+              ? `No se pudieron cargar los Taukits pendientes de anulación: ${e.message}`
+              : 'No se pudieron cargar los Taukits pendientes de anulación.',
+          );
+        }
+      } finally {
+        if (!cancelado) setCargandoPendientesAnulacion(false);
+      }
+    }
+
+    void cargarPendientes();
+    return () => {
+      cancelado = true;
+    };
+  }, [puedeValidar, muestras, pendientesAnulacionResueltas]);
 
   const aplicarRangoFecha = (dias: number) => {
     setFechaDesde(haceDias(dias));
@@ -271,8 +344,136 @@ export function MuestrasPage({
         : 'border-slate-300 text-slate-600 hover:bg-slate-50'
     }`;
 
+  const recargarPendientesAnulacion = async (protocolosResueltos: string[] = []) => {
+    const pendientes = await api.listarPendientesAnulacion();
+    const resueltos = new Set([
+      ...pendientesAnulacionResueltas,
+      ...protocolosResueltos,
+    ]);
+    setPendientesAnulacion(
+      pendientes.filter((m) => !resueltos.has(m.protocolo)),
+    );
+    setSeleccionPendientes((actual) =>
+      actual.filter((protocolo) =>
+        pendientes.some((m) => m.protocolo === protocolo) &&
+        !resueltos.has(protocolo),
+      ),
+    );
+  };
+
+  const togglePendienteSeleccionada = (protocolo: string) => {
+    setSeleccionPendientes((actual) =>
+      actual.includes(protocolo)
+        ? actual.filter((p) => p !== protocolo)
+        : [...actual, protocolo],
+    );
+  };
+
+  const confirmarAnulacionSeleccionada = async () => {
+    if (protocolosPendientesSeleccionados.length === 0) return;
+    setProcesandoAnulacion(true);
+    setErrorAccion(null);
+    setMensajeAccion(null);
+    setAdvertenciaAccion(null);
+    try {
+      for (const protocolo of protocolosPendientesSeleccionados) {
+        await api.confirmarAnulacion(protocolo, usuario.username);
+      }
+      setConfirmarAnulacionAbierta(false);
+      setMensajeAccion(
+        protocolosPendientesSeleccionados.length === 1
+          ? 'TauKit anulado e informado a BACON.'
+          : `${protocolosPendientesSeleccionados.length} Taukits anulados e informados a BACON.`,
+      );
+      setSeleccionPendientes([]);
+      await recargarPendientesAnulacion();
+      onMuestraActualizada();
+    } catch (e) {
+      setErrorAccion(
+        e instanceof Error
+          ? `No se pudo confirmar la anulación: ${e.message}`
+          : 'No se pudo confirmar la anulación.',
+      );
+      await recargarPendientesAnulacion().catch(() => undefined);
+      onMuestraActualizada();
+    } finally {
+      setProcesandoAnulacion(false);
+    }
+  };
+
+  const abrirReversionSeleccionada = () => {
+    if (protocolosPendientesSeleccionados.length !== 1 || !muestraPendienteSeleccionada) {
+      return;
+    }
+    setMotivoReversion('Error en la carga de resultados');
+    setDetalleReversion('');
+    setMuestraReversion(muestraPendienteSeleccionada);
+  };
+
+  const confirmarMalAnulado = async () => {
+    if (!muestraReversion) return;
+    const detalle = detalleReversion.trim();
+    const motivo = motivoReversion as 'Error en la carga de resultados' | 'Otro';
+    if (motivo === 'Otro' && !detalle) {
+      setErrorAccion('Indicá el detalle cuando el motivo es Otro.');
+      return;
+    }
+
+    setProcesandoReversion(true);
+    setErrorAccion(null);
+    setMensajeAccion(null);
+    setAdvertenciaAccion(null);
+    try {
+      await api.marcarMalAnulado(
+        muestraReversion.protocolo,
+        {
+          motivo,
+          detalle: motivo === 'Otro' ? detalle : null,
+          usuarioId: usuario.username,
+        },
+      );
+      setMensajeAccion(
+        'TauKit marcado como mal anulado. Quedó disponible para revisión administrativa en Operación.',
+      );
+      const protocoloResuelto = muestraReversion.protocolo;
+      setPendientesAnulacionResueltas((actual) =>
+        actual.includes(protocoloResuelto)
+          ? actual
+          : [...actual, protocoloResuelto],
+      );
+      setPendientesAnulacion((actual) =>
+        actual.filter((m) => m.protocolo !== protocoloResuelto),
+      );
+      setMuestraReversion(null);
+      setSeleccionPendientes([]);
+      await recargarPendientesAnulacion([protocoloResuelto]);
+      onMuestraActualizada();
+    } catch (e) {
+      setErrorAccion(
+        e instanceof Error
+          ? `No se pudo marcar como mal anulado: ${e.message}`
+          : 'No se pudo marcar como mal anulado.',
+      );
+      await recargarPendientesAnulacion().catch(() => undefined);
+      onMuestraActualizada();
+    } finally {
+      setProcesandoReversion(false);
+    }
+  };
+
   return (
     <div className="space-y-4">
+      {puedeValidar && pendientesAnulacion.length > 0 && (
+        <PendientesAnulacionPanel
+          muestras={pendientesAnulacion}
+          seleccionadas={protocolosPendientesSeleccionados}
+          cargando={cargandoPendientesAnulacion}
+          onToggle={togglePendienteSeleccionada}
+          onConfirmar={() => setConfirmarAnulacionAbierta(true)}
+          onRevertir={abrirReversionSeleccionada}
+        />
+      )}
+
       <div className="flex items-end justify-between">
         <div>
           <h2 className="text-2xl font-semibold text-slate-900 tracking-tight">
@@ -688,7 +889,7 @@ export function MuestrasPage({
         </div>
       )}
 
-      {/* Modal de validación bioquímica */}
+      {/* Modal de validación del bioquímico */}
       {muestraEnValidacion && (
         <ValidacionModal
           muestra={muestraEnValidacion}
@@ -707,6 +908,311 @@ export function MuestrasPage({
           }}
         />
       )}
+
+      {confirmarAnulacionAbierta && (
+        <ConfirmarAnulacionModal
+          cantidad={protocolosPendientesSeleccionados.length}
+          procesando={procesandoAnulacion}
+          onCancelar={() => setConfirmarAnulacionAbierta(false)}
+          onConfirmar={confirmarAnulacionSeleccionada}
+        />
+      )}
+
+      {muestraReversion && (
+        <RevertirAnulacionModal
+          muestra={muestraReversion}
+          motivo={motivoReversion}
+          detalle={detalleReversion}
+          procesando={procesandoReversion}
+          onMotivoChange={setMotivoReversion}
+          onDetalleChange={setDetalleReversion}
+          onCancelar={() => setMuestraReversion(null)}
+          onConfirmar={confirmarMalAnulado}
+        />
+      )}
+    </div>
+  );
+}
+
+function PendientesAnulacionPanel({
+  muestras,
+  seleccionadas,
+  cargando,
+  onToggle,
+  onConfirmar,
+  onRevertir,
+}: {
+  muestras: Muestra[];
+  seleccionadas: string[];
+  cargando: boolean;
+  onToggle: (protocolo: string) => void;
+  onConfirmar: () => void;
+  onRevertir: () => void;
+}) {
+  return (
+    <section className="rounded-xl border border-red-200 bg-red-50/60 p-4 shadow-sm">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="inline-flex h-6 w-6 items-center justify-center rounded-md bg-red-100 text-red-700">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" />
+                <path d="M12 9v4" />
+                <path d="M12 17h.01" />
+              </svg>
+            </span>
+            <h3 className="text-sm font-bold text-red-700">
+              Taukits pendientes de anulación
+            </h3>
+          </div>
+          <p className="mt-1 max-w-3xl text-xs text-red-700">
+            Estos Taukits llegaron al límite de Reinicios 2/2 y necesitan una
+            confirmación antes de ser anulados e informados a BACON.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={onConfirmar}
+            disabled={seleccionadas.length === 0 || cargando}
+            className="rounded-lg bg-emerald-600 px-4 py-2 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
+          >
+            Confirmar anulación y enviar a BACON
+          </button>
+          <button
+            type="button"
+            onClick={onRevertir}
+            disabled={seleccionadas.length !== 1 || cargando}
+            className="rounded-lg border border-emerald-300 bg-white px-4 py-2 text-xs font-semibold text-emerald-700 transition-colors hover:bg-emerald-50 disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-300 disabled:hover:bg-white"
+          >
+            Marcar como mal anulado
+          </button>
+        </div>
+      </div>
+
+      <div className="mt-4 overflow-hidden rounded-lg border border-red-100 bg-white">
+        <table className="w-full">
+          <thead className="bg-red-50">
+            <tr>
+              <th className="w-10 px-3 py-2 text-left" aria-label="Seleccionar" />
+              <th className="px-3 py-2 text-left text-[11px] font-bold uppercase tracking-wider text-slate-600">
+                N° serie
+              </th>
+              <th className="px-3 py-2 text-left text-[11px] font-bold uppercase tracking-wider text-slate-600">
+                Protocolo
+              </th>
+              <th className="px-3 py-2 text-left text-[11px] font-bold uppercase tracking-wider text-slate-600">
+                Paciente
+              </th>
+              <th className="px-3 py-2 text-center text-[11px] font-bold uppercase tracking-wider text-slate-600">
+                Reinicios
+              </th>
+              <th className="px-3 py-2 text-left text-[11px] font-bold uppercase tracking-wider text-slate-600">
+                Motivo
+              </th>
+              <th className="px-3 py-2 text-left text-[11px] font-bold uppercase tracking-wider text-slate-600">
+                Estado
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {muestras.map((m) => (
+              <tr key={m.protocolo} className="border-t border-red-50">
+                <td className="px-3 py-2">
+                  <input
+                    type="checkbox"
+                    checked={seleccionadas.includes(m.protocolo)}
+                    onChange={() => onToggle(m.protocolo)}
+                    className="h-4 w-4 rounded border-slate-300 text-emerald-700 focus:ring-emerald-600"
+                    aria-label={`Seleccionar ${m.protocolo}`}
+                  />
+                </td>
+                <td className="px-3 py-2 text-sm font-mono text-slate-700">
+                  {codigoMuestra(m)}
+                </td>
+                <td className="px-3 py-2 text-sm font-mono font-semibold text-slate-900">
+                  {m.protocolo}
+                </td>
+                <td className="px-3 py-2">
+                  <div className="text-sm font-medium text-slate-900">
+                    {m.paciente.apellido}, {m.paciente.nombre}
+                  </div>
+                  <div className="text-xs text-slate-500 font-mono">
+                    DNI {m.paciente.dni}
+                  </div>
+                </td>
+                <td className="px-3 py-2 text-center">
+                  <ReiniciosBadge muestra={m} />
+                </td>
+                <td className="px-3 py-2 text-sm text-slate-700">
+                  {motivoPendienteAnulacion(m)}
+                </td>
+                <td className="px-3 py-2">
+                  <EstadoBadge estado={m.estado} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+function motivoPendienteAnulacion(muestra: Muestra): string {
+  if (muestra.tieneError) return 'Error del equipo + reinicio';
+  return 'Reinicios 2/2';
+}
+
+function ConfirmarAnulacionModal({
+  cantidad,
+  procesando,
+  onCancelar,
+  onConfirmar,
+}: {
+  cantidad: number;
+  procesando: boolean;
+  onCancelar: () => void;
+  onConfirmar: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/55 p-4">
+      <div className="w-full max-w-md rounded-2xl bg-white p-7 text-center shadow-2xl">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-red-200 bg-red-50 text-red-600">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" />
+            <path d="M12 9v4" />
+            <path d="M12 17h.01" />
+          </svg>
+        </div>
+        <h3 className="mt-5 text-lg font-bold text-slate-900">
+          Confirmar anulación y envío a BACON
+        </h3>
+        <p className="mt-3 text-sm leading-relaxed text-slate-600">
+          Se enviará a BACON el informe de anulación de {cantidad}{' '}
+          TauKit{cantidad !== 1 ? 's' : ''} seleccionado
+          {cantidad !== 1 ? 's' : ''}. Esta acción no se puede deshacer.
+        </p>
+        <p className="mt-3 text-sm font-semibold text-slate-800">
+          ¿Deseás continuar?
+        </p>
+        <div className="mt-6 flex justify-center gap-3">
+          <button
+            type="button"
+            onClick={onCancelar}
+            disabled={procesando}
+            className="rounded-lg border border-slate-300 px-5 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:text-slate-300"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            onClick={onConfirmar}
+            disabled={procesando || cantidad === 0}
+            className="rounded-lg bg-emerald-600 px-5 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-slate-200"
+          >
+            {procesando ? 'Confirmando...' : 'Confirmar'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function RevertirAnulacionModal({
+  muestra,
+  motivo,
+  detalle,
+  procesando,
+  onMotivoChange,
+  onDetalleChange,
+  onCancelar,
+  onConfirmar,
+}: {
+  muestra: Muestra;
+  motivo: string;
+  detalle: string;
+  procesando: boolean;
+  onMotivoChange: (motivo: string) => void;
+  onDetalleChange: (detalle: string) => void;
+  onCancelar: () => void;
+  onConfirmar: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/55 p-4">
+      <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h3 className="text-lg font-bold text-slate-900">
+              Marcar Taukit como mal anulado
+            </h3>
+            <p className="mt-2 text-sm leading-relaxed text-slate-600">
+              Indicá el motivo por el cual este Taukit no debe ser anulado. El
+              caso quedará disponible para revisión administrativa en Operación.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onCancelar}
+            disabled={procesando}
+            className="text-slate-400 hover:text-slate-700 disabled:cursor-not-allowed disabled:text-slate-300"
+            aria-label="Cerrar"
+          >
+            ×
+          </button>
+        </div>
+
+        <div className="mt-4 rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-600">
+          <span className="font-semibold text-slate-800">{muestra.protocolo}</span>{' '}
+          · {codigoMuestra(muestra)}
+        </div>
+
+        <label className="mt-4 block text-sm font-semibold text-slate-700">
+          Motivo <span className="text-red-600">*</span>
+          <select
+            value={motivo}
+            onChange={(e) => onMotivoChange(e.target.value)}
+            disabled={procesando}
+            className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-normal text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-600 disabled:bg-slate-100"
+          >
+            <option>Error en la carga de resultados</option>
+            <option>Otro</option>
+          </select>
+        </label>
+
+        {motivo === 'Otro' && (
+          <label className="mt-4 block text-sm font-semibold text-slate-700">
+            Detalle <span className="text-red-600">*</span>
+            <textarea
+              value={detalle}
+              onChange={(e) => onDetalleChange(e.target.value)}
+              disabled={procesando}
+              placeholder="Escribí el motivo..."
+              rows={3}
+              className="mt-1 w-full resize-none rounded-lg border border-slate-300 px-3 py-2 text-sm font-normal text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-600 disabled:bg-slate-100"
+            />
+          </label>
+        )}
+
+        <div className="mt-6 flex justify-end gap-3">
+          <button
+            type="button"
+            onClick={onCancelar}
+            disabled={procesando}
+            className="rounded-lg border border-slate-300 px-5 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:text-slate-300"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            onClick={onConfirmar}
+            disabled={procesando || !motivo.trim() || (motivo === 'Otro' && !detalle.trim())}
+            className="rounded-lg bg-emerald-600 px-5 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-slate-200"
+          >
+            {procesando ? 'Confirmando...' : 'Confirmar'}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

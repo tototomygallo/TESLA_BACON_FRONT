@@ -47,9 +47,9 @@ interface Props {
 }
 
 // ============================================
-// Modal de validación bioquímica (scope 2.7)
+// Modal de validación del bioquímico (scope 2.7)
 // ============================================
-// Ventana exclusiva de la bioquímica para revisar una muestra
+// Ventana exclusiva del rol bioquímico para revisar una muestra
 // en estado 'en_validacion'. Muestra los datos del paciente y los
 // resultados del HeliFan, con tres acciones:
 //   - Aceptar  → estado pasa a 'completado'
@@ -121,8 +121,14 @@ export function ValidacionModal({
       const respuesta = await api.reiniciarMuestra(muestra.protocolo, usuarioId);
       onActualizada();
 
-      // Si este reinicio lleva el contador a 2/2, la muestra queda
-      // anulada y el informe de anulación se sube/verifica en BACON.
+      if (respuesta.estado === 'pendiente_anulacion') {
+        onCerrar();
+        onValidacionConAdvertencia?.('El TauKit llegó a Reinicios 2/2 y quedó pendiente de anulación. No se envió nada a BACON.');
+        return;
+      }
+
+      // Compatibilidad con respuestas viejas: el flujo actual deja la muestra
+      // pendiente de anulación y no envía nada a BACON en este paso.
       if (respuesta.estado === 'anulado' && respuesta.pdfVerificado !== true) {
         // Se anuló, pero el informe NO se pudo verificar en BACON. No cerramos
         // el modal para que el aviso quede visible.
@@ -163,7 +169,7 @@ export function ValidacionModal({
         <div className="px-6 py-4 border-b border-slate-100 flex items-start justify-between">
           <div>
             <h3 className="text-lg font-semibold text-slate-900 tracking-tight">
-              Validación bioquímica
+              Validación del bioquímico
             </h3>
             <p className="text-xs text-slate-500 mt-0.5">
               Revisá los resultados antes de aprobar el informe
@@ -422,7 +428,7 @@ export function ValidacionModal({
               {muestra.intentosFallidos >= 1 ? (
                 <>
                   Este TauKit ya tiene <span className="font-semibold">1 reinicio/error registrado</span>.
-                  Si confirmás este reinicio, llegará a <span className="font-semibold">2 de 2</span> y el TauKit quedará <span className="font-semibold">ANULADO ahora</span>.
+                  Si confirmás este reinicio, llegará a <span className="font-semibold">2 de 2</span> y quedará como <span className="font-semibold">Pendiente de anulación</span> para revisión del rol bioquímico.
                 </>
               ) : (
                 <>

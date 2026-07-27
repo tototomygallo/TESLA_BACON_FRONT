@@ -1,5 +1,7 @@
 import type {
+  AnuladoPendienteRevision,
   BaconMuestra,
+  CompletadoCorreccion,
   Muestra,
   ProtocoloEditado,
   ResultadoCargaTxt,
@@ -63,14 +65,21 @@ export interface ApiClient {
     usuarioId: string,
   ): Promise<ResultadoCargaTxt>;
 
-  // --- Validación bioquímica (scope 2.7) ---
+  // --- Validación del bioquímico (scope 2.7) ---
   // Aprobar: en_validacion → completado
   validarMuestra(protocolo: string, usuarioId: string): Promise<ValidacionMuestraResponse>;
   // Reiniciar: borra los resultados de una muestra con error para
   // poder recargar otro TXT (solo si tiene error y no está anulada).
-  // Si este reinicio agota el TauKit, la muestra queda anulada y el informe
-  // de anulación se sube/verifica en BACON: por eso devuelve los campos pdf*.
+  // Si este reinicio agota el contador, la muestra queda pendiente de anulación.
+  // BACON se informa recién al confirmar la anulación desde Muestras.
   reiniciarMuestra(protocolo: string, usuarioId: string): Promise<ValidacionMuestraResponse>;
+  listarPendientesAnulacion(): Promise<Muestra[]>;
+  confirmarAnulacion(protocolo: string, usuarioId: string): Promise<ValidacionMuestraResponse>;
+  marcarMalAnulado(
+    protocolo: string,
+    datos: { motivo: 'Error en la carga de resultados' | 'Otro'; detalle: string | null; usuarioId?: string },
+  ): Promise<void>;
+  revertirAnulacion(protocolo: string, motivo: string, usuarioId: string): Promise<Muestra>;
 
   // --- Etiquetas: marca como 'en_proceso' al imprimir (scope 2.4) ---
   imprimirEtiquetas(protocolo: string, usuarioId: string): Promise<Muestra>;
@@ -105,6 +114,24 @@ export interface ApiClient {
     datos: { asunto: string; mensaje: string; archivos: File[] },
     usuarioId: string,
   ): Promise<void>;
+  listarAnuladosPendientesRevision(usuarioId: string): Promise<AnuladoPendienteRevision[]>;
+  revertirAnuladoAEnProceso(protocolo: string, usuarioId: string): Promise<Muestra>;
+  buscarCompletadosCorreccion(q: string, usuarioId: string): Promise<CompletadoCorreccion[]>;
+  cargarValoresCompletadoCorreccion(
+    protocolo: string,
+    valores: {
+      basalCO2: number;
+      postCO2: number;
+      basalDelta: number;
+      postDelta: number;
+      testValue: number;
+      usuarioId: string;
+    },
+  ): Promise<CompletadoCorreccion>;
+  generarInformeCompletadoCorreccion(
+    protocolo: string,
+    usuarioId: string,
+  ): Promise<ValidacionMuestraResponse>;
 }
 
 // Error tipado para que los componentes puedan distinguir casos.

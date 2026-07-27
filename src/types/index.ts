@@ -9,10 +9,10 @@ export type Rol = 'tecnico' | 'bioquimico' | 'admin';
 // El error NO es un estado, es un flag separado en la muestra
 // (porque una muestra puede tener error en una carga previa y
 // seguir siendo válida para reintentar).
-// 'anulado': el TauKit agotó sus 2 mediciones con error y queda
-// fuera de circulación — hay que usar otro TauKit.
+// 'anulado': el rol bioquímico confirmó la anulación del TauKit y el informe
+// correspondiente ya puede ser gestionado/enviado según el flujo vigente.
 // 'eliminado': baja lógica desde Operación; no se lista en Muestras.
-export type Estado = 'recibido' | 'en_proceso' | 'en_validacion' | 'completado' | 'anulado' | 'eliminado';
+export type Estado = 'recibido' | 'en_proceso' | 'en_validacion' | 'completado' | 'pendiente_anulacion' | 'anulado' | 'eliminado';
 
 export interface Usuario {
   id: string;
@@ -165,6 +165,28 @@ export interface ProtocoloEditado {
   camposEditados?: string[];
 }
 
+export interface AnuladoPendienteRevision {
+  numeroSerie: string;
+  protocolo: string;
+  paciente: Paciente;
+  estado: Estado;
+  motivo: 'Error en la carga de resultados' | 'Otro' | string;
+  detalle: string | null;
+  usuarioId: string;
+  fecha: string;
+  tipoEstudio: 'taukit' | 'lactokit' | string;
+  intentosFallidos: number;
+}
+
+export interface CompletadoCorreccion {
+  numeroSerie: string;
+  protocolo: string;
+  paciente: Paciente;
+  estado: Estado;
+  fechaInforme: string;
+  resultados: ResultadoMuestra;
+}
+
 // Resultados de una muestra parseados del TXT del HeliFan.
 export interface ResultadoMuestra {
   basalCO2: number;
@@ -189,9 +211,12 @@ export interface ResultadoCargaTxt {
   // Protocolos con error del equipo (postDelta = -10000) que todavía
   // tienen intentos disponibles. Marcan tieneError pero no cambian estado.
   conErrorEquipo: string[];
-  // Protocolos que con esta carga llegaron a 2 errores → quedaron anulados
-  // (el TauKit agotó sus mediciones).
+  // Protocolos anulados de forma definitiva. En el flujo actual, los Taukit que
+  // llegan a Reinicios 2/2 se informan en pendientesAnulacion.
   anuladas: string[];
+  // Protocolos que llegaron a Reinicios 2/2 y quedaron pendientes de confirmar
+  // anulación. No se informa nada a BACON hasta confirmar manualmente.
+  pendientesAnulacion?: string[];
   // TestIDs del TXT que no matchean con ningún protocolo del sistema.
   noEncontrados: string[];
   // Protocolos que ya estaban completados (no se pisan).

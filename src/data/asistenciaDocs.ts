@@ -90,6 +90,7 @@ export interface FaqDoc {
 export interface SeccionDoc {
   id: string; // slug de navegación
   label: string; // etiqueta del menú lateral
+  adminOnly?: boolean;
   titulo: string;
   descripcion: string;
   // Caja destacada que aparece arriba de los bloques (ej: cómo usar la doc).
@@ -139,7 +140,7 @@ export const SECCIONES_DOC: SeccionDoc[] = [
           { icono: '🔗', texto: 'Validación con BACON' },
           { icono: '📦', texto: 'Recepción de muestras' },
           { icono: '🧪', texto: 'Carga de resultados' },
-          { icono: '👩‍⚕️', texto: 'Validación bioquímica' },
+          { icono: '👩‍⚕️', texto: 'Validación del bioquímico' },
           { icono: '📄', texto: 'Generación del informe' },
           { icono: '📧', texto: 'Envío a BACON' },
         ],
@@ -158,7 +159,7 @@ export const SECCIONES_DOC: SeccionDoc[] = [
         parrafos: ['La navegación principal está en la barra superior. La aplicación se encuentra organizada en módulos, cada uno orientado a una etapa específica del proceso del laboratorio:'],
         items: [
           'Resumen del día: métricas y estado general de la jornada.',
-          'Muestras: listado, búsqueda y validación bioquímica.',
+          'Muestras: listado, búsqueda y validación del bioquímico.',
           'Ingreso por scanner: alta de muestras escaneando códigos.',
           'Carga de resultados: carga de resultados según el tipo de estudio.',
           'Operación: herramientas administrativas, correción de datos y contacto con BACON.',
@@ -336,7 +337,7 @@ export const SECCIONES_DOC: SeccionDoc[] = [
     label: 'Muestras',
     titulo: 'Muestras',
     descripcion:
-      'Desde esta sección es posible consultar todas las muestras registradas en el sistema, buscar información específica, aplicar filtros, imprimir etiquetas y realizar la validación bioquímica cuando corresponda.',
+      'Desde esta sección es posible consultar todas las muestras registradas en el sistema, buscar información específica, aplicar filtros, imprimir etiquetas y realizar la validación del bioquímico cuando corresponda.',
     imagen: '/docs/muestras.png',
     imagenAlt:
       'Pantalla principal de Muestras: buscador, filtros, tarjetas de resumen, tabla y paginación',
@@ -372,11 +373,13 @@ export const SECCIONES_DOC: SeccionDoc[] = [
           'En proceso.',
           'En validación.',
           'Completados.',
+          'Pendiente de anulación.',
           'Anulados.',
           'Con error.',
         ],
         parrafosPost: [
           'Estos filtros pueden combinarse con la búsqueda, el tipo de estudio y el rango de fechas seleccionado.',
+          'El filtro Pendiente de anulación permite consultar los Taukits que alcanzaron el límite de reinicios disponibles, pero que todavía requieren revisión antes de ser anulados e informados a BACON.',
         ],
       },
       {
@@ -427,7 +430,9 @@ export const SECCIONES_DOC: SeccionDoc[] = [
         ],
         parrafosPost: [
           'Las acciones visibles cambian según el estado de la muestra y el rol del usuario.',
-          'En muestras Taukit, la columna **Reinicios** muestra cuántos reinicios o errores de equipo lleva registrados la muestra: **0/2** indica que no hubo reinicios ni errores previos, **1/2** indica que ya hubo un reinicio manual o un error de equipo, y **2/2** indica que el Taukit llegó al límite y queda anulado. Esta columna no aplica al circuito Lactokit.',
+          'En muestras Taukit, la columna **Reinicios** muestra cuántos reinicios o errores de equipo lleva registrados la muestra: **0/2** indica que no hubo reinicios ni errores previos, **1/2** indica que ya hubo un reinicio manual o un error de equipo, y **2/2** indica que el Taukit llegó al límite de reinicios disponibles.',
+          'Cuando un Taukit llega a **2/2**, no se anula automáticamente: queda en estado **Pendiente de anulación** para revisión del rol bioquímico.',
+          'Esta columna no aplica al circuito Lactokit.',
         ],
         subsecciones: [
           {
@@ -459,21 +464,21 @@ export const SECCIONES_DOC: SeccionDoc[] = [
           {
             titulo: 'En validación',
             parrafos: [
-              'La muestra pasa a este estado cuando sus resultados fueron cargados correctamente y se encuentra lista para la revisión de un usuario Bioquímico o Administrador.',
+              'La muestra pasa a este estado cuando sus resultados fueron cargados correctamente y se encuentra lista para la revisión de un usuario con rol Bioquímico o Administrador.',
               'Para Taukit, este estado se alcanza cuando el archivo fue procesado sin errores.',
               'Para Lactokit, se alcanza cuando la carga completa fue confirmada.',
-              'En este estado aparece la acción Validar. Desde la validación bioquímica se podrá:',
+              'En este estado aparece la acción Validar. Desde la ventana de validación se podrá:',
             ],
             items: [
               '**Aceptar y completar** la muestra.',
               'Reiniciar la muestra Taukit cuando sea necesario repetir la medición.',
             ],
             parrafosPost: [
-              'El funcionamiento detallado de esta ventana se explica en el apartado Validación bioquímica.',
+              'El funcionamiento detallado de esta ventana se explica en el apartado Validación del bioquímico.',
             ],
             imagen: '/docs/muestras-estado-en-validacion.png',
             imagenAlt: 'Muestra en estado En validación con la acción Validar',
-            imagenCaption: '**Figura 5. Muestra en estado En validación.** \n Los resultados fueron cargados correctamente y la muestra está lista para la revisión de un usuario Bioquímico o Administrador. En este estado se habilita la acción **Validar**.',
+            imagenCaption: '**Figura 5. Muestra en estado En validación.** \n Los resultados fueron cargados correctamente y la muestra está lista para la revisión de un usuario con rol Bioquímico o Administrador. En este estado se habilita la acción **Validar**.',
           },
           {
             titulo: 'Con error',
@@ -481,12 +486,12 @@ export const SECCIONES_DOC: SeccionDoc[] = [
               {
                 tipo: 'parrafo',
                 texto:
-                  'La condición Con error aparece acompañando al estado principal de la muestra. Puede presentarse como En proceso — Con error o Anulado — Con error, según la cantidad de reinicios o errores registrados.',
+                  'La condición Con error aparece acompañando al estado principal de la muestra. Puede presentarse como En proceso — Con error o derivar en Pendiente de anulación, según la cantidad de reinicios o errores registrados.',
               },
               {
                 tipo: 'parrafo',
                 texto:
-                  'Para Taukit, el contador **Reinicios** suma tanto los reinicios manuales como los errores de equipo detectados automáticamente. La muestra queda anulada cuando llega a **2/2**.',
+                  'Para Taukit, el contador **Reinicios** suma tanto los reinicios manuales como los errores de equipo detectados automáticamente. Cuando llega a **2/2**, la muestra queda en estado **Pendiente de anulación** para revisión del rol bioquímico.',
               },
               {
                 tipo: 'lista',
@@ -515,7 +520,7 @@ export const SECCIONES_DOC: SeccionDoc[] = [
                 tipo: 'imagen',
                 src: '/docs/muestras-con-error-en-proceso.png',
                 alt: 'Muestra En proceso — Con error con la acción **Ver error**',
-                caption: '**Figura 6. Muestra en estado En proceso con la condición Con error.** \n El sistema detectó un inconveniente durante la medición. Los usuarios Bioquímicos y Administradores pueden utilizar la acción **Ver error** para consultar el detalle y reiniciar la muestra.',
+                caption: '**Figura 6. Muestra en estado En proceso con la condición Con error.** \n El sistema detectó un inconveniente durante la medición. Los usuarios con rol Bioquímico o Administrador pueden utilizar la acción **Ver error** para consultar el detalle y reiniciar la muestra.',
               },
               {
                 tipo: 'parrafo',
@@ -542,36 +547,174 @@ export const SECCIONES_DOC: SeccionDoc[] = [
                 alt: 'Ventana **Ver error** con la acción **Reiniciar muestra**',
                 tamano: 'media',
                 caption:
-                  '**Figura 7. Detalle de una muestra En proceso — Con error.** \n La ventana muestra los resultados registrados, el motivo del error y la cantidad de reinicios o errores registrados. La acción **Reiniciar muestra** está disponible únicamente para usuarios Bioquímicos y Administradores.',
+                  '**Figura 7. Detalle de una muestra En proceso — Con error.** \n La ventana muestra los resultados registrados, el motivo del error y la cantidad de reinicios o errores registrados. La acción **Reiniciar muestra** está disponible únicamente para usuarios con rol Bioquímico o Administrador.',
               },
-              { tipo: 'subtitulo', texto: 'Anulado — Con error' },
+              { tipo: 'subtitulo', texto: 'Pendiente de anulación' },
               {
                 tipo: 'parrafo',
                 texto:
-                  'Se produce cuando la muestra Taukit llega a **Reinicios 2/2**, ya sea por reinicios manuales, errores del equipo o una combinación de ambos.',
+                  'Este estado se produce cuando un Taukit llega a **Reinicios 2/2**.',
               },
-              { tipo: 'parrafo', texto: 'En este caso:' },
+              {
+                tipo: 'parrafo',
+                texto:
+                  'La muestra no se anula automáticamente ni se informa a BACON en ese momento.',
+              },
+              { tipo: 'parrafo', texto: 'En este estado:' },
               {
                 tipo: 'lista',
                 items: [
-                  'La muestra pasa a estado Anulado.',
-                  'Se mantiene la condición Con error.',
-                  'El contador de reinicios llegó a **2/2**.',
-                  'No se habilita la acción **Reiniciar muestra**.',
-                  'El sistema genera el informe correspondiente a la anulación y lo envía a BACON.',
-                  'Para continuar con el estudio deberá utilizarse un nuevo Taukit.',
+                  'La muestra queda pendiente de revisión por el rol bioquímico.',
+                  'No se genera informe de anulación.',
+                  'No se envía información a BACON.',
+                  'La muestra aparece en el bloque superior Taukits pendientes de anulación.',
+                  'El rol bioquímico puede confirmar la anulación o marcar el caso como mal anulado.',
                 ],
               },
               {
                 tipo: 'parrafo',
                 texto:
-                  'En este estado se encuentra disponible la acción **Ver PDF**, que permite consultar o descargar el informe generado.',
+                  'Si el rol bioquímico confirma la anulación, recién ahí la muestra pasa a estado Anulado, se genera el informe correspondiente y se envía a BACON.',
+              },
+              {
+                tipo: 'parrafo',
+                texto:
+                  'Si el rol bioquímico marca el caso como mal anulado, la muestra queda disponible para revisión administrativa en Operación > Corrección de estados.',
               },
               {
                 tipo: 'imagen',
-                src: '/docs/muestras-con-error-anulado.png',
-                alt: 'Muestra en estado Anulado — Con error',
-                caption: '**Figura 8. Muestra en estado Anulado con la condición Con error.** \n Este estado se presenta cuando el Taukit llega a **Reinicios 2/2**. La muestra ya no puede reiniciarse y se habilita la acción **Ver PDF** para consultar el informe de anulación enviado a BACON.'
+                src: '/docs/muestras-pendiente-anulacion.png',
+                alt: 'Muestra en estado Pendiente de anulación',
+                caption: '**Figura 8. Muestra en estado Pendiente de anulación.** \n Indica que el Taukit llegó al límite de reinicios disponibles, pero todavía no fue anulado ni informado a BACON. Requiere revisión previa del rol bioquímico.'
+              },
+              { tipo: 'subtitulo', texto: 'Taukits pendientes de anulación' },
+              {
+                tipo: 'parrafo',
+                texto:
+                  'Cuando existen muestras en estado Pendiente de anulación, la pantalla Muestras muestra un recuadro superior llamado Taukits pendientes de anulación.',
+              },
+              {
+                tipo: 'parrafo',
+                texto:
+                  'Este bloque permite visualizar los Taukits que requieren revisión antes de ser anulados definitivamente.',
+              },
+              {
+                tipo: 'parrafo',
+                texto: 'La tabla muestra:',
+              },
+              {
+                tipo: 'lista',
+                items: [
+                  'Número de serie.',
+                  'Protocolo.',
+                  'Paciente.',
+                  'Reinicios.',
+                  'Motivo.',
+                  'Estado.',
+                ],
+              },
+              {
+                tipo: 'parrafo',
+                texto: 'Desde este bloque se pueden realizar dos acciones:',
+              },
+              {
+                tipo: 'lista',
+                items: [
+                  'Confirmar anulación y enviar a BACON.',
+                  'Marcar como mal anulado.',
+                ],
+              },
+              { tipo: 'subtitulo', texto: 'Confirmar anulación y enviar a BACON' },
+              {
+                tipo: 'parrafo',
+                texto:
+                  'Esta acción permite seleccionar uno o más Taukits pendientes de anulación.',
+              },
+              {
+                tipo: 'parrafo',
+                texto: 'Al confirmar:',
+              },
+              {
+                tipo: 'lista',
+                items: [
+                  'La muestra pasa a estado Anulado.',
+                  'Se genera el informe de anulación.',
+                  'Se envía el informe a BACON.',
+                  'Se verifica el envío.',
+                  'Se envía una copia de respaldo por correo electrónico.',
+                  'La muestra desaparece del bloque de pendientes.',
+                  'La acción queda registrada para auditoría.',
+                ],
+              },
+              { tipo: 'subtitulo', texto: 'Marcar como mal anulado' },
+              {
+                tipo: 'parrafo',
+                texto:
+                  'Esta acción permite seleccionar un único Taukit por vez.',
+              },
+              {
+                tipo: 'parrafo',
+                texto:
+                  'Se utiliza cuando la muestra no debería avanzar a anulación definitiva, por ejemplo, porque hubo un error en la carga de resultados o en el proceso previo.',
+              },
+              {
+                tipo: 'parrafo',
+                texto: 'Al confirmar:',
+              },
+              {
+                tipo: 'lista',
+                items: [
+                  'La muestra no se envía a BACON.',
+                  'El caso queda disponible para revisión administrativa en Operación > Corrección de estados.',
+                  'La acción queda registrada para auditoría.',
+                ],
+              },
+              {
+                tipo: 'imagen',
+                src: '/docs/muestras-taukits-pendientes-anulacion.png',
+                alt: 'Taukits pendientes de anulación',
+                caption: '**Figura 9. Taukits pendientes de anulación.** \n El bloque muestra los Taukits que llegaron al límite de reinicios y permite confirmar la anulación con envío a BACON o marcar el caso como mal anulado para revisión administrativa.',
+              },
+              {
+                tipo: 'imagen',
+                src: '/docs/muestras-mal-anulado-modal.png',
+                alt: 'Modal para marcar un Taukit como mal anulado',
+                caption: '**Figura 10. Modal para marcar un Taukit como mal anulado.** \n Solicita el motivo por el cual la muestra no debe ser anulada y deja el caso disponible para revisión administrativa en Operación.',
+              },
+              {
+                tipo: 'imagen',
+                src: '/docs/muestras-confirmar-anulacion-bacon.png',
+                alt: 'Confirmación de anulación y envío a BACON',
+                caption: '**Figura 11. Confirmación de anulación y envío a BACON.** \n Advierte al usuario que, al confirmar, se generará el informe de anulación y se enviará a BACON.',
+              },
+              { tipo: 'subtitulo', texto: 'Anulado' },
+              {
+                tipo: 'parrafo',
+                texto:
+                  'El estado Anulado indica que la muestra ya no puede continuar procesándose.',
+              },
+              {
+                tipo: 'parrafo',
+                texto:
+                  'Para Taukit, este estado se alcanza cuando el rol bioquímico confirma la anulación desde el bloque Taukits pendientes de anulación.',
+              },
+              {
+                tipo: 'parrafo',
+                texto: 'Al confirmar la anulación:',
+              },
+              {
+                tipo: 'lista',
+                items: [
+                  'La muestra pasa de Pendiente de anulación a Anulado.',
+                  'Se genera el informe de anulación.',
+                  'Se envía el informe a BACON.',
+                  'Se envía una copia de respaldo por correo electrónico.',
+                  'Se habilita la acción Ver PDF, que permite consultar o descargar el informe generado.',
+                ],
+              },
+              {
+                tipo: 'parrafo',
+                texto: 'Una muestra anulada ya no puede reiniciarse desde Muestras.',
               },
               {
                 tipo: 'link',
@@ -586,21 +729,21 @@ export const SECCIONES_DOC: SeccionDoc[] = [
           {
             titulo: 'Completado',
             parrafos: [
-              'La muestra pasa a este estado cuando la validación bioquímica finalizó correctamente, se generó el informe y se realizaron los envíos correspondientes.',
+              'La muestra pasa a este estado cuando la validación del bioquímico finalizó correctamente, se generó el informe y se realizaron los envíos correspondientes.',
               'Desde la acción **Ver PDF** se puede abrir o descargar el informe definitivo generado para la muestra.',
               'Una muestra completada ya no puede volver a recibir resultados.',
-              'Si es necesario corregir sus datos, deberá utilizarse la sección Operación, disponible para usuarios administradores.',
+              'Si es necesario corregir valores de una muestra Taukit completada, deberá notificar a un administrador para que lo resuelva.',
             ],
             imagen: '/docs/muestras-estado-completado.png',
             imagenAlt: 'Muestra en estado Completado con la acción **Ver PDF**',
-            imagenCaption: '**Figura 9. Muestra en estado Completado.** \n La validación bioquímica finalizó correctamente, se generó el informe y se realizaron los envíos correspondientes. La acción **Ver PDF** permite consultar o descargar el informe definitivo.',
+            imagenCaption: '**Figura 12. Muestra en estado Completado.** \n La validación del bioquímico finalizó correctamente, se generó el informe y se realizaron los envíos correspondientes. La acción **Ver PDF** permite consultar o descargar el informe definitivo.',
           },
           {
             titulo: 'Flujo general de estados',
             imagen: '/docs/muestras-flujo-general.png',
             imagenAlt:
               'Flujo principal: Recibido, En proceso, En validación, Completado',
-            imagenCaption: '**Figura 10. Flujo general de estados de una muestra.** \n Una muestra avanza normalmente desde **Recibido** hasta **Completado**, pasando por los estados **En proceso** y **En validación**.',
+            imagenCaption: '**Figura 13. Flujo general de estados de una muestra.** \n Una muestra avanza normalmente desde **Recibido** hasta **Completado**, pasando por los estados **En proceso** y **En validación**.',
           },
           {
             titulo: 'Flujos alternativos de Taukit',
@@ -613,7 +756,7 @@ export const SECCIONES_DOC: SeccionDoc[] = [
                   'Nota: Estos flujos aplican al circuito de Taukit, ya que permiten reiniciar la muestra cuando es necesario repetir la carga de resultados. En Lactokit no aplica este mecanismo de reinicio.',
               },
             ],
-            imagenCaption: '**Figura 11. Flujos alternativos de procesamiento de una muestra Taukit.** \n El primer flujo muestra un error inicial seguido de una carga exitosa. El segundo representa un caso que llega a **Reinicios 2/2**, situación en la que la muestra finaliza como **Anulado — Con error**.'
+            imagenCaption: '**Figura 14. Flujos alternativos de Taukit.** \n El primer flujo muestra un intento inicial fallido seguido de una medición exitosa. El segundo representa dos intentos fallidos, situación en la que la muestra queda como Pendiente de anulación hasta que el rol bioquímico confirme cómo continuar.'
           },
         ],
         parrafosFinal: [
@@ -632,7 +775,7 @@ export const SECCIONES_DOC: SeccionDoc[] = [
       },
       {
         id: 'validacion',
-        titulo: '8. Validación bioquímica',
+        titulo: '8. Validación del bioquímico',
         parrafos: [
           'La acción **Validar** está disponible únicamente para usuarios con rol Bioquímico o Administrador y se habilita cuando la muestra se encuentra en estado **En validación**.',
           'Desde esta ventana se pueden revisar los datos del paciente, el tipo de estudio y los resultados cargados, antes de definir la acción final sobre la muestra.',
@@ -645,20 +788,20 @@ export const SECCIONES_DOC: SeccionDoc[] = [
               {
                 tipo: 'parrafo',
                 texto:
-                  'En el caso de Taukit, la ventana de validación bioquímica ofrece dos acciones posibles:',
+                  'En el caso de Taukit, la ventana de validación ofrece dos acciones posibles:',
               },
               {
                 tipo: 'imagen',
                 src: '/docs/validacion-taukit.png',
-                alt: 'Ventana de validación bioquímica de una muestra Taukit',
-                caption: '**Figura 12. Ventana de validación bioquímica para una muestra Taukit.**',
+                alt: 'Ventana de validación de una muestra Taukit',
+                caption: '**Figura 15. Ventana de validación de una muestra Taukit.**',
                 tamano: 'media',
               },
               { tipo: 'subtitulo', texto: '**8.1.1 Aceptar y completar**' },
               {
                 tipo: 'parrafo',
                 texto:
-                  'Si la información es correcta, la bioquímica podrá seleccionar la opción **Aceptar y completar**. Esta acción realiza lo siguiente:',
+                  'Si la información es correcta, el usuario con rol bioquímico podrá seleccionar la opción **Aceptar y completar**. Esta acción realiza lo siguiente:',
               },
               {
                 tipo: 'lista',
@@ -684,13 +827,13 @@ export const SECCIONES_DOC: SeccionDoc[] = [
                 tipo: 'imagen',
                 src: '/docs/validacion-taukit-exito.png',
                 alt: 'Confirmación de validación y envío exitoso del informe',
-                caption: '**Figura 13. Confirmación de validación y envío exitoso del informe.**',
+                caption: '**Figura 16. Confirmación de validación y envío exitoso del informe.**',
               },
               { tipo: 'subtitulo', texto: '**8.1.2 Reiniciar muestra**' },
               {
                 tipo: 'parrafo',
                 texto:
-                  'Si los resultados no son correctos o deben repetirse, la bioquímica podrá seleccionar la opción **Reiniciar muestra**.',
+                  'Si los resultados no son correctos o deben repetirse, el usuario con rol bioquímico podrá seleccionar la opción **Reiniciar muestra**.',
               },
               {
                 tipo: 'parrafo',
@@ -709,44 +852,49 @@ export const SECCIONES_DOC: SeccionDoc[] = [
               {
                 tipo: 'parrafo',
                 texto:
-                  'Esta acción se utiliza únicamente en el circuito de Taukit, cuando es necesario repetir la medición. Si la muestra está en **Reinicios 0/2**, el reinicio la deja en **Reinicios 1/2**. Si ya está en **Reinicios 1/2**, confirmar otro reinicio la lleva a **Reinicios 2/2** y el Taukit queda anulado.',
+                  'Esta acción se utiliza únicamente en el circuito de Taukit, cuando es necesario repetir la medición. Si al reiniciar la muestra el contador llega a **Reinicios 2/2**, la muestra no queda anulada automáticamente. En su lugar, pasa a estado **Pendiente de anulación**, para que el rol bioquímico confirme si corresponde anularla e informarla a BACON.',
               },
               {
                 tipo: 'imagen',
                 src: '/docs/validacion-taukit-reinicio.png',
                 alt: 'Confirmación previa al reinicio de una muestra Taukit',
-                caption: '**Figura 14. Confirmación previa al reinicio de una muestra Taukit.**',
+                caption: '**Figura 17. Confirmación previa al reinicio de una muestra Taukit.**',
                 tamano: 'media',
               },
               { tipo: 'subtitulo', texto: '**8.1.3 Validación luego de un reinicio**' },
               {
                 tipo: 'parrafo',
                 texto:
-                  'Si una muestra Taukit ya fue reiniciada previamente o tuvo un error de equipo, la ventana de validación bioquímica mostrará el contador **Reinicios 1/2**.',
+                  'Si una muestra Taukit ya fue reiniciada previamente o tuvo un error de equipo, la ventana de validación mostrará el contador **Reinicios 1/2**.',
               },
               {
                 tipo: 'parrafo',
                 texto:
-                  'En ese contexto, la confirmación de reinicio advierte que, si se confirma la acción, el contador llegará a **2/2** y el Taukit quedará anulado en ese momento.',
+                  'En este contexto, si los resultados son correctos, podrá seleccionarse **Aceptar y completar**.',
               },
               {
                 tipo: 'parrafo',
                 texto:
-                  'Esta instancia permite a la bioquímica revisar nuevamente los resultados antes de decidir la acción a realizar.',
+                  'Si se vuelve a seleccionar **Reiniciar muestra**, el contador llegará a **Reinicios 2/2**. En ese caso, la muestra no quedará anulada automáticamente, sino que pasará a estado **Pendiente de anulación**.',
+              },
+              {
+                tipo: 'parrafo',
+                texto:
+                  'Desde ese estado, el rol bioquímico deberá confirmar si corresponde anular la muestra y enviar el informe a BACON, o marcar el caso como mal anulado para revisión administrativa.',
               },
               {
                 tipo: 'lista',
                 items: [
                   'Si los resultados son correctos, podrá **Aceptar y completar** la muestra.',
-                  'Si vuelve a seleccionar **Reiniciar muestra**, el contador llegará a **Reinicios 2/2** y el Taukit quedará anulado.',
+                  'Si vuelve a seleccionar **Reiniciar muestra**, el contador llegará a **Reinicios 2/2** y la muestra pasará a **Pendiente de anulación**.',
                 ],
               },
               {
                 tipo: 'imagen',
                 src: '/docs/validacion-taukit-reinicio-2.png',
-                alt: 'Validación bioquímica de una muestra Taukit luego de un reinicio',
+                alt: 'Validación de una muestra Taukit luego de un reinicio',
                 caption:
-                  '**Figura 15. Ejemplo de validación bioquímica de una muestra Taukit luego de un reinicio, con el contador Reinicios 1/2 visible.**',
+                  '**Figura 18. Ejemplo de validación de una muestra Taukit luego de un reinicio, con el contador Reinicios 1/2 visible.**',
                 tamano: 'media',
               },
               {
@@ -754,7 +902,7 @@ export const SECCIONES_DOC: SeccionDoc[] = [
                 src: '/docs/validacion-taukit-confirmar-reinicio-2.png',
                 alt: 'Confirmación de reinicio de una muestra Taukit con Reinicios 1/2',
                 caption:
-                  '**Figura 16. Confirmación de reinicio de una muestra Taukit con Reinicios 1/2.** Al seleccionar **Reiniciar muestra**, el sistema advierte que si se confirma la acción el contador llegará a **2/2** y el Taukit quedará anulado.',
+                  '**Figura 19. Confirmación de reinicio de una muestra Taukit con Reinicios 1/2.** Al seleccionar **Reiniciar muestra**, el sistema advierte que si se confirma la acción el contador llegará a **2/2** y la muestra pasará a estado Pendiente de anulación.',
                 tamano: 'media',
               },
               { tipo: 'subtitulo', texto: '**8.1.4 Caso con error**' },
@@ -768,7 +916,7 @@ export const SECCIONES_DOC: SeccionDoc[] = [
                 src: '/docs/validacion-taukit-error.png',
                 alt: 'Muestra Taukit con error detectado y opción de reinicio',
                 caption:
-                  '**Figura 17. Ejemplo de muestra Taukit con error detectado y opción de reinicio.**',
+                  '**Figura 20. Ejemplo de muestra Taukit con error detectado y opción de reinicio.**',
                 tamano: 'media',
               },
             ],
@@ -779,19 +927,19 @@ export const SECCIONES_DOC: SeccionDoc[] = [
               {
                 tipo: 'parrafo',
                 texto:
-                  'En el caso de Lactokit, la validación bioquímica dispone únicamente de la opción **Aceptar y completar**.',
+                  'En el caso de Lactokit, la validación dispone únicamente de la opción **Aceptar y completar**.',
               },
               {
                 tipo: 'imagen',
                 src: '/docs/validacion-lactokit.png',
-                alt: 'Ventana de validación bioquímica de una muestra Lactokit',
-                caption: '**Figura 18. Ventana de validación bioquímica para una muestra Lactokit.**',
+                alt: 'Ventana de validación de una muestra Lactokit',
+                caption: '**Figura 21. Ventana de validación de una muestra Lactokit.**',
               },
               { tipo: 'subtitulo', texto: '**Aceptar y completar**' },
               {
                 tipo: 'parrafo',
                 texto:
-                  'Si la información cargada es correcta, la bioquímica podrá confirmar la muestra mediante la opción **Aceptar y completar**. Esta acción realiza lo siguiente:',
+                  'Si la información cargada es correcta, el usuario con rol bioquímico podrá confirmar la muestra mediante la opción **Aceptar y completar**. Esta acción realiza lo siguiente:',
               },
               {
                 tipo: 'lista',
@@ -823,7 +971,7 @@ export const SECCIONES_DOC: SeccionDoc[] = [
           {
             titulo: '8.3 Consideraciones generales',
             parrafos: [
-              'En todos los casos, la validación bioquímica representa la última instancia de revisión antes de completar la muestra e informar el resultado.',
+              'En todos los casos, la validación del bioquímico representa la última instancia de revisión antes de completar la muestra e informar el resultado.',
               'Se recomienda verificar especialmente:',
             ],
             items: [
@@ -846,15 +994,24 @@ export const SECCIONES_DOC: SeccionDoc[] = [
         id: 'reinicio',
         titulo: '9. Reinicio de muestra Taukit',
         parrafos: [
-          'Si una muestra Taukit presenta un error o sus resultados deben repetirse, puede reiniciarse para permitir una nueva carga de resultados.',
-          'El reinicio elimina los resultados cargados anteriormente y suma un registro en el contador **Reinicios**.',
-          'El mismo contador también suma los errores de equipo detectados automáticamente. Cuando llega a **2/2**, la muestra queda anulada y deberá utilizarse un nuevo Taukit.',
+          'El reinicio de muestra Taukit permite repetir la medición utilizando la segunda oportunidad disponible del kit.',
+          'Al reiniciar una muestra:',
+        ],
+        items: [
+          'Se eliminan los resultados cargados anteriormente.',
+          'La muestra vuelve a estado En proceso.',
+          'Se utiliza una oportunidad de procesamiento.',
+          'El contador de reinicios se actualiza.',
+        ],
+        parrafosPost: [
+          'Si una muestra llega a **Reinicios 2/2**, no se anula automáticamente. Queda en estado **Pendiente de anulación**.',
+          'Desde ese momento, la muestra aparece en el bloque superior **Taukits pendientes de anulación**, donde el rol bioquímico deberá decidir si corresponde confirmar la anulación o marcar el caso como mal anulado.',
         ],
         infos: [
           {
             tipo: 'advertencia',
             texto:
-              'Reiniciar una muestra elimina los resultados cargados anteriormente y suma un registro en **Reinicios**. Si con esa acción llega a **2/2**, el Taukit queda anulado.',
+              'Reiniciar una muestra elimina los resultados cargados anteriormente y suma un registro en **Reinicios**. Si con esa acción llega a **2/2**, la muestra queda Pendiente de anulación hasta que el rol bioquímico confirme cómo continuar.',
           },
         ],
         parrafosFinal: [
@@ -875,15 +1032,15 @@ export const SECCIONES_DOC: SeccionDoc[] = [
           {
             titulo: 'La muestra Taukit llegó a Reinicios 2/2',
             parrafos: [
-              'Una muestra Taukit que llegó a **Reinicios 2/2** no puede volver a validarse ni reiniciarse.',
-              'Para continuar con el procesamiento deberá utilizarse un nuevo Taukit.',
+              'Cuando un Taukit alcanza el límite de reinicios disponibles, no se anula automáticamente.',
+              'Queda en estado **Pendiente de anulación** hasta que el rol bioquímico confirme la anulación o marque el caso como mal anulado.',
             ],
           },
           {
             titulo: 'La muestra ya está completada',
             parrafos: [
               'Una muestra completada no puede volver a recibir una carga de resultados.',
-              'Si es necesario corregir los datos de una muestra ya completada, deberá utilizarse la sección Operación, disponible para usuarios administradores.',
+              'Si es necesario corregir valores de una muestra Taukit completada, deberá notificar a un administrador para que lo resuelva.',
             ],
           },
         ],
@@ -909,7 +1066,22 @@ export const SECCIONES_DOC: SeccionDoc[] = [
       {
         pregunta: '¿Qué sucede cuando reinicio una muestra Taukit?',
         respuesta:
-          'Se eliminan los resultados cargados anteriormente y se suma un registro en **Reinicios**. Si el contador llega a **2/2**, el Taukit queda anulado.',
+          'Se eliminan los resultados cargados anteriormente y se suma un registro en **Reinicios**. Si el contador llega a **2/2**, la muestra queda en estado Pendiente de anulación para revisión del rol bioquímico.',
+      },
+      {
+        pregunta: '¿Qué significa Pendiente de anulación?',
+        respuesta:
+          'Significa que un Taukit llegó al límite de reinicios disponibles, pero todavía no fue anulado ni informado a BACON. Requiere revisión previa del rol bioquímico.',
+      },
+      {
+        pregunta: '¿Cuándo se envía el informe de anulación a BACON?',
+        respuesta:
+          'El informe de anulación se envía únicamente cuando el rol bioquímico selecciona Confirmar anulación y enviar a BACON.',
+      },
+      {
+        pregunta: '¿Qué pasa si un Taukit fue marcado como mal anulado?',
+        respuesta:
+          'El caso queda disponible en Operación > Corrección de estados, donde un administrador puede revisarlo y revertirlo a En proceso.',
       },
       {
         pregunta: '¿Cómo vuelvo a imprimir una etiqueta?',
@@ -1308,7 +1480,7 @@ export const SECCIONES_DOC: SeccionDoc[] = [
           'Se calcula la valoración.',
           'La muestra pasa a estado En validación.',
           'La fila queda disponible para una nueva carga.',
-          'La muestra queda lista para la revisión bioquímica.',
+          'La muestra queda lista para la revisión del bioquímico.',
         ],
         contenido: [
           {
@@ -1316,7 +1488,7 @@ export const SECCIONES_DOC: SeccionDoc[] = [
             src: '/docs/carga-lactokit-confirmar.png',
             alt: 'Confirmación de carga Lactokit',
             caption:
-              '**Figura 6. Confirmación de carga Lactokit.** Una vez completados todos los frascos de la fila, se habilita la acción **Confirmar**. Al confirmar, los resultados quedan registrados definitivamente y la muestra pasa a estado **En validación** para revisión bioquímica.',
+              '**Figura 6. Confirmación de carga Lactokit.** Una vez completados todos los frascos de la fila, se habilita la acción **Confirmar**. Al confirmar, los resultados quedan registrados definitivamente y la muestra pasa a estado **En validación** para revisión del bioquímico.',
           },
         ],
         infos: [
@@ -1400,7 +1572,7 @@ export const SECCIONES_DOC: SeccionDoc[] = [
       {
         pregunta: '¿Qué sucede al confirmar un Lactokit?',
         respuesta:
-          'La muestra pasa a estado En validación y queda disponible para la revisión bioquímica.',
+          'La muestra pasa a estado En validación y queda disponible para la revisión del bioquímico.',
       },
       {
         pregunta: '¿La valoración de Lactokit se carga manualmente?',
@@ -1436,7 +1608,7 @@ export const SECCIONES_DOC: SeccionDoc[] = [
         id: 'taukit-completada',
         titulo: '1.1 Muestra completada exitosamente',
         parrafos: [
-          'Este informe se genera cuando una muestra Taukit fue validada correctamente por la bioquímica.',
+          'Este informe se genera cuando una muestra Taukit fue validada correctamente por el rol bioquímico.',
           'Ocurre cuando la muestra se encuentra en estado En validación y se selecciona la acción **Aceptar y completar**.',
           'Al completar la muestra:',
         ],
@@ -1463,7 +1635,7 @@ export const SECCIONES_DOC: SeccionDoc[] = [
         titulo: '1.2 Muestra anulada',
         parrafos: [
           'Este informe se genera cuando una muestra Taukit no puede continuar procesándose.',
-          'Puede ocurrir cuando la muestra llega a **Reinicios 2/2** y queda en estado Anulado.',
+          'Puede ocurrir cuando la muestra llega a **Reinicios 2/2**, queda en estado **Pendiente de anulación** y el rol bioquímico confirma la anulación.',
           'Al anularse la muestra:',
         ],
         items: [
@@ -1658,9 +1830,10 @@ export const SECCIONES_DOC: SeccionDoc[] = [
   {
     id: 'operacion',
     label: 'Operación',
+    adminOnly: true,
     titulo: 'Operación',
     descripcion:
-      'La sección Operación reúne herramientas administrativas y correctivas sobre muestras ya ingresadas en el sistema. No forma parte del circuito habitual de trabajo (Ingreso por scanner, Carga de resultados y Validación), sino que se utiliza para resolver errores, corregir datos y comunicarse con BACON cuando sea necesario. El acceso está disponible únicamente para usuarios con rol Administrador.',
+      'La sección Operación reúne herramientas administrativas y correctivas sobre muestras ya ingresadas en el sistema. No forma parte del circuito habitual de trabajo —Ingreso por scanner, Carga de resultados y Validación—, sino que se utiliza para resolver errores, corregir datos, revisar estados excepcionales y comunicarse con BACON cuando sea necesario. El acceso está disponible únicamente para usuarios con rol Administrador.',
     parrafosPrevios: [
       'Desde este módulo se pueden realizar acciones sensibles, por lo que todas las operaciones quedan registradas para auditoría.',
     ],
@@ -1671,14 +1844,60 @@ export const SECCIONES_DOC: SeccionDoc[] = [
           'Las acciones realizadas desde Operación pueden modificar información ya registrada en el sistema. Por este motivo, deben utilizarse únicamente en casos correctivos y siempre indicando el motivo correspondiente.',
       },
     ],
-    imagen: '/docs/operacion.png',
-    imagenAlt: 'Pantalla principal de Operación',
-    imagenCaption:
-      '**Figura 1. Pantalla principal de Operación.** Los números identifican las herramientas administrativas disponibles para usuarios con rol Administrador.',
+    sinPlaceholder: true,
     bloques: [
       {
+        id: 'acceso-permisos',
+        titulo: '1. Acceso y permisos',
+        parrafos: [
+          'La sección Operación es exclusiva para usuarios con rol Administrador.',
+          'Los usuarios con otros roles no podrán visualizar ni utilizar estas herramientas.',
+          'También la documentación de esta sección estará disponible únicamente para administradores, ya que contiene información sobre acciones sensibles del sistema.',
+          'Desde este módulo se podrán gestionar dos tipos de acciones:',
+        ],
+        items: [
+          'Corrección de datos del paciente.',
+          'Corrección de estados y resultados de muestras Taukit en casos excepcionales.',
+        ],
+      },
+      {
+        id: 'organizacion',
+        titulo: '2. Organización de la sección',
+        parrafos: [
+          'La sección Operación se divide en dos apartados principales:',
+        ],
+        items: [
+          'Editar paciente.',
+          'Corrección de estados.',
+        ],
+        imagen: '/docs/operacion.png',
+        imagenAlt: 'Organización de la sección Operación',
+        imagenCaption:
+          '**Figura 1. Organización de la sección Operación.** La sección se divide en dos apartados principales: Editar paciente y Corrección de estados. El primero concentra las acciones correctivas sobre datos de pacientes, mientras que el segundo agrupa herramientas para revisar y corregir estados de muestras Taukit.',
+      },
+      {
+        id: 'editar-paciente',
+        titulo: 'Editar paciente',
+        parrafos: [
+          'El apartado Editar paciente reúne las herramientas administrativas ya existentes para realizar correcciones sobre muestras registradas.',
+          'Desde este apartado se puede:',
+        ],
+        items: [
+          'Consultar el historial de protocolos editados.',
+          'Exportar el historial de correcciones.',
+          'Buscar una muestra.',
+          'Eliminar un número de serie.',
+          'Corregir datos del paciente.',
+          'Contactar a BACON.',
+        ],
+        imagen: '/docs/operacion-editar-paciente.png',
+        imagenAlt: 'Apartado Editar paciente',
+        imagenCaption:
+          '**Figura 2. Apartado Editar paciente.** Este apartado reúne las herramientas administrativas para consultar correcciones realizadas, buscar una muestra, eliminar un número de serie, corregir datos del paciente y contactar a BACON cuando corresponda.',
+      },
+      {
         id: 'protocolos-editados',
-        titulo: '1. Protocolos editados',
+        titulo: '3. Protocolos editados',
         parrafos: [
           'El bloque Protocolos editados muestra un resumen de las correcciones realizadas desde esta sección.',
           'Cada corrección queda registrada con información de auditoría, incluyendo:',
@@ -1699,7 +1918,7 @@ export const SECCIONES_DOC: SeccionDoc[] = [
       },
       {
         id: 'exportar-historial',
-        titulo: '2. Exportar historial',
+        titulo: '4. Exportar historial',
         parrafos: [
           'La acción **Exportar Excel** permite descargar el historial completo de ediciones realizadas desde Operación.',
           'El archivo exportado incluye el detalle de las correcciones registradas, permitiendo revisar o compartir la trazabilidad de los cambios realizados.',
@@ -1707,11 +1926,11 @@ export const SECCIONES_DOC: SeccionDoc[] = [
         imagen: '/docs/operacion-exportar.png',
         imagenAlt: 'Exportación del historial de protocolos editados',
         imagenCaption:
-          '**Figura 2. Exportación del historial de protocolos editados.** El archivo descargado permite consultar las correcciones realizadas, junto con el motivo y el usuario responsable.',
+          '**Figura 3. Exportación del historial de protocolos editados.** El archivo descargado permite consultar las correcciones realizadas, junto con el motivo y el usuario responsable.',
       },
       {
         id: 'buscar-muestra',
-        titulo: '3. Buscador de muestra',
+        titulo: '5. Buscador de muestra',
         contenido: [
           { tipo: 'parrafo', texto: 'El buscador permite localizar una muestra utilizando:' },
           { tipo: 'lista', items: ['Número de serie.', 'Protocolo.'] },
@@ -1733,11 +1952,11 @@ export const SECCIONES_DOC: SeccionDoc[] = [
         imagen: '/docs/operacion-buscador.png',
         imagenAlt: 'Buscador de muestra',
         imagenCaption:
-          '**Figura 3. Buscador de muestra.** Permite localizar una muestra por número de serie o protocolo antes de realizar una acción correctiva.',
+          '**Figura 4. Buscador de muestra.** Permite localizar una muestra por número de serie o protocolo antes de realizar una acción correctiva.',
       },
       {
         id: 'eliminar-serie',
-        titulo: '4. Eliminar número de serie',
+        titulo: '6. Eliminar número de serie',
         parrafos: [
           'La acción Eliminar número de serie permite dar de baja una muestra del sistema cuando fue cargada por error o no corresponde al circuito operativo.',
           'Esta acción requiere:',
@@ -1761,11 +1980,11 @@ export const SECCIONES_DOC: SeccionDoc[] = [
         imagen: '/docs/operacion-eliminar.png',
         imagenAlt: 'Eliminación de número de serie',
         imagenCaption:
-          '**Figura 4. Eliminación de número de serie.** La acción requiere motivo obligatorio y confirmación en dos pasos para evitar bajas accidentales.',
+          '**Figura 5. Eliminación de número de serie.** La acción requiere motivo obligatorio y confirmación en dos pasos para evitar bajas accidentales.',
       },
       {
         id: 'corregir-paciente',
-        titulo: '5. Corregir paciente',
+        titulo: '7. Corregir paciente',
         contenido: [
           {
             tipo: 'parrafo',
@@ -1796,11 +2015,11 @@ export const SECCIONES_DOC: SeccionDoc[] = [
         imagen: '/docs/operacion-corregir.png',
         imagenAlt: 'Corrección de datos del paciente',
         imagenCaption:
-          '**Figura 5. Corrección de datos del paciente.** Permite modificar nombre, apellido o DNI de la muestra seleccionada, registrando siempre el motivo y el usuario responsable.',
+          '**Figura 6. Corrección de datos del paciente.** Permite modificar nombre, apellido o DNI de la muestra seleccionada, registrando siempre el motivo y el usuario responsable.',
       },
       {
         id: 'contacto-bacon',
-        titulo: '6. Contacto BACON',
+        titulo: '8. Contacto BACON',
         parrafos: [
           'La herramienta Contacto BACON permite redactar y enviar un correo a BACON desde la plataforma.',
           'El destinatario se encuentra configurado por sistema, por lo que el usuario solo debe completar o revisar el asunto, el mensaje y los adjuntos correspondientes.',
@@ -1817,11 +2036,165 @@ export const SECCIONES_DOC: SeccionDoc[] = [
         imagen: '/docs/operacion-contacto-bacon.png',
         imagenAlt: 'Contacto BACON',
         imagenCaption:
-          '**Figura 6. Contacto BACON.** Permite enviar correos a BACON utilizando plantillas predefinidas, con posibilidad de adjuntar archivos manualmente o incluir el informe corregido.',
+          '**Figura 7. Contacto BACON.** Permite enviar correos a BACON utilizando plantillas predefinidas, con posibilidad de adjuntar archivos manualmente o incluir el informe corregido.',
+      },
+      {
+        id: 'correccion-estados',
+        titulo: 'Corrección de estados',
+        parrafos: [
+          'El apartado Corrección de estados permite revisar y corregir casos excepcionales relacionados con muestras Taukit.',
+          'Debe utilizarse únicamente cuando una muestra requiera una intervención administrativa fuera del flujo normal.',
+          'Este apartado se divide en dos grupos:',
+        ],
+        items: ['Anulados.', 'Completados.'],
+      },
+      {
+        id: 'anulados',
+        titulo: '9. Anulados',
+        parrafos: [
+          'El grupo Anulados muestra los Taukits que fueron marcados como mal anulados desde la sección Muestras.',
+          'Estos casos corresponden a Taukits que habían llegado al límite de reinicios, pero que el rol bioquímico decidió no confirmar como anulación definitiva.',
+          'Mientras el caso se encuentra en esta instancia:',
+        ],
+        items: [
+          'No se envió informe de anulación a BACON.',
+          'No se realizó impacto externo.',
+          'El administrador puede revisar el caso y devolver la muestra al circuito operativo.',
+        ],
+        parrafosPost: [
+          'La tabla muestra número de serie, protocolo, paciente, estado actual, motivo, usuario que marcó el caso, fecha y acción disponible.',
+          'La acción **Revertir a En proceso** permite devolver la muestra al estado En proceso para que pueda recibir una nueva carga de resultados.',
+          'Al seleccionar esta acción, el sistema muestra una confirmación previa. Si el administrador confirma, la muestra pasa nuevamente a estado En proceso, no se envía ningún informe a BACON, queda disponible para una nueva carga de resultados y la acción queda registrada en auditoría.',
+        ],
+        infos: [
+          {
+            tipo: 'importante',
+            texto:
+              'Texto sugerido de confirmación: Esta acción devolverá la muestra al estado En proceso para permitir una nueva carga de resultados. No se enviará ningún informe a BACON.',
+          },
+        ],
+        imagen: '/docs/operacion-correccion-anulados.png',
+        imagenAlt: 'Corrección de estados para Taukits mal anulados',
+        imagenCaption:
+          '**Figura 8. Corrección de estados para Taukits mal anulados.** Muestra los casos marcados por el rol bioquímico como mal anulados y permite revertirlos a estado En proceso.',
+      },
+      {
+        id: 'completados',
+        titulo: '10. Completados',
+        parrafos: [
+          'El grupo Completados permite gestionar casos en los que una muestra Taukit fue completada e informada, pero los valores de medición cargados fueron incorrectos.',
+          'Esta herramienta debe utilizarse únicamente en casos excepcionales, cuando sea necesario corregir valores de una muestra que ya fue completada.',
+        ],
+      },
+      {
+        id: 'buscar-muestra-completada',
+        titulo: '11. Buscar muestra completada',
+        parrafos: [
+          'La acción Buscar muestra completada permite localizar una muestra Taukit ya completada.',
+          'La búsqueda puede realizarse por:',
+        ],
+        items: [
+          'Número de serie.',
+          'Protocolo.',
+          'Nombre y apellido del paciente.',
+        ],
+        parrafosPost: [
+          'Al seleccionar una muestra, el sistema muestra sus valores actuales para iniciar el proceso de corrección.',
+        ],
+        imagen: '/docs/operacion-buscar-completada.png',
+        imagenAlt: 'Buscar muestra completada',
+        imagenCaption:
+          '**Figura 9. Buscar muestra completada.** Permite buscar y seleccionar una muestra Taukit completada para visualizar sus valores actuales y continuar con el proceso de corrección.',
+      },
+      {
+        id: 'correccion-valores',
+        titulo: '12. Corrección de valores de muestra completada',
+        parrafos: [
+          'Luego de seleccionar una muestra completada, se muestra una tabla con los valores actuales de medición.',
+          'La tabla incluye:',
+        ],
+        items: [
+          'Protocolo.',
+          'Número de serie.',
+          'Resultado basal CO2.',
+          'Resultado post CO2.',
+          'Resultado basal Delta.',
+          'Resultado post Delta.',
+          'Resultado Test Value.',
+          'Estado.',
+        ],
+        parrafosPost: [
+          'A la derecha de la tabla se muestran dos acciones: **Cargar TXT** y **Generar informe y subir**.',
+          'La acción Generar informe y subir permanece deshabilitada hasta que se hayan cargado nuevos valores de medición.',
+        ],
+        imagen: '/docs/operacion-correccion-completados.png',
+        imagenAlt: 'Corrección de muestras completadas',
+        imagenCaption:
+          '**Figura 10. Corrección de muestras completadas.** Permite seleccionar una muestra completada, visualizar sus valores actuales y cargar un nuevo TXT para corregir los resultados antes de generar un nuevo informe.',
+      },
+      {
+        id: 'cargar-txt-correccion',
+        titulo: '13. Cargar TXT para corrección de valores',
+        parrafos: [
+          'La acción Cargar TXT permite adjuntar el archivo TXT corregido correspondiente a la muestra seleccionada.',
+          'El usuario no debe completar manualmente los valores en una tabla. En su lugar, carga el archivo TXT y el sistema muestra una previsualización de los datos detectados antes de confirmar.',
+          'El modal debe incluir:',
+        ],
+        items: [
+          'Área para adjuntar archivo TXT.',
+          'Previsualización de las dos mediciones esperadas.',
+          'Identificación automática del protocolo/TestID correspondiente.',
+          'Validación del formato del archivo.',
+          'Mensajes de error si el archivo no corresponde o no puede interpretarse.',
+        ],
+        parrafosPost: [
+          'La previsualización muestra los valores detectados para t/min, 12CO2/%, Delta C/%, TestValue y TestID.',
+          'Al confirmar la carga del TXT corregido, se reemplazan únicamente los valores anteriores de resultados, se conserva la información general de la muestra, se guardan los nuevos valores detectados desde el TXT y la muestra queda lista para generar un nuevo informe.',
+        ],
+        imagen: '/docs/operacion-cargar-txt-correccion.png',
+        imagenAlt: 'Carga de TXT para corrección de valores',
+        imagenCaption:
+          '**Figura 11. Carga de TXT para corrección de valores.** Permite adjuntar el archivo TXT corregido y visualizar una previsualización de los valores antes de confirmar la carga.',
+      },
+      {
+        id: 'generar-informe-subir',
+        titulo: '14. Generar informe y subir',
+        parrafos: [
+          'Una vez cargados los nuevos valores, se habilita la acción **Generar informe y subir**.',
+          'Al confirmar esta acción:',
+        ],
+        items: [
+          'Se genera un nuevo informe con los valores corregidos.',
+          'Se sube el informe a BACON.',
+          'Se verifica el envío.',
+          'Se envía una copia de respaldo por correo electrónico.',
+          'El correo de respaldo utiliza una plantilla específica indicando que se envía nuevamente el informe porque el anterior contenía un error en los valores cargados.',
+          'La acción queda registrada en auditoría.',
+          'La muestra queda en estado Completado.',
+        ],
+        parrafosPost: [
+          'Antes de ejecutar la acción, el sistema muestra una ventana de confirmación.',
+        ],
+        infos: [
+          {
+            tipo: 'importante',
+            texto:
+              'Texto sugerido de confirmación: Se generará el nuevo informe con los valores cargados y se enviará a BACON. Esta acción quedará registrada en auditoría.',
+          },
+          {
+            tipo: 'consejo',
+            texto:
+              'Texto sugerido para el mail de respaldo: Se envía nuevamente el informe correspondiente a la muestra seleccionada, debido a que el informe anterior contenía un error en los valores cargados. Se adjunta el informe corregido para su correspondiente revisión y registro.',
+          },
+        ],
+        imagen: '/docs/operacion-generar-informe-corregido.png',
+        imagenAlt: 'Confirmación para generar informe corregido y subir a BACON',
+        imagenCaption:
+          '**Figura 12. Confirmación para generar informe corregido y subir a BACON.** Confirma la generación del nuevo informe, su envío a BACON y el envío del respaldo por correo electrónico.',
       },
       {
         id: 'auditoria',
-        titulo: '7. Auditoría de acciones',
+        titulo: '15. Auditoría de acciones',
         parrafos: [
           'Todas las acciones realizadas desde la sección Operación quedan registradas para trazabilidad.',
           'Se auditan, entre otras:',
@@ -1834,6 +2207,11 @@ export const SECCIONES_DOC: SeccionDoc[] = [
           'Fecha y hora de la acción.',
           'Campos modificados.',
           'Contactos enviados a BACON.',
+          'Marcado de Taukits como mal anulados.',
+          'Reversión de estado a En proceso.',
+          'Carga de TXT corregido.',
+          'Generación y envío de informe corregido.',
+          'Resultado del envío a BACON, cuando corresponda.',
         ],
         parrafosPost: [
           'La auditoría permite reconstruir qué cambio se realizó, cuándo, por quién y por qué motivo.',
@@ -1846,12 +2224,17 @@ export const SECCIONES_DOC: SeccionDoc[] = [
           {
             tipo: 'consejo',
             texto:
-              'Antes de realizar una corrección o baja, buscá la muestra y verificá cuidadosamente el protocolo, número de serie, tipo de estudio y estado.',
+              'Antes de realizar una corrección, baja o reversión de estado, buscá la muestra y verificá cuidadosamente el protocolo, número de serie, tipo de estudio y estado.',
           },
           {
             tipo: 'importante',
             texto:
               'Toda modificación realizada desde Operación debe tener un motivo claro, ya que quedará registrada en la auditoría.',
+          },
+          {
+            tipo: 'advertencia',
+            texto:
+              'No utilices la sección Operación para tareas del flujo normal. El ingreso, la carga de resultados y la validación deben realizarse desde sus secciones correspondientes.',
           },
         ],
       },
@@ -1865,32 +2248,42 @@ export const SECCIONES_DOC: SeccionDoc[] = [
       {
         pregunta: '¿Qué pasa si no tengo permisos?',
         respuesta:
-          'No podrás ver la sección Operación en el menú principal. Si necesitás acceso, consultá con un administrador.',
+          'El sistema no muestra la sección o informa que el usuario no tiene permisos para acceder.',
       },
       {
-        pregunta: '¿Para qué sirve el buscador de muestra?',
+        pregunta: '¿Para qué sirve Editar paciente?',
         respuesta:
-          'Sirve para seleccionar la muestra sobre la que se aplicarán las acciones correctivas, como eliminar un número de serie, corregir datos del paciente o contactar a BACON.',
+          'Sirve para corregir datos asociados a una muestra, como nombre, apellido o DNI, registrando siempre el motivo de la corrección.',
       },
       {
-        pregunta: '¿Puedo corregir una muestra sin motivo?',
+        pregunta: '¿Para qué sirve Corrección de estados?',
         respuesta:
-          'No. Toda corrección requiere indicar un motivo para que la acción quede correctamente auditada.',
+          'Sirve para resolver casos excepcionales de Taukits mal anulados o muestras completadas con valores incorrectos.',
       },
       {
-        pregunta: '¿Cuándo debo usar Contacto BACON?',
+        pregunta: '¿Qué significa revertir una muestra a En proceso?',
         respuesta:
-          'Se utiliza cuando es necesario informar a BACON una corrección realizada sobre una muestra, especialmente si se modificaron datos del paciente o si ya existía un informe enviado.',
+          'Significa que la muestra vuelve al estado En proceso para permitir una nueva carga de resultados. Esta acción no envía información a BACON.',
       },
       {
-        pregunta: '¿El destinatario del mail puede modificarse?',
+        pregunta: '¿Cuándo debo usar la corrección de muestras completadas?',
         respuesta:
-          'No. El destinatario se encuentra configurado por sistema para evitar errores de envío.',
+          'Solo cuando una muestra Taukit ya fue completada e informada, pero se detectó que los valores cargados eran incorrectos.',
+      },
+      {
+        pregunta: '¿Qué hace el botón Cargar TXT?',
+        respuesta:
+          'Permite adjuntar un archivo TXT corregido y visualizar una previsualización de los valores antes de confirmar la carga.',
+      },
+      {
+        pregunta: '¿Qué hace Generar informe y subir?',
+        respuesta:
+          'Genera un nuevo informe con los valores corregidos, lo sube a BACON, envía una copia de respaldo por mail y deja la acción registrada en auditoría.',
       },
       {
         pregunta: '¿Las acciones quedan registradas?',
         respuesta:
-          'Sí. Las correcciones, bajas y contactos enviados quedan registrados para auditoría.',
+          'Sí. Todas las correcciones, bajas, reversión de estados, cargas de TXT y envíos quedan registrados para auditoría.',
       },
     ],
   },

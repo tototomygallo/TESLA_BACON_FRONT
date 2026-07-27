@@ -6,6 +6,7 @@ import {
   type PasoFlujo,
   type SeccionDoc,
 } from '../data/asistenciaDocs';
+import type { Usuario } from '../types';
 
 // ============================================
 // Asistencia y documentación (base de conocimiento integrada)
@@ -20,12 +21,12 @@ interface ResultadoBusqueda {
   titulo: string;
 }
 
-function buscar(q: string): ResultadoBusqueda[] {
+function buscar(q: string, secciones: SeccionDoc[]): ResultadoBusqueda[] {
   const query = q.trim().toLowerCase();
   if (query.length < 2) return [];
   const resultados: ResultadoBusqueda[] = [];
 
-  for (const seccion of SECCIONES_DOC) {
+  for (const seccion of secciones) {
     for (const bloque of seccion.bloques) {
       const texto = [
         bloque.titulo,
@@ -58,14 +59,30 @@ function buscar(q: string): ResultadoBusqueda[] {
   return resultados.slice(0, 12);
 }
 
-export function AsistenciaPage() {
+export function AsistenciaPage({ usuario }: { usuario: Usuario }) {
+  const seccionesVisibles = useMemo(
+    () =>
+      SECCIONES_DOC.filter(
+        (seccion) => !seccion.adminOnly || usuario.rol === 'admin',
+      ),
+    [usuario.rol],
+  );
   const [seccionId, setSeccionId] = useState(SECCIONES_DOC[0].id);
   const [query, setQuery] = useState('');
   const [anclaPendiente, setAnclaPendiente] = useState<string | null>(null);
 
   const seccion =
-    SECCIONES_DOC.find((s) => s.id === seccionId) ?? SECCIONES_DOC[0];
-  const resultados = useMemo(() => buscar(query), [query]);
+    seccionesVisibles.find((s) => s.id === seccionId) ?? seccionesVisibles[0];
+  const resultados = useMemo(
+    () => buscar(query, seccionesVisibles),
+    [query, seccionesVisibles],
+  );
+
+  useEffect(() => {
+    if (!seccionesVisibles.some((s) => s.id === seccionId)) {
+      setSeccionId(seccionesVisibles[0].id);
+    }
+  }, [seccionId, seccionesVisibles]);
 
   // Al cambiar de sección, subimos al inicio (o al ancla pendiente si venís
   // de un resultado de búsqueda).
@@ -167,7 +184,7 @@ export function AsistenciaPage() {
           onChange={(e) => irASeccion(e.target.value)}
           className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
         >
-          {SECCIONES_DOC.map((s) => (
+          {seccionesVisibles.map((s) => (
             <option key={s.id} value={s.id}>
               {s.label}
             </option>
@@ -182,7 +199,9 @@ export function AsistenciaPage() {
             Asistencia y documentación
           </div>
           <nav className="space-y-0.5">
-            {SECCIONES_DOC.map((s) => {
+            {seccionesVisibles
+              .filter((s) => !s.adminOnly)
+              .map((s) => {
               const activo = s.id === seccionId;
               return (
                 <button
@@ -198,6 +217,32 @@ export function AsistenciaPage() {
                 </button>
               );
             })}
+            {usuario.rol === 'admin' &&
+              seccionesVisibles.some((s) => s.adminOnly) && (
+                <>
+                  <div className="px-3 pt-4 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    Solo administradores
+                  </div>
+                  {seccionesVisibles
+                    .filter((s) => s.adminOnly)
+                    .map((s) => {
+                      const activo = s.id === seccionId;
+                      return (
+                        <button
+                          key={s.id}
+                          onClick={() => irASeccion(s.id)}
+                          className={`w-full text-left rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                            activo
+                              ? 'bg-blue-50 text-blue-800'
+                              : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                          }`}
+                        >
+                          {s.label}
+                        </button>
+                      );
+                    })}
+                </>
+              )}
           </nav>
         </aside>
 
