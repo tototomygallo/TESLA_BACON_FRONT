@@ -223,9 +223,9 @@ export interface ResultadoCargaTxt {
   yaCompletados: string[];
   // Protocolos que ya estaban anulados (no se les cargan resultados).
   yaAnuladas: string[];
-  // Protocolos que tienen datos pero NO fueron reiniciados: la muestra está
-  // con error y para volver a cargarla hay que apretar "Reiniciar muestra"
-  // primero. No se pisan los resultados existentes.
+  // Protocolos que tienen datos que no pueden reemplazarse directamente.
+  // Los errores del equipo con intentos disponibles no entran en esta lista:
+  // el siguiente TXT puede reemplazar esa medición sin reinicio manual.
   requierenReinicio?: string[];
   // Controles descartados del TXT.
   controles: number;

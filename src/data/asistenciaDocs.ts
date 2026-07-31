@@ -520,7 +520,7 @@ export const SECCIONES_DOC: SeccionDoc[] = [
                 tipo: 'imagen',
                 src: '/docs/muestras-con-error-en-proceso.png',
                 alt: 'Muestra En proceso — Con error con la acción **Ver error**',
-                caption: '**Figura 6. Muestra en estado En proceso con la condición Con error.** \n El sistema detectó un inconveniente durante la medición. Los usuarios con rol Bioquímico o Administrador pueden utilizar la acción **Ver error** para consultar el detalle y reiniciar la muestra.',
+                caption: '**Figura 6. Muestra en estado En proceso con la condición Con error.** \n El sistema detectó un inconveniente durante la medición. Los usuarios con rol Bioquímico o Administrador pueden utilizar la acción **Ver error** para consultar el detalle. El próximo TXT puede cargarse directamente, sin reiniciar la muestra.',
               },
               {
                 tipo: 'parrafo',
@@ -533,7 +533,7 @@ export const SECCIONES_DOC: SeccionDoc[] = [
                   'Los valores registrados en la medición.',
                   'El motivo del error detectado.',
                   'La cantidad de reinicios o errores registrados.',
-                  'La acción **Reiniciar muestra**.',
+                  'La indicación de que el próximo TXT puede cargarse directamente, sin reiniciar la muestra.',
                 ],
               },
               {
@@ -544,10 +544,10 @@ export const SECCIONES_DOC: SeccionDoc[] = [
               {
                 tipo: 'imagen',
                 src: '/docs/muestras-con-error-ver-error.png',
-                alt: 'Ventana **Ver error** con la acción **Reiniciar muestra**',
+                alt: 'Ventana **Ver error** con el detalle del error del equipo',
                 tamano: 'media',
                 caption:
-                  '**Figura 7. Detalle de una muestra En proceso — Con error.** \n La ventana muestra los resultados registrados, el motivo del error y la cantidad de reinicios o errores registrados. La acción **Reiniciar muestra** está disponible únicamente para usuarios con rol Bioquímico o Administrador.',
+                  '**Figura 7. Detalle de una muestra En proceso — Con error.** \n La ventana muestra los resultados registrados, el motivo del error y la cantidad de reinicios o errores registrados. Ante un error del equipo con intentos disponibles, el próximo TXT puede cargarse directamente y no se muestra **Reiniciar muestra** como acción.',
               },
               { tipo: 'subtitulo', texto: 'Pendiente de anulación' },
               {

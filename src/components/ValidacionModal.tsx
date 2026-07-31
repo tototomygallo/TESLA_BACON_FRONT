@@ -396,7 +396,8 @@ export function ValidacionModal({
               </div>
               <div className="text-xs text-amber-600 pt-1 border-t border-amber-200">
                 Reinicios: <span className="font-semibold">{muestra.intentosFallidos}/2</span>.
-                Esta medición quedó registrada con error del equipo.
+                Esta medición quedó registrada con error del equipo. Podés
+                cargar el próximo TXT directamente, sin reiniciar la muestra.
               </div>
             </div>
           )}
@@ -460,6 +461,7 @@ export function ValidacionModal({
           <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-between gap-2">
             <div>
               {muestra.resultados &&
+                !muestra.tieneError &&
                 muestra.estado !== 'anulado' &&
                 muestra.estado !== 'completado' && (
                 <button

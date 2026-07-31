@@ -463,10 +463,10 @@ function ResultadoCarga({
         <DetalleProtocolos titulo="Cargados correctamente" protocolos={resultado.cargadosOk} color="emerald" />
       )}
       {resultado.cargadosReintentando.length > 0 && (
-        <DetalleProtocolos titulo="Reintentados (recargados tras reinicio)" protocolos={resultado.cargadosReintentando} color="violet" />
+        <DetalleProtocolos titulo="Reintentados" protocolos={resultado.cargadosReintentando} color="violet" />
       )}
       {resultado.conErrorEquipo.length > 0 && (
-        <DetalleProtocolos titulo="Con error del equipo — revisar reinicio" protocolos={resultado.conErrorEquipo} color="red" />
+        <DetalleProtocolos titulo="Con error del equipo — el próximo TXT puede cargarse directamente" protocolos={resultado.conErrorEquipo} color="red" />
       )}
       {pendientesAnulacion.length > 0 && (
         <DetalleProtocolos titulo="Pendientes de anulación - confirmar en Muestras" protocolos={pendientesAnulacion} color="red" />

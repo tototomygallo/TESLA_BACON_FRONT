@@ -271,9 +271,10 @@ export const mockApi: ApiClient = {
   // - Si está 'completado': ignorar (no se pisa).
   // - Si NO tiene resultados aún ('recibido' o recién reiniciada):
   //     cargar resultados y pasar a 'en_validacion'.
-  // - Si YA tiene resultados ('en_validacion' o con error): NO se pisa;
-  //   se reporta en requierenReinicio. Para volver a cargarla hay que
-  //   apretar "Reiniciar muestra" primero (eso limpia los resultados).
+  // - Si YA tiene resultados en validación: NO se pisa y se reporta en
+  //   requierenReinicio.
+  // - Si tiene un error del equipo 1/2, el siguiente TXT se carga directamente
+  //   y reemplaza la medición fallida, sin reinicio manual.
   // - Si el TXT trae error del equipo (postDelta = -10000):
   //     incrementar intentosFallidos, marcar tieneError, no cambiar estado.
   // - TestIDs sin match: reportar como noEncontrados.
@@ -327,11 +328,14 @@ export const mockApi: ApiClient = {
         yaAnuladas.push(muestra.protocolo);
         continue;
       }
-      // Una muestra que YA tiene resultados cargados no se puede recargar por
-      // TXT: hay que apretar "Reiniciar muestra" primero (el reinicio limpia
-      // los resultados). Cubre tanto 'en_validacion' como 'con error'. Así se
-      // garantiza una sola carga por reinicio y no se pisan datos existentes.
-      if (muestra.resultados) {
+      // Una medición con error del equipo y un intento disponible se reemplaza
+      // con el siguiente TXT. El resto de los resultados cargados requiere un
+      // reinicio manual antes de poder pisarse.
+      const puedeReintentarErrorDirectamente =
+        muestra.tieneError &&
+        muestra.intentosFallidos < 2 &&
+        muestra.estado !== 'pendiente_anulacion';
+      if (muestra.resultados && !puedeReintentarErrorDirectamente) {
         requierenReinicio.push(muestra.protocolo);
         continue;
       }
